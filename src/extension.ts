@@ -74,11 +74,18 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
     console.log("👹 read result:", readStr)
     // const module = await import(uri.path);
     // console.log('👹 module import result:', module, {...module});
-    const dataUri = esm(readStr)
-    console.log("👹 data uri for import:", dataUri)
-    import(dataUri).then((namespaceObject) => {
-      console.log("namespaceObject", namespaceObject)
-    })
+		const tk = await import (uri.path)
+    console.log("👹 loaded:", tk)
+		if (tk.try) {
+			console.log("👹 trying..:", tk.try)
+			const res = await tk.try()
+
+		}
+    // const dataUri = esm(readStr)
+    // console.log("👹 data uri for import:", dataUri)
+    // import(dataUri).then((namespaceObject) => {
+    //   console.log("namespaceObject", namespaceObject)
+    // })
     // const Fn = Function(readStr)
 
     // const fnRes = Fn()
