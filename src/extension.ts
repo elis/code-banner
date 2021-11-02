@@ -74,23 +74,19 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
     console.log("👹 read result:", readStr)
     // const module = await import(uri.path);
     // console.log('👹 module import result:', module, {...module});
-		const tk = await import (uri.path)
+		const name = Math.floor(Math.random() * 1000000000).toString(32)
+
+		const nuri = vscode.Uri.parse(uri.path + name);
+
+		await vscode.workspace.fs.writeFile(nuri, readData)
+		const tk = await import (nuri.path)
     console.log("👹 loaded:", tk)
 		if (tk.try) {
 			console.log("👹 trying..:", tk.try)
 			const res = await tk.try()
 
 		}
-    // const dataUri = esm(readStr)
-    // console.log("👹 data uri for import:", dataUri)
-    // import(dataUri).then((namespaceObject) => {
-    //   console.log("namespaceObject", namespaceObject)
-    // })
-    // const Fn = Function(readStr)
-
-    // const fnRes = Fn()
-
-    // console.log('FNN RES:', fnRes)
+		await vscode.workspace.fs.delete(nuri)
   }
   public async fileChanged2(uri: vscode.Uri) {
     console.log("👌🚨 IS PB CHANGED!", uri)
