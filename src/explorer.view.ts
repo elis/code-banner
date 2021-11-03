@@ -87,6 +87,10 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  public addRow() {
+    // add ew row
+  }
+
   public addColor() {
     if (this._view) {
       this._view.show?.(true) // `show` is not implemented in 1.49 but is for 1.50 insiders
