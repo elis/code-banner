@@ -1,23 +1,9 @@
-import * as vscode from "vscode"
+import * as vscode from 'vscode'
 
-import { posix } from "path"
-import * as YAML from "yaml"
-
-function btoa(str: string | Buffer) {
-  let buffer
-
-  if (str instanceof Buffer) {
-    buffer = str
-  } else {
-    buffer = Buffer.from(str.toString(), "binary")
-  }
-
-  return buffer.toString("base64")
-}
+import { posix } from 'path'
+import * as YAML from 'yaml'
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("dafuq btoa?", btoa)
-
   const provider = new ColorsViewProvider(context.extensionUri)
 
   context.subscriptions.push(
@@ -27,10 +13,10 @@ export function activate(context: vscode.ExtensionContext) {
     )
   )
 
-  const watcher = vscode.workspace.createFileSystemWatcher("**/.pb")
-  const watcher2 = vscode.workspace.createFileSystemWatcher("**/.codebanner")
+  const watcher = vscode.workspace.createFileSystemWatcher('**/.pb')
+  const watcher2 = vscode.workspace.createFileSystemWatcher('**/.codebanner')
 
-  const uriPb = context.asAbsolutePath(".pb")
+  const uriPb = context.asAbsolutePath('.pb')
   context.subscriptions.push(watcher.onDidChange(provider.fileChanged))
   context.subscriptions.push(watcher2.onDidChange(provider.fileChanged2))
   // vscode.workspace.onDidChangeTextDocument((e) => {
@@ -39,13 +25,13 @@ export function activate(context: vscode.ExtensionContext) {
   // }));
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("calicoColors.addColor", () => {
+    vscode.commands.registerCommand('calicoColors.addColor', () => {
       provider.addColor()
     })
   )
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("calicoColors.clearColors", () => {
+    vscode.commands.registerCommand('calicoColors.clearColors', () => {
       provider.clearColors()
     })
   )
@@ -55,49 +41,48 @@ function esm(code: string) {
   // return 'data:text/javascript;base64,' + btoa(code);
 
   const dataUri =
-    "data:text/javascript;charset=utf-8," + encodeURIComponent(code)
+    'data:text/javascript;charset=utf-8,' + encodeURIComponent(code)
   return dataUri
 }
 
 class ColorsViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = "calicoColors.colorsView";
+  public static readonly viewType = 'calicoColors.colorsView'
 
-  private _view?: vscode.WebviewView;
+  private _view?: vscode.WebviewView
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
   public async fileChanged(uri: vscode.Uri) {
-    console.log("👌🚨 IS PB CHANGED!", uri)
+    console.log('👌🚨 IS PB CHANGED!', uri)
 
     const readData = await vscode.workspace.fs.readFile(uri)
-    const readStr = Buffer.from(readData).toString("utf8")
-    console.log("👹 read result:", readStr)
+    const readStr = Buffer.from(readData).toString('utf8')
+    console.log('👹 read result:', readStr)
     // const module = await import(uri.path);
     // console.log('👹 module import result:', module, {...module});
-		const name = Math.floor(Math.random() * 1000000000).toString(32)
+    const name = Math.floor(Math.random() * 1000000000).toString(32)
 
-		const nuri = vscode.Uri.parse(uri.path + name);
+    const nuri = vscode.Uri.parse(uri.path + name)
 
-		await vscode.workspace.fs.writeFile(nuri, readData)
-		const tk = await import (nuri.path)
-    console.log("👹 loaded:", tk)
-		if (tk.try) {
-			console.log("👹 trying..:", tk.try)
-			const res = await tk.try()
-
-		}
-		await vscode.workspace.fs.delete(nuri)
+    await vscode.workspace.fs.writeFile(nuri, readData)
+    const tk = await import(nuri.path)
+    console.log('👹 loaded:', tk)
+    if (tk.try) {
+      console.log('👹 trying..:', tk.try)
+      const res = await tk.try()
+    }
+    await vscode.workspace.fs.delete(nuri)
   }
   public async fileChanged2(uri: vscode.Uri) {
-    console.log("👌🚨 IS PB CHANGED!", uri)
+    console.log('👌🚨 IS PB CHANGED!', uri)
 
     const readData = await vscode.workspace.fs.readFile(uri)
-    const readStr = Buffer.from(readData).toString("utf8")
-    console.log("👹 read result:", readStr)
+    const readStr = Buffer.from(readData).toString('utf8')
+    console.log('👹 read result:', readStr)
     // const module = await import(uri.path);
     // console.log('👹 module import result:', module, {...module});
     const parsed = YAML.parse(readStr)
-    console.log("👹 parsed:", parsed)
+    console.log('👹 parsed:', parsed)
     // const dataUri = esm(readStr)
     // console.log('👹 data uri for import:', dataUri)
     // import(dataUri)
@@ -112,10 +97,10 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
   }
 
   public contentChanged(e: vscode.TextDocumentChangeEvent) {
-    console.log("CONTENTE CHANGED!", e)
+    console.log('CONTENTE CHANGED!', e)
     if (e.document.fileName.match(/\/\.pb$/)) {
-      console.log("👌 IS PB FILE!", e.document.fileName)
-      console.log("👌 TEXT DOCUMENTS!", vscode.workspace.textDocuments)
+      console.log('👌 IS PB FILE!', e.document.fileName)
+      console.log('👌 TEXT DOCUMENTS!', vscode.workspace.textDocuments)
     }
   }
 
@@ -135,16 +120,16 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
-    webviewView.webview.postMessage({ type: "goat", goat: "behehhheee" })
+    webviewView.webview.postMessage({ type: 'goat', goat: 'behehhheee' })
     webviewView.webview.onDidReceiveMessage((data) => {
       switch (data.type) {
-        case "colorSelected": {
+        case 'colorSelected': {
           vscode.window.activeTextEditor?.insertSnippet(
             new vscode.SnippetString(`#${data.value}`)
           )
           break
         }
-        case "thangDone": {
+        case 'thangDone': {
           this.thangDoer(context)
           break
         }
@@ -155,23 +140,23 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
   public async thangDoer(context: vscode.WebviewViewResolveContext) {
     const tsUri = vscode.window.activeTextEditor?.document.uri
     if (!tsUri) return
-    const jsPath = posix.join(tsUri.path, "..", posix.basename(tsUri.path))
+    const jsPath = posix.join(tsUri.path, '..', posix.basename(tsUri.path))
     const jsUri = tsUri.with({ path: jsPath })
 
-    console.log("PATH:", { jsUri, jsPath, tsUriPath: tsUri.path })
-    console.log("👹 vscode:", vscode.workspace.workspaceFolders)
-    console.log("👹 context:", context)
+    console.log('PATH:', { jsUri, jsPath, tsUriPath: tsUri.path })
+    console.log('👹 vscode:', vscode.workspace.workspaceFolders)
+    console.log('👹 context:', context)
 
     try {
       const readData = await vscode.workspace.fs.readFile(jsUri)
-      const readStr = Buffer.from(readData).toString("utf8")
-      console.log("👹 read result:", readStr)
+      const readStr = Buffer.from(readData).toString('utf8')
+      console.log('👹 read result:', readStr)
 
       const statResult = await vscode.workspace.fs.stat(jsUri)
-      console.log("👹 stat result:", statResult)
+      console.log('👹 stat result:', statResult)
       // vscode.window.showTextDocument(jsUri, { viewColumn: vscode.ViewColumn.Beside });
     } catch (error) {
-      console.log("👹 error:", error)
+      console.log('👹 error:', error)
 
       vscode.window.showInformationMessage(
         `${jsUri.toString(true)} file does *not* exist`
@@ -182,25 +167,25 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
   public addColor() {
     if (this._view) {
       this._view.show?.(true) // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({ type: "addColor" })
+      this._view.webview.postMessage({ type: 'addColor' })
     }
   }
 
   public clearColors() {
     if (this._view) {
-      this._view.webview.postMessage({ type: "clearColors" })
+      this._view.webview.postMessage({ type: 'clearColors' })
     }
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "main.js")
+      vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js')
     )
 
     // Do the same for the stylesheet.
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
+      vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css')
     )
 
     // Use a nonce to only allow a specific script to be run.
@@ -237,9 +222,9 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
 }
 
 function getNonce() {
-  let text = ""
+  let text = ''
   const possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }

@@ -136,6 +136,7 @@ declare module 'vscode' {
 		resolveWebviewView(webviewView: WebviewView, context: WebviewViewResolveContext, token: CancellationToken): Thenable<void> | void;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-namespace
 	namespace window {
 		/**
 		 * Register a new provider for webview views.
