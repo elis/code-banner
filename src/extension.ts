@@ -4,9 +4,11 @@ import { posix } from 'path'
 import * as YAML from 'yaml'
 import * as executables from './executables'
 import { getNonce } from './utils'
+import ExplorerViewProvider from './explorer.view'
 
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ColorsViewProvider(context.extensionUri)
+  const explorerPanelProvider = new ExplorerViewProvider(context)
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(

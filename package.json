@@ -27,6 +27,11 @@
 					"type": "webview",
 					"id": "calicoColors.colorsView",
 					"name": "Calico Colors"
+				},
+				{
+					"type": "webview",
+					"id": "codeBanner.explorerPanel",
+					"name": "Code Banner"
 				}
 			]
 		},
