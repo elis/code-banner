@@ -2,6 +2,8 @@ import * as vscode from 'vscode'
 
 import { posix } from 'path'
 import * as YAML from 'yaml'
+import * as executables from './executables'
+import { getNonce } from './utils'
 
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ColorsViewProvider(context.extensionUri)
@@ -13,11 +15,12 @@ export function activate(context: vscode.ExtensionContext) {
     )
   )
 
-  const watcher = vscode.workspace.createFileSystemWatcher('**/.pb')
+  const executablesWatcher = executables.init(context)
+  console.log('👑 Executable watcher initialized', executablesWatcher)
+
   const watcher2 = vscode.workspace.createFileSystemWatcher('**/.codebanner')
 
-  const uriPb = context.asAbsolutePath('.pb')
-  context.subscriptions.push(watcher.onDidChange(provider.fileChanged))
+  // const uriPb = context.asAbsolutePath('.pb')
   context.subscriptions.push(watcher2.onDidChange(provider.fileChanged2))
   // vscode.workspace.onDidChangeTextDocument((e) => {
   // 	console.log('somethinng changed', e);
@@ -219,14 +222,4 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
 			</body>
 			</html>`
   }
-}
-
-function getNonce() {
-  let text = ''
-  const possible =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  for (let i = 0; i < 32; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length))
-  }
-  return text
 }
