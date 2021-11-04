@@ -61,11 +61,10 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile:server": "tsc -p ./",
-    "xcompile:client": "esbuild src/client/* --bundle --outdir=out/client/",
     "compile:client": "node build.js",
     "compile": "concurrently -n \"npm:compile:server\" \"npm:compile:client\"",
     "lint": "eslint . --ext .ts,.tsx",
-    "watch": "tsc -w -p ./",
+    "watch": "npm run compile:client && tsc -w -p ./",
     "watch:both": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
     "watch:server": "tsc -w -p ./",
     "watch:client": "node build.js --watch",
