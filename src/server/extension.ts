@@ -17,12 +17,17 @@ export function activate(context: vscode.ExtensionContext) {
     )
   )
 
-  const executablesWatcher = executables.init(context, {
-		explorerPanel: explorerPanelProvider
-	}).then((result) => {
-		console.log('👑 init result', { result })
-	})
-  console.log('👑 Executable watcher initialized', executablesWatcher)
+  executables.init(context, {
+    explorerPanel: explorerPanelProvider,
+    onReady: (files) => {
+      console.log('👑 Executables loaded', { files })
+      explorerPanelProvider.updateFiles(files)
+    },
+    onUpdate: (file) => {
+      console.log('👑 Executable updated', { file })
+      explorerPanelProvider.updateFile(file)
+    }
+  })
 
   const watcher2 = vscode.workspace.createFileSystemWatcher('**/.codebanner')
 

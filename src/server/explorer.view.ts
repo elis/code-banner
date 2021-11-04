@@ -3,7 +3,7 @@ import * as vscode from 'vscode'
 import { posix } from 'path'
 import * as YAML from 'yaml'
 import { getNonce } from './utils'
-import { Config } from './executables'
+import { Config, ParsedFile } from './executables'
 
 export type TestingResult = {
   output: string
@@ -32,6 +32,17 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
         this
       )
     )
+  }
+
+  public async updateFiles(files: ParsedFile[]) {
+    console.log('👌🚨 Files updated!', files, {view: this._view})
+    if (this._view)
+      this._view.webview.postMessage({ type: 'files-updated', files })
+  }
+  public async updateFile(file: ParsedFile) {
+    console.log('👌🚨 File updated!', file, {view: this._view})
+    if (this._view)
+      this._view.webview.postMessage({ type: 'file-updated', file })
   }
 
   public resolveWebviewView(

@@ -3,6 +3,11 @@
 module.exports = {
 	root: true,
 	parser: '@typescript-eslint/parser',
+	globals: {
+		acquireVsCodeApi: true,
+		console: true,
+		document: true
+	},
 	plugins: [
 		'@typescript-eslint',
 	],

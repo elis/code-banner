@@ -1,0 +1,7 @@
+{
+  "globals": {
+    "window": true,
+    "console": true,
+    "document": true
+  }
+}
