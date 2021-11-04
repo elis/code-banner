@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 import { posix } from 'path'
 import * as YAML from 'yaml'
 import { getNonce } from './utils'
+import { Config } from './executables'
 
 class ExplorerViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'codeBanner.explorerPanel'
@@ -45,6 +46,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.postMessage({ type: 'goat', goat: 'behehhheee' })
     webviewView.webview.onDidReceiveMessage((data) => {
+      console.log('🦮 Message from webview:', data)
       switch (data.type) {
         case 'colorSelected': {
           vscode.window.activeTextEditor?.insertSnippet(
@@ -87,8 +89,16 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public addRow() {
+  public async addRow(conf: Config) {
     // add ew row
+    if (!this._view) {
+      console.log('🕓 View not ready...', { conf })
+
+    } else {
+      console.log('🕓 Adding row...', { conf })
+      const result = await this._view.webview.postMessage({ type: 'addRow' })
+      console.log('🕓 Add row result:', { result })
+    }
   }
 
   public addColor() {
@@ -107,7 +117,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
   private _getHtmlForWebview(webview: vscode.Webview) {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js')
+      vscode.Uri.joinPath(this._extensionUri, 'media', 'code-banner.js')
     )
 
     // Do the same for the stylesheet.

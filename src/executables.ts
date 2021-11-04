@@ -21,7 +21,7 @@ export const init = async (context: vscode.ExtensionContext, api: Basics) => {
 
     sorted.forEach(({ relative, conf, level}) => {
       console.log('🪳🪳🪳🪳 Adding row:', { relative, conf, level })
-      api.explorerPanel.addRow()
+      api.explorerPanel.addRow(conf)
     })
     console.log('🪳🪳🪳🪳 sorted:', { sorted })
   }

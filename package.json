@@ -66,6 +66,7 @@
 	},
 	"dependencies": {
 		"btoa": "^1.2.1",
+		"comlink": "^4.3.1",
 		"yaml": "^1.10.2"
 	},
 	"devDependencies": {
