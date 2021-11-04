@@ -1,89 +1,98 @@
 {
-	"name": "code-banner",
-	"description": "Upgrade your project in VSCode and make it pop!",
-	"version": "0.0.1",
-	"publisher": "Eli Sklar",
-	"enableProposedApi": true,
-	"engines": {
-		"vscode": "^1.57.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onView:calicoColors.colorsView",
-		"onCommand:calicoColors.addColor",
-		"onCommand:calicoColors.clearColors"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/microsoft/vscode-extension-samples.git"
-	},
-	"main": "./out/server/extension.js",
-	"contributes": {
-		"views": {
-			"explorer": [
-				{
-					"type": "webview",
-					"id": "calicoColors.colorsView",
-					"name": "Calico Colors"
-				},
-				{
-					"type": "webview",
-					"id": "codeBanner.explorerPanel",
-					"name": "Code Banner"
-				}
-			]
-		},
-		"commands": [
-			{
-				"command": "calicoColors.addColor",
-				"category": "Calico Colors",
-				"title": "Add Color"
-			},
-			{
-				"command": "calicoColors.clearColors",
-				"category": "Calico Colors",
-				"title": "Clear Colors",
-				"icon": "$(clear-all)"
-			}
-		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "calicoColors.clearColors",
-					"group": "navigation",
-					"when": "view == calicoColors.colorsView"
-				}
-			]
-		}
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile:server": "tsc -p ./",
-		"compile:client": "esbuild src/client/* --bundle --outdir=out/client/",
-		"compile": "concurrently -n \"npm:compile:server\" \"npm:compile:client\"",
-		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
-		"watch:server": "tsc -w -p ./",
-		"watch:client": "npm run compile:client -- --watch"
-	},
-	"dependencies": {
-		"btoa": "^1.2.1",
-		"comlink": "^4.3.1",
-		"yaml": "^1.10.2"
-	},
-	"devDependencies": {
-		"@types/node": "^16.11.6",
-		"@types/vscode": "^1.32.0",
-		"@typescript-eslint/eslint-plugin": "^4.16.0",
-		"@typescript-eslint/parser": "^4.16.0",
-		"concurrently": "^6.3.0",
-		"esbuild": "^0.13.12",
-		"eslint": "^7.21.0",
-		"prettier": "2.4.1",
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2",
-		"typescript": "^4.2.2"
-	}
+  "name": "code-banner",
+  "description": "Upgrade your project in VSCode and make it pop!",
+  "version": "0.0.1",
+  "publisher": "Eli Sklar",
+  "enableProposedApi": true,
+  "engines": {
+    "vscode": "^1.57.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:calicoColors.colorsView",
+    "onCommand:calicoColors.addColor",
+    "onCommand:calicoColors.clearColors"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/vscode-extension-samples.git"
+  },
+  "main": "./out/server/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "calicoColors.colorsView",
+          "name": "Calico Colors"
+        },
+        {
+          "type": "webview",
+          "id": "codeBanner.explorerPanel",
+          "name": "Code Banner"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "calicoColors.addColor",
+        "category": "Calico Colors",
+        "title": "Add Color"
+      },
+      {
+        "command": "calicoColors.clearColors",
+        "category": "Calico Colors",
+        "title": "Clear Colors",
+        "icon": "$(clear-all)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "calicoColors.clearColors",
+          "group": "navigation",
+          "when": "view == calicoColors.colorsView"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile:server": "tsc -p ./",
+    "compile:client": "esbuild src/client/* --bundle --outdir=out/client/",
+    "compile": "concurrently -n \"npm:compile:server\" \"npm:compile:client\"",
+    "lint": "eslint . --ext .ts,.tsx",
+    "watch": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
+    "watch:server": "tsc -w -p ./",
+    "watch:client": "npm run compile:client -- --watch",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "btoa": "^1.2.1",
+    "comlink": "^4.3.1",
+    "yaml": "^1.10.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@storybook/addon-actions": "^6.3.12",
+    "@storybook/addon-essentials": "^6.3.12",
+    "@storybook/addon-links": "^6.3.12",
+    "@storybook/react": "^6.3.12",
+    "@types/node": "^16.11.6",
+    "@types/vscode": "^1.32.0",
+    "@typescript-eslint/eslint-plugin": "^4.16.0",
+    "@typescript-eslint/parser": "^4.16.0",
+    "babel-loader": "^8.2.3",
+    "concurrently": "^6.3.0",
+    "esbuild": "^0.13.12",
+    "eslint": "^7.21.0",
+    "prettier": "2.4.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "storybook-dark-mode": "^1.0.8",
+    "typescript": "^4.2.2"
+  }
 }

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as Server from 'react-dom/server'
 import { render } from 'react-dom'
+import { Panel } from './panel'
 
 const vscode = acquireVsCodeApi()
 
@@ -49,7 +50,7 @@ const CommService = ({ children }) => {
     }
   }, [])
   return (
-    <CommServiceContext.Provider value={{state, actions}}>
+    <CommServiceContext.Provider value={{ state, actions }}>
       {children}
     </CommServiceContext.Provider>
   )
@@ -90,7 +91,10 @@ const App = () => {
   return (
     <>
       <CommService>
-        <ConfigService>App Running!</ConfigService>
+        <ConfigService>
+          App Running!
+          <Panel />
+        </ConfigService>
       </CommService>
     </>
   )

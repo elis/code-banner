@@ -5,8 +5,9 @@
     "lib": ["ES2019"],
     "outDir": "out/server",
     "sourceMap": true,
+    "jsx": "react",
     "strict": true,
     "rootDir": "src/server"
   },
-  "exclude": ["node_modules", ".vscode-test"]
+  "exclude": ["node_modules", ".vscode-test", "src/stories"]
 }
