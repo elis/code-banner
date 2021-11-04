@@ -1,13 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useComms } from './comms.services'
+import { vscode } from './vscode'
+
 
 export const ConfigServiceContext = React.createContext()
 export const ConfigService = ({ children }) => {
   const comms = useComms()
 
-  const [state, setState] = React.useState({
+  const [state, setState] = React.useState(vscode.getState()?.config || {
     files: [],
   })
+
+	useEffect(() => {
+		const st = vscode.getState()
+		vscode.setState({ ...st, config: state })
+	}, [state])
   const actions = {}
 
   React.useEffect(() => {

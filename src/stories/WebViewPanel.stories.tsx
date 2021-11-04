@@ -1,6 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { ComponentStory, ComponentMeta } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 import { Panel } from '../client/panel'
 import * as HeaderStories from './Header.stories'
@@ -13,17 +12,19 @@ export default {
   component: Panel,
 } as ComponentMeta<typeof Panel>
 
-const ThemedWrapper = styled.div`
-  color: #fff;
-`
-
 const Template: ComponentStory<typeof Panel> = (args) => {
   const content = (
     <ConfigServiceContext.Provider value={mock}>
       <Panel {...args} />
     </ConfigServiceContext.Provider>
   )
-  return useDarkMode() ? <ThemedWrapper>{content}</ThemedWrapper> : content
+  return useDarkMode() ? (
+    <div style={{ color: '#FFF' }}>
+      <>{content}</>
+    </div>
+  ) : (
+    content
+  )
 }
 
 export const LoggedIn = Template.bind({})

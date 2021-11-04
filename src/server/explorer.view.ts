@@ -35,12 +35,12 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
   }
 
   public async updateFiles(files: ParsedFile[]) {
-    console.log('👌🚨 Files updated!', files, {view: this._view})
+    console.log('👌🚨 Files updated!', files, { view: this._view })
     if (this._view)
       this._view.webview.postMessage({ type: 'files-updated', files })
   }
   public async updateFile(file: ParsedFile) {
-    console.log('👌🚨 File updated!', file, {view: this._view})
+    console.log('👌🚨 File updated!', file, { view: this._view })
     if (this._view)
       this._view.webview.postMessage({ type: 'file-updated', file })
   }
@@ -138,7 +138,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     )
     // Do the same for the stylesheet.
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'view.explorer.css')
+      vscode.Uri.joinPath(this._extensionUri, 'out/client/', 'code-banner.css')
     )
 
     // Use a nonce to only allow a specific script to be run.
@@ -153,8 +153,11 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="default-src 'none'; img-src ${webview.cspSource} https:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
+        />
+      
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<link href="${styleUri}" rel="stylesheet">

@@ -30,6 +30,10 @@ export const mock = {
 								type: 'text',
 								text: 'Hello, World!',
 							},
+							{
+								type: 'text',
+								text: 'Another!',
+							},
 						],
 					},
 				},

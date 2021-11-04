@@ -5,7 +5,6 @@ import { Panel } from './panel'
 import { CommService } from './services/comms.services'
 import { ConfigService } from './services/config.service'
 
-const vscode = acquireVsCodeApi()
 
 let Greet = () => <h1>🚸➕ Hello, world!</h1>
 

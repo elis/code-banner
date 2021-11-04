@@ -61,18 +61,21 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile:server": "tsc -p ./",
-    "compile:client": "esbuild src/client/* --bundle --outdir=out/client/",
+    "xcompile:client": "esbuild src/client/* --bundle --outdir=out/client/",
+    "compile:client": "node build.js",
     "compile": "concurrently -n \"npm:compile:server\" \"npm:compile:client\"",
     "lint": "eslint . --ext .ts,.tsx",
-    "watch": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
+    "watch": "tsc -w -p ./",
+    "watch:both": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
     "watch:server": "tsc -w -p ./",
-    "watch:client": "npm run compile:client -- --watch",
+    "watch:client": "node build.js --watch",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
     "btoa": "^1.2.1",
     "comlink": "^4.3.1",
+    "esbuild-sass-plugin": "^1.7.0",
     "styled-components": "^5.3.3",
     "yaml": "^1.10.2"
   },
@@ -87,7 +90,6 @@
     "@typescript-eslint/eslint-plugin": "^4.16.0",
     "@typescript-eslint/parser": "^4.16.0",
     "babel-loader": "^8.2.3",
-    "concurrently": "^6.3.0",
     "esbuild": "^0.13.12",
     "eslint": "^7.21.0",
     "prettier": "2.4.1",

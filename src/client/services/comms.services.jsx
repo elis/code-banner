@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 
 export const CommServiceContext = React.createContext()
 export const CommService = ({ children }) => {
@@ -44,6 +44,7 @@ export const CommService = ({ children }) => {
       window.removeEventListener('message', cb)
     }
   }, [])
+
   return (
     <CommServiceContext.Provider value={{ state, actions }}>
       {children}
