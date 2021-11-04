@@ -5,28 +5,34 @@ import * as YAML from 'yaml'
 import { getNonce } from './utils'
 import { Config } from './executables'
 
+export type TestingResult = {
+  output: string
+}
+
+export type APIOutline = {
+  testing: (input: string) => Promise<TestingResult>
+}
 class ExplorerViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'codeBanner.explorerPanel'
 
   private _view?: vscode.WebviewView
-	private _context: vscode.ExtensionContext
-	private _extensionUri: vscode.Uri
+  private _context: vscode.ExtensionContext
+  private _extensionUri: vscode.Uri
 
   constructor(context: vscode.ExtensionContext) {
-		this._extensionUri = context.extensionUri
-		this._context = context
-		this.attach()
-	}
+    this._extensionUri = context.extensionUri
+    this._context = context
+    this.attach()
+  }
 
-	private attach () {
-
-		this._context.subscriptions.push(
-			vscode.window.registerWebviewViewProvider(
-				ExplorerViewProvider.viewType,
-				this
-			)
-		)
-	}
+  private attach() {
+    this._context.subscriptions.push(
+      vscode.window.registerWebviewViewProvider(
+        ExplorerViewProvider.viewType,
+        this
+      )
+    )
+  }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -93,7 +99,6 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     // add ew row
     if (!this._view) {
       console.log('🕓 View not ready...', { conf })
-
     } else {
       console.log('🕓 Adding row...', { conf })
       const result = await this._view.webview.postMessage({ type: 'addRow' })
@@ -117,9 +122,9 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
   private _getHtmlForWebview(webview: vscode.Webview) {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'code-banner.js')
+      // vscode.Uri.joinPath(this._extensionUri, 'media', 'code-banner.js')
+      vscode.Uri.joinPath(this._extensionUri, 'out/client/', 'code-banner.js')
     )
-
     // Do the same for the stylesheet.
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'media', 'view.explorer.css')
@@ -146,6 +151,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 				<title>Cat Colors</title>
 			</head>
 			<body>
+        <div id="root"></div>
 				Ok 🐝
 
 				<script nonce="${nonce}" src="${scriptUri}"></script>

@@ -1,8 +1,8 @@
 {
-	"name": "calico-colors",
-	"description": "Calico Colors - A Webview View API Sample",
+	"name": "code-banner",
+	"description": "Upgrade your project in VSCode and make it pop!",
 	"version": "0.0.1",
-	"publisher": "vscode-samplesa",
+	"publisher": "Eli Sklar",
 	"enableProposedApi": true,
 	"engines": {
 		"vscode": "^1.57.0"
@@ -19,7 +19,7 @@
 		"type": "git",
 		"url": "https://github.com/microsoft/vscode-extension-samples.git"
 	},
-	"main": "./out/extension.js",
+	"main": "./out/server/extension.js",
 	"contributes": {
 		"views": {
 			"explorer": [
@@ -60,9 +60,13 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile:server": "tsc -p ./",
+		"compile:client": "esbuild src/client/* --bundle --outdir=out/client/",
+		"compile": "concurrently -n \"npm:compile:server\" \"npm:compile:client\"",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -w -p ./"
+		"watch": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
+		"watch:server": "tsc -w -p ./",
+		"watch:client": "npm run compile:client -- --watch"
 	},
 	"dependencies": {
 		"btoa": "^1.2.1",
@@ -74,8 +78,12 @@
 		"@types/vscode": "^1.32.0",
 		"@typescript-eslint/eslint-plugin": "^4.16.0",
 		"@typescript-eslint/parser": "^4.16.0",
+		"concurrently": "^6.3.0",
+		"esbuild": "^0.13.12",
 		"eslint": "^7.21.0",
 		"prettier": "2.4.1",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
 		"typescript": "^4.2.2"
 	}
 }
