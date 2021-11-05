@@ -5,6 +5,10 @@ import * as YAML from 'yaml'
 import { getNonce } from './utils'
 import { Config, ParsedFile } from './executables'
 
+import * as fs from 'fs'
+import * as path from 'path'
+import * as hash from 'object-hash'
+
 export type TestingResult = {
   output: string
 }
@@ -62,15 +66,46 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
     webviewView.webview.postMessage({ type: 'goat', goat: 'behehhheee' })
+
+    type ImportMediaRequest = {
+      type: 'get-webview-uri'
+
+      id: string
+      fullpath: string
+      workspace: string
+    }
+    const doImport = async (data: ImportMediaRequest) => {
+      const id = data.id
+      this.importMedia(data.fullpath, data.workspace)
+        .then((importedMedia) => {
+          console.log('🧪 result of importedMedia:', { importedMedia, id })
+          // const result = webviewView.webview.asWebviewUri(onDiskPath)
+          // console.log('🧪 result of webview uri get:', result)
+          // console.log(
+          //   '🧪 result of webview uri get as string',
+          //   result.toString()
+          // )
+          if (this._view) {
+            console.log('🧪 posting message:', {
+              importedMedia,
+              id,
+              type: 'get-webview-uri-' + id,
+            })
+            this._view.webview.postMessage({
+              type: 'get-webview-uri-' + id,
+              result: importedMedia,
+            })
+          }
+        })
+        .catch((err) => {
+          console.log('error with import:', err)
+        })
+    }
     webviewView.webview.onDidReceiveMessage((data) => {
       console.log('🦮 Message from webview:', data)
       switch (data.type) {
         case 'get-webview-uri': {
-          const onDiskPath = vscode.Uri.file(data.fullpath)
-          const result = webviewView.webview.asWebviewUri(onDiskPath)
-          console.log('🧪 result of webview uri get:', result)
-          console.log('🧪 result of webview uri get as string', result.toString())
-          webviewView.webview.postMessage({ type: 'get-webview-uri-' + data.id, result })
+          doImport(data)
           break
         }
         case 'colorSelected': {
@@ -163,7 +198,14 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 				-->
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; img-src ${webview.cspSource} https: ${webview.cspSource.replace('https:', 'vscode-resource:')}  vscode-resource:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
+          content="default-src 'none'; img-src ${
+            webview.cspSource
+          } https: ${webview.cspSource.replace(
+      'https:',
+      'vscode-resource:'
+    )}  vscode-resource:; script-src ${webview.cspSource}; style-src ${
+      webview.cspSource
+    };"
         />
       
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -174,11 +216,124 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 			</head>
 			<body>
         <div id="root"></div>
-				Ok 🐝
-
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`
+  }
+
+  // const ingest =
+  // (context: vscode.ExtensionContext, api: Basics) =>
+  // async (uri: vscode.Uri) => {
+  //   const loaded = await importFile(uri)
+  //   const relative = vscode.workspace.asRelativePath(uri)
+
+  //   // console.log('🦄 Loaded:', { path: uri.path, relative }, loaded)
+  //   const conf = {}
+  //   if (loaded.explorer) {
+  //     if (typeof loaded.explorer === 'function') {
+  //       const explorer = await loaded.explorer(uri, context)
+  //       Object.assign(conf, { explorer })
+  //     } else Object.assign(conf, { explorer: loaded.explorer })
+  //   }
+
+  //   return {
+  //     uri,
+  //     conf,
+  //   }
+
+  public async importMedia(fullpath: string, workspaceName: string) {
+    console.log('❤️ vscode.workspace.workspaceFolders:', {
+      folders: vscode.workspace.workspaceFolders,
+      workspaceName,
+    })
+    const workspace = vscode.workspace.workspaceFolders?.find(
+      ({ name }) => name === workspaceName
+    )
+    if (!workspace)
+      return { error: 'No active workspace found ' + workspaceName }
+    console.log('❤️ workspace:', { fullpath }, workspace)
+
+    const uri = vscode.Uri.parse(fullpath)
+    console.log('❤️ uri of fullpath:', { fullpath }, uri)
+
+    const newpath = vscode.Uri.joinPath(workspace.uri, fullpath)
+
+    console.log('❤️ uri of newpath:', { fullpath }, newpath)
+
+    const newFolderPath = hash({
+      workspaceName,
+      workspacePath: workspace.uri.fsPath,
+    })
+    const newFileName = hash({ fullpath, workspaceName })
+    const ext = path.extname(fullpath)
+    const newFullpath = vscode.Uri.joinPath(
+      this._extensionUri,
+      'media/cache',
+      newFolderPath,
+      `${newFileName}${ext}`
+    )
+
+    // const existingFileStat = await fs.promises.stat(newFullpath.fsPath)
+
+    const hashed = hash({ testing: 'yes' })
+    console.log('❤️ pathsssssss:', {
+      hashed,
+      newFolderPath,
+      newFileName,
+      ext,
+      newFullpath,
+    })
+
+    await (async () => {
+      return vscode.workspace.fs.delete(newFullpath).then(
+        () => {
+          console.log('file deleted successfuly', newFullpath)
+        },
+        () => {
+          console.log('no file detected', newFullpath)
+        }
+      )
+    })()
+    await vscode.workspace.fs.copy(newpath, newFullpath)
+
+    const webviewUri = this._view?.webview.asWebviewUri(newFullpath)
+
+    console.log('❤️❤️❤️❤️ pathsssssss:', {
+      ext,
+      webviewUri,
+      // newFullpath,
+      // existingFileStat
+    })
+
+    return webviewUri
+
+    // const readData = await vscode.workspace.fs.readFile(uri)
+
+    // console.log('❤️ readed data length:', readData?.length)
+    // const hashprops = { fullpath, project: vscode.workspace.name }
+    // console.log('❤️ hash props:', hashprops)
+    // const tempname = hash({ fullpath, project: vscode.workspace.name })
+    // console.log('❤️ hash tempname:', tempname)
+    // const ext = path.ext(fullpath)
+    // console.log('❤️ ext tempname:', ext)
+    // const mediaPath = vscode.Uri.joinPath(
+    //   this._extensionUri,
+    //   'media/temp/',
+    //   tempname + '.' + ext
+    // )
+    // console.log('❤️ mediapath:', { mediaPath })
+
+    // await vscode.workspace.fs.writeFile()
+    // const name = Math.floor(Math.random() * 1000000000).toString(32)
+
+    // const nuri = vscode.Uri.parse(uri.path + name)
+
+    // await vscode.workspace.fs.writeFile(nuri, readData)
+    // const tk = await import(nuri.path)
+    // await vscode.workspace.fs.delete(nuri)
+
+    // return tk
+    // }
   }
 }
 

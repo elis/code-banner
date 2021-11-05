@@ -20,10 +20,10 @@ export const CommService = ({ children }) => {
     }
   }, [])
 
-  const getWebviewUri = useCallback(async (fullpath) => {
+  const getWebviewUri = useCallback(async (fullpath, workspace) => {
     const promise = new Promise((r) => {
       const id = getNonce()
-      vscode.postMessage({ type: 'get-webview-uri', id, fullpath })
+      vscode.postMessage({ type: 'get-webview-uri', id, fullpath, workspace })
       const release = subscribe('get-webview-uri-' + id, (data) => {
         console.log('🟣🍊♿️ Result of get webview:', data)
         release()

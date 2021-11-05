@@ -75,6 +75,7 @@
     "btoa": "^1.2.1",
     "comlink": "^4.3.1",
     "esbuild-sass-plugin": "^1.7.0",
+    "object-hash": "^2.2.0",
     "styled-components": "^5.3.3",
     "yaml": "^1.10.2"
   },
@@ -85,6 +86,7 @@
     "@storybook/addon-links": "^6.3.12",
     "@storybook/react": "^6.3.12",
     "@types/node": "^16.11.6",
+    "@types/object-hash": "^2.2.1",
     "@types/vscode": "^1.32.0",
     "@typescript-eslint/eslint-plugin": "^4.16.0",
     "@typescript-eslint/parser": "^4.16.0",

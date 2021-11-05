@@ -61,6 +61,7 @@ export type ParsedFile = {
   uri: vscode.Uri
   conf: Config
   relative: string
+  workspace: string
 }
 
 const parseFiles = async (
@@ -86,13 +87,24 @@ const parseFiles = async (
 const parseFile =
   (context: vscode.ExtensionContext, api: Basics) =>
   async (uri: vscode.Uri) => {
+    const relative = vscode.workspace.asRelativePath(uri)
+    const level = relative.split('/').length
+    function escapeRegExp(string = '') {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+    }
+
+    const workspace = vscode.workspace.getWorkspaceFolder(uri)?.name
+    if (!workspace)
+      throw new Error('Unknow file workspace ' + uri.fsPath)
     const { conf } = await ingest(context, api)(uri)
+
 
     return {
       conf,
       uri,
-      relative: vscode.workspace.asRelativePath(uri),
-      level: vscode.workspace.asRelativePath(uri).split('/').length,
+      relative,
+      level,
+      workspace,
     }
   }
 
