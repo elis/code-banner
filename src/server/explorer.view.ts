@@ -65,6 +65,14 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage((data) => {
       console.log('🦮 Message from webview:', data)
       switch (data.type) {
+        case 'get-webview-uri': {
+          const onDiskPath = vscode.Uri.file(data.fullpath)
+          const result = webviewView.webview.asWebviewUri(onDiskPath)
+          console.log('🧪 result of webview uri get:', result)
+          console.log('🧪 result of webview uri get as string', result.toString())
+          webviewView.webview.postMessage({ type: 'get-webview-uri-' + data.id, result })
+          break
+        }
         case 'colorSelected': {
           vscode.window.activeTextEditor?.insertSnippet(
             new vscode.SnippetString(`#${data.value}`)
@@ -155,7 +163,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 				-->
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; img-src ${webview.cspSource} https:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
+          content="default-src 'none'; img-src ${webview.cspSource} https: ${webview.cspSource.replace('https:', 'vscode-resource:')}  vscode-resource:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
         />
       
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">

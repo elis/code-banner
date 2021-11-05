@@ -1,4 +1,5 @@
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
+import { vscode } from "./vscode"
 
 export const CommServiceContext = React.createContext()
 export const CommService = ({ children }) => {
@@ -19,8 +20,22 @@ export const CommService = ({ children }) => {
     }
   }, [])
 
+  const getWebviewUri = useCallback(async (fullpath) => {
+    const promise = new Promise((r) => {
+      const id = getNonce()
+      vscode.postMessage({ type: 'get-webview-uri', id, fullpath })
+      const release = subscribe('get-webview-uri-' + id, (data) => {
+        console.log('🟣🍊♿️ Result of get webview:', data)
+        release()
+        r(data.result)
+      })
+    })
+    return promise
+  }, [])
+
   const actions = {
     subscribe,
+    getWebviewUri
   }
 
   React.useEffect(() => {
@@ -53,3 +68,13 @@ export const CommService = ({ children }) => {
 }
 
 export const useComms = () => React.useContext(CommServiceContext)
+
+export const getNonce = () => {
+  let text = ''
+  const possible =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+  return text
+}

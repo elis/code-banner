@@ -87,6 +87,7 @@ const parseFile =
   (context: vscode.ExtensionContext, api: Basics) =>
   async (uri: vscode.Uri) => {
     const { conf } = await ingest(context, api)(uri)
+
     return {
       conf,
       uri,
