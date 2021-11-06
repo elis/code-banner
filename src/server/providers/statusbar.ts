@@ -3,7 +3,7 @@ import {
   ParsedFile,
   StatusBarItemOptions,
   StatusItems,
-	UpdateEditor,
+  UpdateEditor,
 } from '../../types'
 import { diff } from 'deep-object-diff'
 
@@ -14,16 +14,17 @@ class StatusBar {
     wrapped: vscode.StatusBarItem
     sbar: vscode.StatusBarItem
     options: StatusBarItemOptions
+    file: ParsedFile
   }[] = []
 
-
   private _cache: {
+    files: ParsedFile[]
     visibleEditors: UpdateEditor[]
     activeEditor?: UpdateEditor
-   } = {
-     visibleEditors: []
-   }     
-
+  } = {
+    files: [],
+    visibleEditors: [],
+  }
 
   private statusItems: StatusItems
 
@@ -64,14 +65,11 @@ class StatusBar {
 
   public updateFiles(files: ParsedFile[]) {
     const statusable = files.filter(({ conf: { statusbar } }) => !!statusbar)
-    console.log('👑 Statusable Items', { statusable })
     statusable.map((item) => {
       if (item.conf.statusbar?.items.length) {
         item.conf.statusbar.items.forEach(({ name, options }) => {
-          const api = this.addItem(name, options)
-          console.log('👑 StatusBar Item', { api })
+          const api = this.addItem(name, options, item)
           this.statusItems.items.push({ name, options })
-          // statusItems.items.push({ name, options, sbar: api })
           this.statusItems.confs[item.relative + item.workspace] = [
             ...(this.statusItems.confs[item.relative + item.workspace] || []),
             name,
@@ -79,11 +77,20 @@ class StatusBar {
         })
       }
     })
+
+    this._cache.files = files
   }
 
   public updateFile(file: ParsedFile) {
+    this._cache.files = this._cache.files.length
+      ? this._cache.files.map((ec) =>
+          ec.relative === file.relative && ec.workspace === file.workspace
+            ? { ...ec, conf: file.conf }
+            : ec
+        )
+      : [file]
+
     if (file.conf.statusbar) {
-      console.log('👑 Statusable Item', file.conf.statusbar)
       if (file.conf.statusbar?.items.length) {
         file.conf.statusbar.items.forEach(({ name, options }) => {
           if (this.getItem(name)) {
@@ -96,9 +103,7 @@ class StatusBar {
               this.statusItems.items.push({ name, options })
             }
           } else {
-            const api = this.addItem(name, options)
-            console.log('👑 StatusBar Item', { api })
-            // this.statusItems.items.push({ name, options, sbar: api })
+            this.addItem(name, options, file)
             this.statusItems.items.push({ name, options })
             this.statusItems.confs[file.relative + file.workspace] = [
               ...(this.statusItems.confs[file.relative + file.workspace] || []),
@@ -132,7 +137,6 @@ class StatusBar {
       throw new Error('Item with name does not exists: ' + name)
 
     const diffed = diff(oldOptions, options) as Partial<StatusBarItemOptions>
-    console.log('🍊🍊🍊🍊 diffed status:', diffed)
 
     if (options.visible) sbar.show()
     else sbar.hide()
@@ -157,7 +161,8 @@ class StatusBar {
       text: '',
       alignment: vscode.StatusBarAlignment.Left,
       priority: 10,
-    }
+    },
+    file: ParsedFile
   ) {
     if (this._items.find((e) => e.name === name))
       throw new Error(
@@ -177,25 +182,53 @@ class StatusBar {
     }
 
     const wrapped = Object.assign({}, sbar, { dispose })
-    this._items.push({ name, wrapped, sbar, options })
+    this._items.push({ name, wrapped, sbar, options, file })
     return wrapped
   }
 
-
-  public async updateVisible (editors: UpdateEditor[]) {
-    console.log('👑 🚨 Visible updated!', editors, { cache: this._cache })
+  public async updateVisible(editors: UpdateEditor[]) {
     this._cache.visibleEditors = editors
-    // if (this._view)
-    // this._view.webview.postMessage({ type: 'visible-updated', editors })
+
+    const outdatedItems = this._items.filter(
+      (item) => !editors.find((editor) => editor.dirname === item.file.dirname)
+    )
+
+		if (outdatedItems.length) {
+      outdatedItems.forEach((item) => item.wrapped.dispose())
+    }
+
+    const newEditors = editors.filter(
+      (editor) =>
+        this._cache.files.find(
+          (file) =>
+            editor.dirname === file.dirname ||
+            // Match editor relative path to file's dirname
+            (editor.relative.match(new RegExp(`^${file.dirname}`)) &&
+              // check if parent at sufficient depth
+              file.conf.statusbar?.items.find(
+                (item) => item.depth && item.depth + file.level >= editor.level
+              ))
+        ) && !this._items.find((item) => editor.dirname === item.file.dirname)
+    )
+
+		if (newEditors.length) {
+      const newCofs = this._cache.files.filter((file) =>
+        newEditors.find(
+          (editor) =>
+            editor.dirname === file.dirname ||
+            (editor.dirname.match(new RegExp(`^${file.dirname}`)) &&
+              file.conf.statusbar?.items.find(
+                (item) => item.depth && item.depth + file.level >= editor.level
+              ))
+        )
+      )
+      newCofs.forEach((file) => this.updateFile(file))
+    }
   }
 
-  public async updateActive (editor?: UpdateEditor) {
-    console.log('👑 🚨 Active updated!', editor, { cache: this._cache })
+  public async updateActive(editor?: UpdateEditor) {
     this._cache.activeEditor = editor
-    // if (this._view)
-    // this._view.webview.postMessage({ type: 'active-updated', editor })
   }
-
 }
 
 export default StatusBar

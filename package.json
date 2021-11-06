@@ -13,9 +13,13 @@
   "activationEvents": [
     "*"
   ],
+  "author": {
+    "email": "eli.sklar@gmail.com",
+    "name": "Eli Sklar"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/microsoft/vscode-extension-samples.git"
+    "url": "https://github.com/elis/code-banner.git"
   },
   "main": "./out/server/extension.js",
   "contributes": {
@@ -33,30 +37,24 @@
         {
           "type": "webview",
           "id": "codeBanner.explorerPanel",
-          "name": "🌈 Code Banner",
+          "name": "🚩 Code Banner",
           "icon": "media/assets/icon.svg"
         }
-      ]
-    },
-    "commands": [
-      {
-        "command": "calicoColors.addColor",
-        "category": "Calico Colors",
-        "title": "Add Color"
-      },
-      {
-        "command": "calicoColors.clearColors",
-        "category": "Calico Colors",
-        "title": "Clear Colors",
-        "icon": "$(clear-all)"
-      }
-    ],
-    "menus": {
-      "view/title": [
+      ],
+      "debug": [
         {
-          "command": "calicoColors.clearColors",
-          "group": "navigation",
-          "when": "view == calicoColors.colorsView"
+          "type": "webview",
+          "id": "codeBanner.debugPanel",
+          "name": "Code Banner",
+          "icon": "media/assets/icon.svg"
+        }
+      ],
+      "scm": [
+        {
+          "type": "webview",
+          "id": "codeBanner.scmPanel",
+          "name": "Code Banner",
+          "icon": "media/assets/icon.svg"
         }
       ]
     }
@@ -75,8 +73,6 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "btoa": "^1.2.1",
-    "comlink": "^4.3.1",
     "deep-object-diff": "^1.1.0",
     "esbuild-sass-plugin": "^1.7.0",
     "object-hash": "^2.2.0",

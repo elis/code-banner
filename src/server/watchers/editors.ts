@@ -3,8 +3,6 @@ import * as vscode from 'vscode'
 import { UpdateEditor } from '../../types'
 
 export type EditorsWatcherAPI = {
-  // onReady: (files: ParsedExecutableFile[]) => void
-  // onUpdate: (file: ParsedExecutableFile) => void
   onVisibileUpdate: (editors: UpdateEditor[]) => void
   onActiveUpdate: (editor?: UpdateEditor) => void
 }
@@ -14,23 +12,18 @@ export const initEditorWatcher = async (
   api: EditorsWatcherAPI
 ) => {
   const watcher = vscode.window.onDidChangeVisibleTextEditors((editors) => {
-    console.log('💻 Visible Editors:', editors)
     const output = editors.map(makeUpdateEditor({ isVisible: true }))
     api.onVisibileUpdate(output)
   })
 
   const watcher2 = vscode.window.onDidChangeActiveTextEditor((editor) => {
     if (editor) {
-      console.log('💻 Active Editor:', editor)
       api.onActiveUpdate(
         makeUpdateEditor({
           isActive: true,
         })(editor)
       )
-    } else {
-      console.log('💻🦎 No Active Editor:')
-      api.onActiveUpdate()
-    }
+    } else api.onActiveUpdate()
   })
 
   const visible = vscode.window.visibleTextEditors
@@ -53,21 +46,16 @@ const makeUpdateEditor =
     const level = relative.split('/').length
 
     const workspace = vscode.workspace.getWorkspaceFolder(uri)?.name
-    console.log(
-      '💻🦎 Editor:',
-      { editor, options },
-      { document, uri, version, lineCount, languageId }
-    )
 
     return {
-			document,
-			dirname,
+      document,
+      dirname,
       editor,
       lineCount,
       languageId,
       level,
       options,
-			relative,
+      relative,
       version,
       uri,
       workspace,

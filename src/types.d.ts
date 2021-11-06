@@ -25,9 +25,9 @@ export type BannerItemText = BannerItemBase & {
 }
 
 
-
 export type StatusBarItem = {
 	name: string
+	depth?: number
 	options: StatusBarItemOptions
 }
 
@@ -55,6 +55,7 @@ export type ParsedBaseFile = {
   conf: CodeBannerConfig
   relative: string
   workspace: string
+	dirname: string
 }
 
 export type ParsedExecutableFile = ParsedBaseFile & {

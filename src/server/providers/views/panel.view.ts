@@ -1,12 +1,9 @@
 import * as vscode from 'vscode'
-
-import { posix } from 'path'
-import * as YAML from 'yaml'
-import { getNonce } from '../utils'
-
-import * as path from 'path'
 import * as hash from 'object-hash'
-import { ParsedFile, UpdateEditor } from '../../types'
+import * as path from 'path'
+
+import { getNonce } from '../../utils'
+import { ParsedFile, UpdateEditor } from '../../../types'
 
 export type TestingResult = {
   output: string
@@ -21,21 +18,21 @@ export type ResponseRequest = {
   type: string
   payload: Record<string, any>
 }
-class ExplorerViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'codeBanner.explorerPanel'
+class PanelViewProvider implements vscode.WebviewViewProvider {
+  protected viewContainer = 'custom'
 
-  private _view?: vscode.WebviewView
-  private _context: vscode.ExtensionContext
-  private _extensionUri: vscode.Uri
+  protected _view?: vscode.WebviewView
+  protected _context: vscode.ExtensionContext
+  protected _extensionUri: vscode.Uri
 
-  private _cache: {
+  protected _cache: {
     files: ParsedFile[]
     visibleEditors: UpdateEditor[]
     activeEditor?: UpdateEditor
-   } = {
-     files: [],
-     visibleEditors: []
-   }     
+  } = {
+    files: [],
+    visibleEditors: [],
+  }
 
   constructor(context: vscode.ExtensionContext) {
     this._extensionUri = context.extensionUri
@@ -43,24 +40,17 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     this.attach()
   }
 
-  private attach() {
-    this._context.subscriptions.push(
-      vscode.window.registerWebviewViewProvider(
-        ExplorerViewProvider.viewType,
-        this
-      )
-    )
+  protected attach() {
+    // noop
   }
 
   public async updateFiles(files: ParsedFile[]) {
-    console.log('👌🚨 Files updated!', files, { view: this._view })
     this._cache.files = files
 
     if (this._view)
       this._view.webview.postMessage({ type: 'files-updated', files })
   }
   public async updateFile(file: ParsedFile) {
-    console.log('👌🚨 File updated!', file, { view: this._view, cache: this._cache, file })
     this._cache.files = this._cache.files.map((ec) =>
       ec.relative === file.relative && ec.workspace === file.workspace
         ? { ...ec, conf: file.conf }
@@ -70,18 +60,16 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
       this._view.webview.postMessage({ type: 'file-updated', file })
   }
 
-  public async updateVisible (editors: UpdateEditor[]) {
-    console.log('👌🚨 Visible updated!', editors, { view: this._view, cache: this._cache })
+  public async updateVisible(editors: UpdateEditor[]) {
     this._cache.visibleEditors = editors
     if (this._view)
-    this._view.webview.postMessage({ type: 'visible-updated', editors })
+      this._view.webview.postMessage({ type: 'visible-updated', editors })
   }
 
-  public async updateActive (editor?: UpdateEditor) {
-    console.log('👌🚨 Active updated!', editor, { view: this._view, cache: this._cache })
+  public async updateActive(editor?: UpdateEditor) {
     this._cache.activeEditor = editor
     if (this._view)
-    this._view.webview.postMessage({ type: 'active-updated', editor })
+      this._view.webview.postMessage({ type: 'active-updated', editor })
   }
 
   public resolveWebviewView(
@@ -101,7 +89,6 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
     webviewView.webview.onDidReceiveMessage((data) => {
-      console.log('🦮 Message from webview:', data)
       if (data.id) {
         // Request expecting response
         this._handleClientRequest(data)
@@ -113,22 +100,25 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
   private async _handleClientRequest(data: ResponseRequest) {
     const respond = (result: any) =>
       this._view?.webview.postMessage({
-        type: data.type + '-'+ data.id,
+        type: data.type + '-' + data.id,
         result,
       })
 
     // ! bootup
     if (data.type === 'bootup') {
       respond({ ...this._cache })
-    } 
-    
+    }
+
     // ! get-webview-uri
     else if (data.type === 'get-webview-uri') {
       import(data.payload.fullpath)
-      this.importMedia(data.payload.fullpath, data.payload.workspace, data.payload.caller)
-        .then((importedMedia) => {
-          respond(importedMedia)
-        })
+      this.importMedia(
+        data.payload.fullpath,
+        data.payload.workspace,
+        data.payload.caller
+      ).then((importedMedia) => {
+        respond(importedMedia)
+      })
     }
   }
 
@@ -174,54 +164,26 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 				<title>Cat Colors</title>
 			</head>
 			<body>
-        <div id="root"></div>
+        <div id="root" data-view-container="${this.viewContainer}"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`
   }
-
-  // const ingest =
-  // (context: vscode.ExtensionContext, api: Basics) =>
-  // async (uri: vscode.Uri) => {
-  //   const loaded = await importFile(uri)
-  //   const relative = vscode.workspace.asRelativePath(uri)
-
-  //   // console.log('🦄 Loaded:', { path: uri.path, relative }, loaded)
-  //   const conf = {}
-  //   if (loaded.explorer) {
-  //     if (typeof loaded.explorer === 'function') {
-  //       const explorer = await loaded.explorer(uri, context)
-  //       Object.assign(conf, { explorer })
-  //     } else Object.assign(conf, { explorer: loaded.explorer })
-  //   }
-
-  //   return {
-  //     uri,
-  //     conf,
-  //   }
 
   public async importMedia(
     fullpath: string,
     workspaceName: string,
     caller: string
   ) {
-    console.log('❤️ vscode.workspace.workspaceFolders:', {
-      folders: vscode.workspace.workspaceFolders,
-      workspaceName,
-    })
     const workspace = vscode.workspace.workspaceFolders?.find(
       ({ name }) => name === workspaceName
     )
     if (!workspace)
       return { error: 'No active workspace found ' + workspaceName }
-    console.log('❤️ workspace:', { fullpath }, workspace)
 
     const uri = vscode.Uri.parse(fullpath)
-    console.log('❤️ uri of fullpath:', { fullpath }, uri)
 
     const newpath = vscode.Uri.joinPath(workspace.uri, fullpath)
-
-    console.log('❤️ uri of newpath:', { fullpath }, newpath)
 
     const newFolderPath = hash({
       caller,
@@ -237,24 +199,13 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
       `${newFileName}${ext}`
     )
 
-    // const existingFileStat = await fs.promises.stat(newFullpath.fsPath)
-
-    const hashed = hash({ testing: 'yes' })
-    console.log('❤️ pathsssssss:', {
-      hashed,
-      newFolderPath,
-      newFileName,
-      ext,
-      newFullpath,
-    })
-
     await (async () => {
       return vscode.workspace.fs.delete(newFullpath).then(
         () => {
-          console.log('file deleted successfuly', newFullpath)
+          // noop
         },
         () => {
-          console.log('no file detected', newFullpath)
+          // noop
         }
       )
     })()
@@ -262,43 +213,8 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 
     const webviewUri = this._view?.webview.asWebviewUri(newFullpath)
 
-    console.log('❤️❤️❤️❤️ pathsssssss:', {
-      ext,
-      webviewUri,
-      // newFullpath,
-      // existingFileStat
-    })
-
     return webviewUri
-
-    // const readData = await vscode.workspace.fs.readFile(uri)
-
-    // console.log('❤️ readed data length:', readData?.length)
-    // const hashprops = { fullpath, project: vscode.workspace.name }
-    // console.log('❤️ hash props:', hashprops)
-    // const tempname = hash({ fullpath, project: vscode.workspace.name })
-    // console.log('❤️ hash tempname:', tempname)
-    // const ext = path.ext(fullpath)
-    // console.log('❤️ ext tempname:', ext)
-    // const mediaPath = vscode.Uri.joinPath(
-    //   this._extensionUri,
-    //   'media/temp/',
-    //   tempname + '.' + ext
-    // )
-    // console.log('❤️ mediapath:', { mediaPath })
-
-    // await vscode.workspace.fs.writeFile()
-    // const name = Math.floor(Math.random() * 1000000000).toString(32)
-
-    // const nuri = vscode.Uri.parse(uri.path + name)
-
-    // await vscode.workspace.fs.writeFile(nuri, readData)
-    // const tk = await import(nuri.path)
-    // await vscode.workspace.fs.delete(nuri)
-
-    // return tk
-    // }
   }
 }
 
-export default ExplorerViewProvider
+export default PanelViewProvider

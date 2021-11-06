@@ -11,6 +11,8 @@ export const ConfigService = ({ children }) => {
     files: [],
   })
 
+  const viewContainer = document.getElementById('root').dataset.viewContainer
+
 	useEffect(() => {
 		const st = vscode.getState()
 		vscode.setState({ ...st, config: state })
@@ -19,11 +21,9 @@ export const ConfigService = ({ children }) => {
 
   React.useEffect(() => {
     const releaseFiles = comms.actions.subscribe('files-updated', (message) => {
-      console.log('📐👀 Received Message:', message)
       setState((v) => ({ ...v, files: message.files }))
     })
     const releaseFile = comms.actions.subscribe('file-updated', (message) => {
-      console.log('📐👀 Received Message:', message)
       setState((v) => ({
         ...v,
         files: [
@@ -33,11 +33,9 @@ export const ConfigService = ({ children }) => {
       }))
     })
     const releaseVisible = comms.actions.subscribe('visible-updated', (message) => {
-      console.log('📐👀 Received Message:', message)
       setState((v) => ({ ...v, visible: message.editors }))
     })
     const releaseActive = comms.actions.subscribe('active-updated', (message) => {
-      console.log('📐👀 Received Message:', message)
       setState((v) => ({
         ...v,
         active: message.editor
@@ -49,7 +47,6 @@ export const ConfigService = ({ children }) => {
       bootCanceled = true
     }
     comms.actions.requestResponse('bootup').then(result => {
-      console.log('🍐🍑🍈🫐 Boot response:', result)
       setState(v => ({
         ...v,
         active: result.activeEditor,
@@ -70,7 +67,7 @@ export const ConfigService = ({ children }) => {
   }, [])
 
   return (
-    <ConfigServiceContext.Provider value={{ state, actions }}>
+    <ConfigServiceContext.Provider value={{ state, actions, viewContainer }}>
       {children}
     </ConfigServiceContext.Provider>
   )

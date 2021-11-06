@@ -6,15 +6,7 @@ import { useConfig } from './services/config.service'
 import './testing.scss'
 
 export const Panel = ({ text }) => {
-  const config = useConfig()
 	const banners = useBanners()
-
-  useEffect(() => {
-    console.log('🧏‍♀️🧏‍♀️🧏‍♀️ config updated:', config)
-  }, [config])
-  useEffect(() => {
-    console.log('🧏‍♀️🧏‍♀️🧏‍♀️ banners updated:', banners)
-  }, [banners])
 
 	const files = useMemo(() => {
 		return banners.state.confs
@@ -39,8 +31,9 @@ const BannerContext = createContext()
 const useBanner = () => useContext(BannerContext)
 
 const Banner = ({ config, relative, workspace }) => {
+	const confs = useConfig()
   const {
-    explorer: { items, style },
+    [confs.viewContainer]: { items = [], style = {} } = {},
   } = config
   return (
     <BannerContext.Provider value={{ config, relative, workspace }}>
@@ -70,9 +63,6 @@ const SVGItem = ({ svg, style = {} }) => {
   const banner = useBanner()
   const comms = useComms()
 
-  console.log('🧃 whats banner?', banner)
-  console.log('whats svg?', svg)
-
   const [url, setUrl] = useState('')
 	
   useEffect(() => {
@@ -83,7 +73,6 @@ const SVGItem = ({ svg, style = {} }) => {
         workspace: banner.workspace,
         caller: banner.relative,
       })
-      console.log('☔️🥘 resulting rui:', uri)
       const url = `${uri.scheme}://${uri.authority}${uri.path}`
       if (!release) setUrl(url)
     })()

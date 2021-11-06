@@ -25,7 +25,6 @@ export const CommService = ({ children }) => {
       const id = getNonce()
       vscode.postMessage({ id, type, payload })
       const release = subscribe(type + '-' + id, (data) => {
-        console.log('🟣🍊♿️ Result of get requestResponse:', data)
         release()
         r(data.result)
       })
@@ -45,13 +44,10 @@ export const CommService = ({ children }) => {
   React.useEffect(() => {
     const cb = (event) => {
       const message = event.data // The json data that the extension sent
-      console.log('🧮 MESSAGE', message)
       const subs = subsRef.current
       subs
         .filter(([type]) => message.type === type)
         .forEach(([type, vcb]) => vcb(message))
-      // switch (message.type) {
-      // 		case 'addRow': {
     }
 
     window.addEventListener('message', cb)
