@@ -11,9 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:calicoColors.colorsView",
-    "onCommand:calicoColors.addColor",
-    "onCommand:calicoColors.clearColors"
+    "*"
   ],
   "repository": {
     "type": "git",
@@ -23,11 +21,6 @@
   "contributes": {
     "views": {
       "explorer": [
-        {
-          "type": "webview",
-          "id": "calicoColors.colorsView",
-          "name": "Calico Colors"
-        },
         {
           "type": "webview",
           "id": "codeBanner.explorerPanel",
@@ -74,6 +67,7 @@
   "dependencies": {
     "btoa": "^1.2.1",
     "comlink": "^4.3.1",
+    "deep-object-diff": "^1.1.0",
     "esbuild-sass-plugin": "^1.7.0",
     "object-hash": "^2.2.0",
     "styled-components": "^5.3.3",

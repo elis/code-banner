@@ -2,12 +2,11 @@ import * as vscode from 'vscode'
 
 import { posix } from 'path'
 import * as YAML from 'yaml'
-import { getNonce } from './utils'
-import { Config, ParsedFile } from './executables'
+import { getNonce } from '../utils'
 
-import * as fs from 'fs'
 import * as path from 'path'
 import * as hash from 'object-hash'
+import { ParsedFile } from '../../types'
 
 export type TestingResult = {
   output: string
@@ -114,63 +113,8 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
           )
           break
         }
-        case 'thangDone': {
-          this.thangDoer(context)
-          break
-        }
       }
     })
-  }
-
-  public async thangDoer(context: vscode.WebviewViewResolveContext) {
-    const tsUri = vscode.window.activeTextEditor?.document.uri
-    if (!tsUri) return
-    const jsPath = posix.join(tsUri.path, '..', posix.basename(tsUri.path))
-    const jsUri = tsUri.with({ path: jsPath })
-
-    console.log('PATH:', { jsUri, jsPath, tsUriPath: tsUri.path })
-    console.log('👹 vscode:', vscode.workspace.workspaceFolders)
-    console.log('👹 context:', context)
-
-    try {
-      const readData = await vscode.workspace.fs.readFile(jsUri)
-      const readStr = Buffer.from(readData).toString('utf8')
-      console.log('👹 read result:', readStr)
-
-      const statResult = await vscode.workspace.fs.stat(jsUri)
-      console.log('👹 stat result:', statResult)
-      // vscode.window.showTextDocument(jsUri, { viewColumn: vscode.ViewColumn.Beside });
-    } catch (error) {
-      console.log('👹 error:', error)
-
-      vscode.window.showInformationMessage(
-        `${jsUri.toString(true)} file does *not* exist`
-      )
-    }
-  }
-
-  public async addRow(conf: Config) {
-    // add ew row
-    if (!this._view) {
-      console.log('🕓 View not ready...', { conf })
-    } else {
-      console.log('🕓 Adding row...', { conf })
-      const result = await this._view.webview.postMessage({ type: 'addRow' })
-      console.log('🕓 Add row result:', { result })
-    }
-  }
-
-  public addColor() {
-    if (this._view) {
-      this._view.show?.(true) // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({ type: 'addColor' })
-    }
-  }
-
-  public clearColors() {
-    if (this._view) {
-      this._view.webview.postMessage({ type: 'clearColors' })
-    }
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
