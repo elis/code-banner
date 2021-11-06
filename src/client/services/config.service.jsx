@@ -32,6 +32,17 @@ export const ConfigService = ({ children }) => {
         ],
       }))
     })
+    const releaseVisible = comms.actions.subscribe('visible-updated', (message) => {
+      console.log('📐👀 Received Message:', message)
+      setState((v) => ({ ...v, visible: message.editors }))
+    })
+    const releaseActive = comms.actions.subscribe('active-updated', (message) => {
+      console.log('📐👀 Received Message:', message)
+      setState((v) => ({
+        ...v,
+        active: message.editor
+      }))
+    })
 
     let bootCanceled
     const releaseBoot = () => {
@@ -39,11 +50,19 @@ export const ConfigService = ({ children }) => {
     }
     comms.actions.requestResponse('bootup').then(result => {
       console.log('🍐🍑🍈🫐 Boot response:', result)
+      setState(v => ({
+        ...v,
+        active: result.activeEditor,
+        visible: result.visibleEditors,
+        files: result.files
+      }))
     })
 
     const release = () => {
       releaseFile()
       releaseFiles()
+      releaseVisible()
+      releaseActive()
       releaseBoot()
     }
 

@@ -3,6 +3,7 @@ import {
   ParsedFile,
   StatusBarItemOptions,
   StatusItems,
+	UpdateEditor,
 } from '../../types'
 import { diff } from 'deep-object-diff'
 
@@ -14,6 +15,15 @@ class StatusBar {
     sbar: vscode.StatusBarItem
     options: StatusBarItemOptions
   }[] = []
+
+
+  private _cache: {
+    visibleEditors: UpdateEditor[]
+    activeEditor?: UpdateEditor
+   } = {
+     visibleEditors: []
+   }     
+
 
   private statusItems: StatusItems
 
@@ -170,6 +180,22 @@ class StatusBar {
     this._items.push({ name, wrapped, sbar, options })
     return wrapped
   }
+
+
+  public async updateVisible (editors: UpdateEditor[]) {
+    console.log('👑 🚨 Visible updated!', editors, { cache: this._cache })
+    this._cache.visibleEditors = editors
+    // if (this._view)
+    // this._view.webview.postMessage({ type: 'visible-updated', editors })
+  }
+
+  public async updateActive (editor?: UpdateEditor) {
+    console.log('👑 🚨 Active updated!', editor, { cache: this._cache })
+    this._cache.activeEditor = editor
+    // if (this._view)
+    // this._view.webview.postMessage({ type: 'active-updated', editor })
+  }
+
 }
 
 export default StatusBar

@@ -6,7 +6,7 @@ import { getNonce } from '../utils'
 
 import * as path from 'path'
 import * as hash from 'object-hash'
-import { ParsedFile } from '../../types'
+import { ParsedFile, UpdateEditor } from '../../types'
 
 export type TestingResult = {
   output: string
@@ -28,7 +28,14 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
   private _context: vscode.ExtensionContext
   private _extensionUri: vscode.Uri
 
-  private _cache: ParsedFile[] = []
+  private _cache: {
+    files: ParsedFile[]
+    visibleEditors: UpdateEditor[]
+    activeEditor?: UpdateEditor
+   } = {
+     files: [],
+     visibleEditors: []
+   }     
 
   constructor(context: vscode.ExtensionContext) {
     this._extensionUri = context.extensionUri
@@ -47,20 +54,34 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 
   public async updateFiles(files: ParsedFile[]) {
     console.log('👌🚨 Files updated!', files, { view: this._view })
-    this._cache = files
+    this._cache.files = files
 
     if (this._view)
       this._view.webview.postMessage({ type: 'files-updated', files })
   }
   public async updateFile(file: ParsedFile) {
     console.log('👌🚨 File updated!', file, { view: this._view, cache: this._cache, file })
-    this._cache = this._cache.map((ec) =>
+    this._cache.files = this._cache.files.map((ec) =>
       ec.relative === file.relative && ec.workspace === file.workspace
         ? { ...ec, conf: file.conf }
         : ec
     )
     if (this._view)
       this._view.webview.postMessage({ type: 'file-updated', file })
+  }
+
+  public async updateVisible (editors: UpdateEditor[]) {
+    console.log('👌🚨 Visible updated!', editors, { view: this._view, cache: this._cache })
+    this._cache.visibleEditors = editors
+    if (this._view)
+    this._view.webview.postMessage({ type: 'visible-updated', editors })
+  }
+
+  public async updateActive (editor?: UpdateEditor) {
+    console.log('👌🚨 Active updated!', editor, { view: this._view, cache: this._cache })
+    this._cache.activeEditor = editor
+    if (this._view)
+    this._view.webview.postMessage({ type: 'active-updated', editor })
   }
 
   public resolveWebviewView(
@@ -78,44 +99,6 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     }
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
-
-    webviewView.webview.postMessage({ type: 'goat', goat: 'behehhheee' })
-
-    type ImportMediaRequest = {
-      type: 'get-webview-uri'
-
-      id: string
-      fullpath: string
-      workspace: string
-      caller: string
-    }
-    const doImport = async (data: ImportMediaRequest) => {
-      const id = data.id
-      this.importMedia(data.fullpath, data.workspace, data.caller)
-        .then((importedMedia) => {
-          console.log('🧪 result of importedMedia:', { importedMedia, id })
-          // const result = webviewView.webview.asWebviewUri(onDiskPath)
-          // console.log('🧪 result of webview uri get:', result)
-          // console.log(
-          //   '🧪 result of webview uri get as string',
-          //   result.toString()
-          // )
-          if (this._view) {
-            console.log('🧪 posting message:', {
-              importedMedia,
-              id,
-              type: 'get-webview-uri-' + id,
-            })
-            this._view.webview.postMessage({
-              type: 'get-webview-uri-' + id,
-              result: importedMedia,
-            })
-          }
-        })
-        .catch((err) => {
-          console.log('error with import:', err)
-        })
-    }
 
     webviewView.webview.onDidReceiveMessage((data) => {
       console.log('🦮 Message from webview:', data)
@@ -136,7 +119,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 
     // ! bootup
     if (data.type === 'bootup') {
-      respond({ files: this._cache })
+      respond({ ...this._cache })
     } 
     
     // ! get-webview-uri

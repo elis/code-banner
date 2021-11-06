@@ -19,12 +19,22 @@
   },
   "main": "./out/server/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "codebanner": [
+        {
+          "id": "code-baner",
+          "title": "Code Banner",
+          "icon": "media/assets/icon.svg"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {
           "type": "webview",
           "id": "codeBanner.explorerPanel",
-          "name": "Code Banner"
+          "name": "🌈 Code Banner",
+          "icon": "media/assets/icon.svg"
         }
       ]
     },
@@ -70,6 +80,7 @@
     "deep-object-diff": "^1.1.0",
     "esbuild-sass-plugin": "^1.7.0",
     "object-hash": "^2.2.0",
+    "path": "^0.12.7",
     "styled-components": "^5.3.3",
     "yaml": "^1.10.2"
   },

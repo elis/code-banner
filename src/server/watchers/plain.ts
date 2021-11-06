@@ -1,3 +1,4 @@
+import * as path from 'path'
 import * as vscode from 'vscode'
 import * as YAML from 'yaml'
 import { extname } from 'path'
@@ -72,12 +73,14 @@ export const parseFile =
   async (uri: vscode.Uri) => {
     const relative = vscode.workspace.asRelativePath(uri)
     const level = relative.split('/').length
+		const dirname = path.dirname(relative)
 
     const workspace = vscode.workspace.getWorkspaceFolder(uri)?.name
     if (!workspace) throw new Error('Unknow file workspace ' + uri.fsPath)
     const { conf } = await ingest(context, executable)(uri)
 
     return {
+			dirname,
       executable,
       conf,
       uri,

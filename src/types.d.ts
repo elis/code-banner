@@ -72,3 +72,20 @@ export type StatusItems = {
 	}[],
 	confs: Record<string, string[]>
 }
+
+
+export type UpdateEditor = {
+	editor: vscode.TextEditor
+	options: vscode.TextEditorOptions
+	document: vscode.TextDocument
+	dirname: string
+	uri: vscode.Uri
+	version: number
+	lineCount: number
+	languageId: string
+	isVisible?: boolean
+	isActive?: boolean
+	level: number
+	relative: string
+	workspace: string
+}

@@ -4,6 +4,7 @@ import StatusBar from './providers/statusbar'
 import { ParsedFile } from '../types'
 import { initPlainWatcher } from './watchers/plain'
 import { initExecutableWatcher } from './watchers/executable'
+import { initEditorWatcher } from './watchers/editors'
 
 export function activate(context: vscode.ExtensionContext) {
   const explorerPanelProvider = new ExplorerViewProvider(context)
@@ -16,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
       responses.push(files)
       if (responses.length === penders.length) {
         console.log('🌈 PENDING COMPLETE - UPDATING PENDERS', { files })
-        const allFiles = responses.reduce((acc, fa) => ([ ...acc, ...fa ]), [])
+        const allFiles = responses.reduce((acc, fa) => [...acc, ...fa], [])
         explorerPanelProvider.updateFiles(allFiles)
         statusbarProvider.updateFiles(allFiles)
       }
@@ -33,4 +34,16 @@ export function activate(context: vscode.ExtensionContext) {
     initExecutableWatcher(context, { ...handlers }),
   ]
 
+  initEditorWatcher(context, {
+    onVisibileUpdate: (visibleEditors) => {
+      console.log('🌈  Vsibility Updated', { visibleEditors })
+      explorerPanelProvider.updateVisible(visibleEditors)
+      statusbarProvider.updateVisible(visibleEditors)
+    },
+    onActiveUpdate: (activeEditor) => {
+      console.log('🌈  Active Updated', { activeEditor })
+      explorerPanelProvider.updateActive(activeEditor)
+      statusbarProvider.updateActive(activeEditor)
+    },
+  })
 }

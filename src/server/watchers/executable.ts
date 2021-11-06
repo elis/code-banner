@@ -1,3 +1,4 @@
+import * as path from 'path'
 import * as vscode from 'vscode'
 import { ParsedExecutableFile, ParsedFile } from '../../types'
 
@@ -52,12 +53,14 @@ export const parseFile =
   (context: vscode.ExtensionContext) => async (uri: vscode.Uri) => {
     const relative = vscode.workspace.asRelativePath(uri)
     const level = relative.split('/').length
+    const dirname = path.dirname(relative)
 
     const workspace = vscode.workspace.getWorkspaceFolder(uri)?.name
     if (!workspace) throw new Error('Unknow file workspace ' + uri.fsPath)
     const { conf } = await ingest(context)(uri)
 
     return {
+      dirname,
       executable: true,
       conf,
       uri,

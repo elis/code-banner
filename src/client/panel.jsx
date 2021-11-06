@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useBanners } from './services/banners.service'
 import { useComms } from './services/comms.services'
 import { useConfig } from './services/config.service'
 
@@ -6,22 +7,18 @@ import './testing.scss'
 
 export const Panel = ({ text }) => {
   const config = useConfig()
+	const banners = useBanners()
 
   useEffect(() => {
     console.log('🧏‍♀️🧏‍♀️🧏‍♀️ config updated:', config)
   }, [config])
+  useEffect(() => {
+    console.log('🧏‍♀️🧏‍♀️🧏‍♀️ banners updated:', banners)
+  }, [banners])
 
 	const files = useMemo(() => {
-
-		const sorted = config.state.files
-			.sort((a, b) => a.level > b.level ? 1 : -1)
-			.sort((a, b) => +a.conf?.explorer?.priority < +b.conf?.explorer?.priority ? 1 : -1)
-		
-		console.log('🍝 Sorted:', sorted)
-		console.table(sorted.map(file => [file.relative, file?.conf?.explorer?.priority]))
-
-		return sorted
-	}, [config.state.files])
+		return banners.state.confs
+	}, [banners.state.confs])
 
   return (
     <div className={'banners'}>
@@ -72,7 +69,7 @@ const TextItem = ({ children, text }) => {
 const SVGItem = ({ svg, style = {} }) => {
   const banner = useBanner()
   const comms = useComms()
-	
+
   console.log('🧃 whats banner?', banner)
   console.log('whats svg?', svg)
 

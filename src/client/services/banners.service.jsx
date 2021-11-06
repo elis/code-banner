@@ -11,9 +11,27 @@ export const BannersService = ({ children }) => {
   const value = { state, actions }
 
   useEffect(() => {
-    console.log('🦈 Config state updated:', config.state)
-  }, [config.state])
+    const { active, files, visible } = config.state
+    console.log('🦈 Config state updated:', { active, files, visible })
+    const confs = files
+      .filter((file) => {
+        if (file.level === 1) return true
+        if (file.dirname === active.dirname) return true
+        if (visible?.find(editor => editor.dirname === file.dirname)) return true
+        // if (file)
+      })
+      .sort((a, b) => (a.level > b.level ? 1 : -1))
+      .sort((a, b) =>
+        +a.conf?.explorer?.priority < +b.conf?.explorer?.priority ? 1 : -1
+      )
 
+    console.log('🍝 Sorted:', confs)
+    console.table(
+      confs.map((file) => [file.relative, file?.conf?.explorer?.priority])
+    )
+
+    setState((v) => ({ ...v, confs }))
+  }, [config.state])
 
   return (
     <BannersContext.Provider value={value}>{children}</BannersContext.Provider>
