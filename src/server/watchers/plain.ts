@@ -13,10 +13,7 @@ export const initPlainWatcher = async (
   api: PlainConfigAPI
 ) => {
 	const globs = [
-		'**/.cb',
 		'**/*.cb',
-		'**/.cb.json',
-		'**/.cb.yml',
 		'**/*.cb.json',
 		'**/*.cb.yml'
 	]

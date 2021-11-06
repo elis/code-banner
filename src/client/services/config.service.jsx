@@ -18,11 +18,11 @@ export const ConfigService = ({ children }) => {
   const actions = {}
 
   React.useEffect(() => {
-    const release = comms.actions.subscribe('files-updated', (message) => {
+    const releaseFiles = comms.actions.subscribe('files-updated', (message) => {
       console.log('📐👀 Received Message:', message)
       setState((v) => ({ ...v, files: message.files }))
     })
-    const release2 = comms.actions.subscribe('file-updated', (message) => {
+    const releaseFile = comms.actions.subscribe('file-updated', (message) => {
       console.log('📐👀 Received Message:', message)
       setState((v) => ({
         ...v,
@@ -32,10 +32,22 @@ export const ConfigService = ({ children }) => {
         ],
       }))
     })
-    return () => {
-      release()
-      release2()
+
+    let bootCanceled
+    const releaseBoot = () => {
+      bootCanceled = true
     }
+    comms.actions.requestResponse('bootup').then(result => {
+      console.log('🍐🍑🍈🫐 Boot response:', result)
+    })
+
+    const release = () => {
+      releaseFile()
+      releaseFiles()
+      releaseBoot()
+    }
+
+    return release
   }, [])
 
   return (

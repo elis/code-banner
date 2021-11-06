@@ -15,12 +15,20 @@ export type TestingResult = {
 export type APIOutline = {
   testing: (input: string) => Promise<TestingResult>
 }
+
+export type ResponseRequest = {
+  id: string
+  type: string
+  payload: Record<string, any>
+}
 class ExplorerViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'codeBanner.explorerPanel'
 
   private _view?: vscode.WebviewView
   private _context: vscode.ExtensionContext
   private _extensionUri: vscode.Uri
+
+  private _cache: ParsedFile[] = []
 
   constructor(context: vscode.ExtensionContext) {
     this._extensionUri = context.extensionUri
@@ -39,11 +47,18 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
 
   public async updateFiles(files: ParsedFile[]) {
     console.log('👌🚨 Files updated!', files, { view: this._view })
+    this._cache = files
+
     if (this._view)
       this._view.webview.postMessage({ type: 'files-updated', files })
   }
   public async updateFile(file: ParsedFile) {
-    console.log('👌🚨 File updated!', file, { view: this._view })
+    console.log('👌🚨 File updated!', file, { view: this._view, cache: this._cache, file })
+    this._cache = this._cache.map((ec) =>
+      ec.relative === file.relative && ec.workspace === file.workspace
+        ? { ...ec, conf: file.conf }
+        : ec
+    )
     if (this._view)
       this._view.webview.postMessage({ type: 'file-updated', file })
   }
@@ -72,10 +87,11 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
       id: string
       fullpath: string
       workspace: string
+      caller: string
     }
     const doImport = async (data: ImportMediaRequest) => {
       const id = data.id
-      this.importMedia(data.fullpath, data.workspace)
+      this.importMedia(data.fullpath, data.workspace, data.caller)
         .then((importedMedia) => {
           console.log('🧪 result of importedMedia:', { importedMedia, id })
           // const result = webviewView.webview.asWebviewUri(onDiskPath)
@@ -100,21 +116,37 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
           console.log('error with import:', err)
         })
     }
+
     webviewView.webview.onDidReceiveMessage((data) => {
       console.log('🦮 Message from webview:', data)
-      switch (data.type) {
-        case 'get-webview-uri': {
-          doImport(data)
-          break
-        }
-        case 'colorSelected': {
-          vscode.window.activeTextEditor?.insertSnippet(
-            new vscode.SnippetString(`#${data.value}`)
-          )
-          break
-        }
+      if (data.id) {
+        // Request expecting response
+        this._handleClientRequest(data)
+        return
       }
     })
+  }
+
+  private async _handleClientRequest(data: ResponseRequest) {
+    const respond = (result: any) =>
+      this._view?.webview.postMessage({
+        type: data.type + '-'+ data.id,
+        result,
+      })
+
+    // ! bootup
+    if (data.type === 'bootup') {
+      respond({ files: this._cache })
+    } 
+    
+    // ! get-webview-uri
+    else if (data.type === 'get-webview-uri') {
+      import(data.payload.fullpath)
+      this.importMedia(data.payload.fullpath, data.payload.workspace, data.payload.caller)
+        .then((importedMedia) => {
+          respond(importedMedia)
+        })
+    }
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -185,7 +217,11 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
   //     conf,
   //   }
 
-  public async importMedia(fullpath: string, workspaceName: string) {
+  public async importMedia(
+    fullpath: string,
+    workspaceName: string,
+    caller: string
+  ) {
     console.log('❤️ vscode.workspace.workspaceFolders:', {
       folders: vscode.workspace.workspaceFolders,
       workspaceName,
@@ -205,6 +241,7 @@ class ExplorerViewProvider implements vscode.WebviewViewProvider {
     console.log('❤️ uri of newpath:', { fullpath }, newpath)
 
     const newFolderPath = hash({
+      caller,
       workspaceName,
       workspacePath: workspace.uri.fsPath,
     })

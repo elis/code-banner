@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback } from "react"
 import { vscode } from "./vscode"
 
 export const CommServiceContext = React.createContext()
 export const CommService = ({ children }) => {
-  const [state, setState] = React.useState({
+  const [state] = React.useState({
     loaded: false,
   })
 
@@ -20,12 +20,12 @@ export const CommService = ({ children }) => {
     }
   }, [])
 
-  const getWebviewUri = useCallback(async (fullpath, workspace) => {
+  const requestResponse = useCallback((type, payload) => {
     const promise = new Promise((r) => {
       const id = getNonce()
-      vscode.postMessage({ type: 'get-webview-uri', id, fullpath, workspace })
-      const release = subscribe('get-webview-uri-' + id, (data) => {
-        console.log('🟣🍊♿️ Result of get webview:', data)
+      vscode.postMessage({ id, type, payload })
+      const release = subscribe(type + '-' + id, (data) => {
+        console.log('🟣🍊♿️ Result of get requestResponse:', data)
         release()
         r(data.result)
       })
@@ -34,8 +34,8 @@ export const CommService = ({ children }) => {
   }, [])
 
   const actions = {
+    requestResponse,
     subscribe,
-    getWebviewUri
   }
 
   React.useEffect(() => {
