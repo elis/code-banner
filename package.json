@@ -3,7 +3,7 @@
   "description": "Upgrade your project in VSCode and make it pop!",
   "version": "0.1.0",
   "publisher": "EliSklar",
-  "enableProposedApi": true,
+  "enableProposedApi": false,
   "engines": {
     "vscode": "^1.57.0"
   },
