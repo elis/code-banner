@@ -79,9 +79,31 @@ const ContainerItem = ({ items, style = {} }) => {
   )
 }
 const TextItem = ({ children, text, style = {} }) => {
+  const banner = useBanner()
+  const comms = useComms()
+
+  const [display, setDisplay] = useState(text || children)
+
+  useEffect(() => {
+    let release
+    ;(async () => {
+      const parsed = await comms.actions.requestResponse('parse-text-content', {
+        text: text || children,
+        workspace: banner.workspace,
+        caller: banner.relative,
+      })
+      
+      console.log('parsed text', parsed, {text, children})
+      setDisplay(parsed)
+    })()
+    return () => {
+      release = true
+    }
+  }, [text, children, banner.workspace])
+
   return (
     <div className="item item-text" style={style}>
-      {text || children}
+      {display}
     </div>
   )
 }

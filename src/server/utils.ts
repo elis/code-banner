@@ -7,3 +7,8 @@ export const getNonce = () => {
   }
   return text
 }
+
+export function escapeRegex(string: string) {
+  // eslint-disable-next-line no-useless-escape
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+}

@@ -1,8 +1,9 @@
 import * as vscode from 'vscode'
 import * as hash from 'object-hash'
+import * as objectPath from 'object-path'
 import * as path from 'path'
 
-import { getNonce } from '../../utils'
+import { escapeRegex, getNonce } from '../../utils'
 import { ParsedFile, UpdateEditor } from '../../../types'
 
 export type TestingResult = {
@@ -16,7 +17,11 @@ export type APIOutline = {
 export type ResponseRequest = {
   id: string
   type: string
-  payload: Record<string, any>
+  payload: {
+    caller?: string
+    workspace?: string
+    [key: string]: any
+  }
 }
 class PanelViewProvider implements vscode.WebviewViewProvider {
   protected viewContainer = 'custom'
@@ -104,9 +109,53 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
         result,
       })
 
+    console.log('🍊 Handling client request:', { data })
+
     // ! bootup
     if (data.type === 'bootup') {
       respond({ ...this._cache })
+    }
+
+    // ! parse-text-content
+    else if (data.type === 'parse-text-content') {
+      const text = data.payload.text?.toString()
+      let response = text
+      console.log('🍊 we are text:', text)
+      const replacables = text.match(/(\$\(([^)]*)+\))+/g)
+      console.log('🍊 replacables in text:', replacables)
+      if (replacables?.length > 0)
+        for (const item of replacables) {
+          const [, v] = item.match(/^\$\(([^)]+)\)$/)
+          if (v.match(/^package\./)) {
+            const workspace = vscode.workspace.workspaceFolders?.find(f => f.name === data.payload.workspace)
+            if (!workspace) continue
+
+            const packageUri = vscode.Uri.file(path.join(workspace?.uri.fsPath, 'package.json'))
+            console.log('🍊 found packages:', { v, packageUri })
+
+            try {
+              const buffer = await vscode.workspace.fs.readFile(packageUri)
+              console.log('🍊 found str:', { buffer })
+              const jsonData = buffer.toString()
+
+              console.log('🍊 loaded json:', { jsonData })
+              const packagej = JSON.parse(jsonData)
+              console.log('🍊 loaded packagej:', { packagej })
+              const result = objectPath.get({ package: packagej }, v)
+              console.log('🍊 result:', { packagej })
+              response = response.replace(
+                new RegExp(`${escapeRegex(item)}`, 'g'),
+                result
+              )
+              console.log('🍊 new response:', { response })
+            } catch (err) {
+              // noop
+            }
+          }
+        }
+      console.log('🍊 sending response:', response)
+
+      respond(response)
     }
 
     // ! get-webview-uri
