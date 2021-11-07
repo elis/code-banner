@@ -46,7 +46,7 @@ export const initFileWatcher = async (
     const sorted = results.sort((a, b) => (a.level > b.level ? 1 : -1))
 
     api.onReady(sorted)
-  }
+  } else api.onReady([])
 }
 
 export const fileChanged =

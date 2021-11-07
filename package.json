@@ -4,6 +4,9 @@
   "version": "0.2.0",
   "publisher": "EliSklar",
   "enableProposedApi": false,
+  "displayName": "Code Banner",
+  "icon": "media/assets/code-banner.png",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.57.0"
   },
@@ -37,7 +40,7 @@
         {
           "type": "webview",
           "id": "codeBanner.explorerPanel",
-          "name": "🚩 Code Banner",
+          "name": "Code Banner",
           "icon": "media/assets/icon.svg"
         }
       ],
