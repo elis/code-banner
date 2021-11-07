@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { useBanners } from './services/banners.service'
 import { useComms } from './services/comms.services'
 import { useConfig } from './services/config.service'
@@ -6,11 +12,11 @@ import { useConfig } from './services/config.service'
 import './testing.scss'
 
 export const Panel = ({ text }) => {
-	const banners = useBanners()
+  const banners = useBanners()
 
-	const files = useMemo(() => {
-		return banners.state.confs
-	}, [banners.state.confs])
+  const files = useMemo(() => {
+    return banners.state.confs
+  }, [banners.state.confs])
 
   return (
     <div className={'banners'}>
@@ -31,40 +37,60 @@ const BannerContext = createContext()
 const useBanner = () => useContext(BannerContext)
 
 const Banner = ({ config, relative, workspace }) => {
-	const confs = useConfig()
-  const {
-    [confs.viewContainer]: { items = [], style = {} } = {},
-  } = config
+  const confs = useConfig()
+  const { [confs.viewContainer]: { items = [], style = {} } = {} } = config
   return (
     <BannerContext.Provider value={{ config, relative, workspace }}>
       <div className="banner" style={style}>
-        {items?.length > 0 &&
-          items.map((item, index) => {
-            if (item.type === 'text')
-              return <TextItem key={'item-text-' + index}>{item.text}</TextItem>
-            if (item.type === 'svg')
-              return (
-                <SVGItem
-                  key={'item-svg-' + index}
-                  svg={item.svg}
-                  style={item.style}
-                />
-              )
-          })}
+        <ItemsDisplay items={items} />
       </div>
     </BannerContext.Provider>
   )
 }
 
-const TextItem = ({ children, text }) => {
-  return <div className="item item-text">{text || children}</div>
+export const ItemDisplay = ({ item, index }) => {
+  if (item.type === 'text')
+    return <TextItem style={item.style}>{item.text}</TextItem>
+  if (item.type === 'svg') return <SVGItem svg={item.svg} style={item.style} />
+  if (item.type === 'container')
+    return <ContainerItem items={item.items} style={item.style} />
+
+  return <>UNKNOWN</>
+}
+
+export const ItemsDisplay = ({ items }) =>
+  items?.length > 0 ? (
+    items.map((item, index) => (
+      <ItemDisplay
+        key={`item-${item.type}-${index}`}
+        item={item}
+        index={index}
+      />
+    ))
+  ) : (
+    <>x</>
+  )
+
+const ContainerItem = ({ items, style = {} }) => {
+  return (
+    <div className="item item-container" style={style}>
+      <ItemsDisplay items={items} />
+    </div>
+  )
+}
+const TextItem = ({ children, text, style = {} }) => {
+  return (
+    <div className="item item-text" style={style}>
+      {text || children}
+    </div>
+  )
 }
 const SVGItem = ({ svg, style = {} }) => {
   const banner = useBanner()
   const comms = useComms()
 
   const [url, setUrl] = useState('')
-	
+
   useEffect(() => {
     let release
     ;(async () => {
