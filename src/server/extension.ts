@@ -26,6 +26,9 @@ export function activate(context: vscode.ExtensionContext) {
     visible: false,
   }
   let booted = false
+  vscode.commands.getCommands().then(commands => {
+    console.log('🌈 Commands', { commands })
+  })
 
   const checkit = () => {
     if (
@@ -37,6 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
         readyCheck,
         allFiles,
       })
+
       explorerPanelProvider.updateFiles(allFiles)
       debugPanelProvider.updateFiles(allFiles)
       testPanelProvider.updateFiles(allFiles)

@@ -81,6 +81,7 @@
     "object-hash": "^2.2.0",
     "object-path": "^0.11.8",
     "path": "^0.12.7",
+    "react-markdown": "^7.1.0",
     "styled-components": "^5.3.3",
     "yaml": "^1.10.2"
   },

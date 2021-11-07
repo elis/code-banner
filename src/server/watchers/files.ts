@@ -29,8 +29,10 @@ export const initFileWatcher = async (
       const watcher = vscode.workspace.createFileSystemWatcher(glob)
       context.subscriptions.push(
         watcher.onDidChange(
-          fileChanged(context, (data: ParsedFile) =>
-            onUpdate(data as ParsedFile)
+          fileChanged(
+            context,
+            (data: ParsedFile) => onUpdate(data as ParsedFile),
+            executable
           )
         )
       )
@@ -127,6 +129,11 @@ export const importPlainFile = async (uri: vscode.Uri) => {
   const readData = await vscode.workspace.fs.readFile(uri)
   const ext = extname(uri.fsPath)
   const data = readData.toString()
+
+  console.log('🧜 IMPORTING PLAIN', { uri, data, ext })
+  console.log('🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜')
+  console.log('🧜 DATA: 🧜', data)
+  console.log('🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜')
 
   if (!ext || ext === '.cb' || ext === '.yml') {
     const yaml = YAML.parse(data, {})

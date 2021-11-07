@@ -11,6 +11,7 @@ esbuild
     entryPoints: ['src/client/code-banner.jsx'],
     outdir: './out/client',
     bundle: true,
+    sourcemap: true,
     plugins: [sassPlugin({})],
     ...(process.argv.find((e) => e === '--watch')
       ? {

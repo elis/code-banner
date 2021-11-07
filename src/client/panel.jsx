@@ -5,6 +5,8 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { escapeRegex } from '../utils'
 import { useBanners } from './services/banners.service'
 import { useComms } from './services/comms.services'
 import { useConfig } from './services/config.service'
@@ -15,7 +17,8 @@ export const Panel = ({ text }) => {
   const banners = useBanners()
 
   const files = useMemo(() => {
-    return banners.state.confs
+    console.log('📘 banners.state.confs', banners.state.confs)
+    return banners.state.confs?.filter(({ conf }) => !!conf.explorer)
   }, [banners.state.confs])
 
   return (
@@ -41,7 +44,12 @@ const Banner = ({ config, relative, workspace }) => {
   const { [confs.viewContainer]: { items = [], style = {} } = {} } = config
   return (
     <BannerContext.Provider value={{ config, relative, workspace }}>
-      <div className="banner" style={style}>
+      <div
+        className="banner"
+        style={style}
+        dataRelative={relative}
+        dataWorkspace={workspace}
+      >
         <ItemsDisplay items={items} />
       </div>
     </BannerContext.Provider>
@@ -49,13 +57,15 @@ const Banner = ({ config, relative, workspace }) => {
 }
 
 export const ItemDisplay = ({ item, index }) => {
-  if (item.type === 'text')
-    return <TextItem style={item.style}>{item.text}</TextItem>
-  if (item.type === 'svg') return <SVGItem svg={item.svg} style={item.style} />
-  if (item.type === 'container')
-    return <ContainerItem items={item.items} style={item.style} />
+  const handlers = {
+    text: TextItem,
+    svg: SVGItem,
+    container: ContainerItem,
+    markdown: MarkdownItem,
+  }
 
-  return <>UNKNOWN</>
+  const Comp = handlers[item.type] || UnknownItem
+  return <Comp item={item} index={index} />
 }
 
 export const ItemsDisplay = ({ items }) =>
@@ -71,35 +81,89 @@ export const ItemsDisplay = ({ items }) =>
     <>x</>
   )
 
-const ContainerItem = ({ items, style = {} }) => {
+export const useSmartText = (text) => {
+  const banner = useBanner()
+  const comms = useComms()
+
+  const [display, setDisplay] = useState(text)
+
+  console.log('🛕 CHECKING TEXT FOR SMART', { text, display })
+  useEffect(() => {
+    let release
+    ;(async () => {
+      const parsed = await comms.actions.requestResponse('parse-text-content', {
+        text,
+        workspace: banner.workspace,
+        caller: banner.relative,
+      })
+
+      console.log('parsed text', parsed, { text })
+      if (!release) setDisplay(parsed)
+    })()
+    return () => {
+      release = true
+    }
+  }, [text, banner.workspace])
+
+  const result = useMemo(() => {
+    let output = text
+    if (output !== display && !!display) return display
+    const replacables = text.match(/(\$\(([^)]*)+\))+/g)
+    console.log('🍊 replacables in text:', replacables)
+    if (replacables?.length > 0)
+      for (const item of replacables) {
+        const [, x] = item.match(/^\$\(([^)]+)\)$/)
+        const [v, defs] = x.split(', ')
+        output = output.replace(new RegExp(`${escapeRegex(item)}`, 'g'), defs)
+      }
+  }, [text, display])
+
+  return result
+}
+
+const MarkdownItem = ({ item: { markdown, style = {} } }) => {
+  const display = useSmartText(markdown)
+  return <ReactMarkdown>{display}</ReactMarkdown>
+}
+
+const UnknownItem = ({ item }) => {
+  return (
+    <>
+      Unknown type: <strong>{item.type}</strong>
+    </>
+  )
+}
+
+const ContainerItem = ({ item: { items, style = {} } }) => {
   return (
     <div className="item item-container" style={style}>
       <ItemsDisplay items={items} />
     </div>
   )
 }
-const TextItem = ({ children, text, style = {} }) => {
-  const banner = useBanner()
-  const comms = useComms()
+const TextItem = ({ children, item: { text, style = {} } }) => {
+  // const banner = useBanner()
+  // const comms = useComms()
+  const display = useSmartText(text || children)
 
-  const [display, setDisplay] = useState(text || children)
+  // const [display, setDisplay] = useState(text || children)
 
-  useEffect(() => {
-    let release
-    ;(async () => {
-      const parsed = await comms.actions.requestResponse('parse-text-content', {
-        text: text || children,
-        workspace: banner.workspace,
-        caller: banner.relative,
-      })
-      
-      console.log('parsed text', parsed, {text, children})
-      setDisplay(parsed)
-    })()
-    return () => {
-      release = true
-    }
-  }, [text, children, banner.workspace])
+  // useEffect(() => {
+  //   let release
+  //   ;(async () => {
+  //     const parsed = await comms.actions.requestResponse('parse-text-content', {
+  //       text: text || children,
+  //       workspace: banner.workspace,
+  //       caller: banner.relative,
+  //     })
+
+  //     console.log('parsed text', parsed, { text, children })
+  //     setDisplay(parsed)
+  //   })()
+  //   return () => {
+  //     release = true
+  //   }
+  // }, [text, children, banner.workspace])
 
   return (
     <div className="item item-text" style={style}>
@@ -107,7 +171,7 @@ const TextItem = ({ children, text, style = {} }) => {
     </div>
   )
 }
-const SVGItem = ({ svg, style = {} }) => {
+const SVGItem = ({ item: { svg, style = {} } }) => {
   const banner = useBanner()
   const comms = useComms()
 

@@ -125,7 +125,8 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
       console.log('🍊 replacables in text:', replacables)
       if (replacables?.length > 0)
         for (const item of replacables) {
-          const [, v] = item.match(/^\$\(([^)]+)\)$/)
+          const [, x] = item.match(/^\$\(([^)]+)\)$/)
+          const [v, defs, missing] = x.split(', ')
           if (v.match(/^package\./)) {
             const workspace = vscode.workspace.workspaceFolders?.find(f => f.name === data.payload.workspace)
             if (!workspace) continue
@@ -141,7 +142,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
               console.log('🍊 loaded json:', { jsonData })
               const packagej = JSON.parse(jsonData)
               console.log('🍊 loaded packagej:', { packagej })
-              const result = objectPath.get({ package: packagej }, v)
+              const result = objectPath.get({ package: packagej }, v) || defs || missing
               console.log('🍊 result:', { packagej })
               response = response.replace(
                 new RegExp(`${escapeRegex(item)}`, 'g'),
@@ -160,11 +161,10 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
 
     // ! get-webview-uri
     else if (data.type === 'get-webview-uri') {
-      import(data.payload.fullpath)
       this.importMedia(
         data.payload.fullpath,
-        data.payload.workspace,
-        data.payload.caller
+        data.payload.workspace || '',
+        data.payload.caller || ''
       ).then((importedMedia) => {
         respond(importedMedia)
       })
