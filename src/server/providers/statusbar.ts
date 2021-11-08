@@ -309,7 +309,7 @@ class StatusBar {
       const stage4 = stage2
         // stage 4.1 - extract the status bar items
         .map((file) => file.items?.map((i) => i.item))
-        .reduce((acc, items) => [...(acc || []), ...(items || [])])
+        .reduce((acc, items) => [...(acc || []), ...(items || [])], [])
 
         // stage 5 - remove already visible items
         ?.filter((item) => activeNames.indexOf(item.name) === -1)
