@@ -7,6 +7,9 @@ import BannersService from './services/banners.service'
 
 import Panel from './panel'
 
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'shards-ui/dist/css/shards.min.css'
+
 const App = () => {
   return (
     <CommService>
