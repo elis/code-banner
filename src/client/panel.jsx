@@ -93,7 +93,6 @@ const TextItem = ({ children, text, style = {} }) => {
         caller: banner.relative,
       })
       
-      console.log('parsed text', parsed, {text, children})
       setDisplay(parsed)
     })()
     return () => {
