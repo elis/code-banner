@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { escapeRegex } from '../utils'
+import { escapeRegex } from './utils'
 import { useBanners } from './services/banners.service'
 import { useComms } from './services/comms.services'
 import { useConfig } from './services/config.service'
@@ -17,7 +17,6 @@ export const Panel = ({ text }) => {
   const banners = useBanners()
 
   const files = useMemo(() => {
-    console.log('📘 banners.state.confs', banners.state.confs)
     return banners.state.confs?.filter(({ conf }) => !!conf.explorer)
   }, [banners.state.confs])
 
@@ -87,7 +86,6 @@ export const useSmartText = (text) => {
 
   const [display, setDisplay] = useState(text)
 
-  console.log('🛕 CHECKING TEXT FOR SMART', { text, display })
   useEffect(() => {
     let release
     ;(async () => {
@@ -97,7 +95,6 @@ export const useSmartText = (text) => {
         caller: banner.relative,
       })
 
-      console.log('parsed text', parsed, { text })
       if (!release) setDisplay(parsed)
     })()
     return () => {
@@ -108,14 +105,16 @@ export const useSmartText = (text) => {
   const result = useMemo(() => {
     let output = text
     if (output !== display && !!display) return display
+  
     const replacables = text.match(/(\$\(([^)]*)+\))+/g)
-    console.log('🍊 replacables in text:', replacables)
+
     if (replacables?.length > 0)
       for (const item of replacables) {
         const [, x] = item.match(/^\$\(([^)]+)\)$/)
         const [v, defs] = x.split(', ')
         output = output.replace(new RegExp(`${escapeRegex(item)}`, 'g'), defs)
       }
+    return output
   }, [text, display])
 
   return result
@@ -142,28 +141,7 @@ const ContainerItem = ({ item: { items, style = {} } }) => {
   )
 }
 const TextItem = ({ children, item: { text, style = {} } }) => {
-  // const banner = useBanner()
-  // const comms = useComms()
   const display = useSmartText(text || children)
-
-  // const [display, setDisplay] = useState(text || children)
-
-  // useEffect(() => {
-  //   let release
-  //   ;(async () => {
-  //     const parsed = await comms.actions.requestResponse('parse-text-content', {
-  //       text: text || children,
-  //       workspace: banner.workspace,
-  //       caller: banner.relative,
-  //     })
-
-  //     console.log('parsed text', parsed, { text, children })
-  //     setDisplay(parsed)
-  //   })()
-  //   return () => {
-  //     release = true
-  //   }
-  // }, [text, children, banner.workspace])
 
   return (
     <div className="item item-text" style={style}>

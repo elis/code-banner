@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import * as hash from 'object-hash'
 import * as objectPath from 'object-path'
 import * as path from 'path'
+import * as YAML from 'yaml'
 
 import { escapeRegex, getNonce } from '../../utils'
 import { ParsedFile, UpdateEditor } from '../../../types'
@@ -120,41 +121,66 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     else if (data.type === 'parse-text-content') {
       const text = data.payload.text?.toString()
       let response = text
-      console.log('🍊 we are text:', text)
       const replacables = text.match(/(\$\(([^)]*)+\))+/g)
-      console.log('🍊 replacables in text:', replacables)
       if (replacables?.length > 0)
         for (const item of replacables) {
           const [, x] = item.match(/^\$\(([^)]+)\)$/)
           const [v, defs, missing] = x.split(', ')
-          if (v.match(/^package\./)) {
-            const workspace = vscode.workspace.workspaceFolders?.find(f => f.name === data.payload.workspace)
+
+          // Support for $(dir/file.yaml, some.path)
+          if (v.match(/.(json|ya?ml)$/)) {
+            const workspace = vscode.workspace.workspaceFolders?.find(
+              (f) => f.name === data.payload.workspace
+            )
             if (!workspace) continue
 
-            const packageUri = vscode.Uri.file(path.join(workspace?.uri.fsPath, 'package.json'))
-            console.log('🍊 found packages:', { v, packageUri })
+            const jsonUri = vscode.Uri.file(
+              path.join(workspace?.uri.fsPath, v)
+            )
 
             try {
-              const buffer = await vscode.workspace.fs.readFile(packageUri)
-              console.log('🍊 found str:', { buffer })
+              const buffer = await vscode.workspace.fs.readFile(jsonUri)
               const jsonData = buffer.toString()
 
-              console.log('🍊 loaded json:', { jsonData })
-              const packagej = JSON.parse(jsonData)
-              console.log('🍊 loaded packagej:', { packagej })
-              const result = objectPath.get({ package: packagej }, v) || defs || missing
-              console.log('🍊 result:', { packagej })
+              const json = ['yml', 'yaml'].indexOf(v.match(/.(json|ya?ml)$/)[1]) >= 0 ? YAML.parse(jsonData) : JSON.parse(jsonData)
+              const result =
+                objectPath.get(json, defs) || missing
               response = response.replace(
                 new RegExp(`${escapeRegex(item)}`, 'g'),
                 result
               )
-              console.log('🍊 new response:', { response })
+            } catch (err) {
+              // noop
+            }
+          } 
+          
+          // Support for `$(package.some.path)`
+          else if (v.match(/^package\./)) {
+            const workspace = vscode.workspace.workspaceFolders?.find(
+              (f) => f.name === data.payload.workspace
+            )
+            if (!workspace) continue
+
+            const packageUri = vscode.Uri.file(
+              path.join(workspace?.uri.fsPath, 'package.json')
+            )
+
+            try {
+              const buffer = await vscode.workspace.fs.readFile(packageUri)
+              const jsonData = buffer.toString()
+
+              const packagej = JSON.parse(jsonData)
+              const result =
+                objectPath.get({ package: packagej }, v) || defs || missing
+              response = response.replace(
+                new RegExp(`${escapeRegex(item)}`, 'g'),
+                result
+              )
             } catch (err) {
               // noop
             }
           }
         }
-      console.log('🍊 sending response:', response)
 
       respond(response)
     }

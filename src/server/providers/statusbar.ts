@@ -1,7 +1,6 @@
 import * as vscode from 'vscode'
 import {
   ParsedFile,
-  StatusBarItem,
   StatusBarItemOptions,
   StatusItems,
   UpdateEditor,
@@ -199,10 +198,6 @@ class StatusBar {
 
   public async updateVisible(editors: UpdateEditor[]) {
     this._cache.visibleEditors = editors
-    console.log('🐥 [updateVisible] Visible updated', {
-      editors,
-      'this._items': this._items,
-    })
 
     this._items
 
@@ -212,7 +207,6 @@ class StatusBar {
     ) => {
       // stage 1 - get current items
       const stage1 = items
-      console.log('🐥 [new flow] Stage 1 - current items', { stage1 })
 
       // stage 2 - find items, that
       //   - editors to high of a level
@@ -237,7 +231,6 @@ class StatusBar {
         })),
       }))
 
-      console.log('🐥 [new flow] Stage 2 - expired items', { stage2 })
       // Remove items with permitted editors
       const stage3 = stage2
         .filter(
@@ -253,8 +246,6 @@ class StatusBar {
 
     const outdatedItems = getExpiredItems(this._items, editors)
 
-    console.log('🦞🐢 [updateVisible] Outdated items result', { outdatedItems })
-
     if (outdatedItems.length) {
       outdatedItems.forEach((item) => item.wrapped.dispose())
     }
@@ -263,80 +254,74 @@ class StatusBar {
       editors: UpdateEditor[],
       items: ActiveStatusBarItem[]
     ) => {
+      const activeNames = items.map((item) => item.name)
       // stage 1 - get all available confs
-      const stage1 = files.filter((file) => file.conf.statusbar?.items?.length)
-      console.log('🐥 [new items new flow] Stage 1 - Available files', {
-        stage1,
-      })
+      const stage1 = files.filter(
+        (file) =>
+          // make sure it has statusable items
+          file.conf.statusbar?.items?.length
+      )
 
-      // stage 2 - find confs that can appear but don't
-      const stage2 = stage1.map((file) => ({
+      // // stage 2 - find files with confs that can appear but don't
+      const stage2 = stage1
+        .map((file) => ({
+          file,
           'file.level': file.level,
           items: file.conf.statusbar?.items.map((item) => ({
-            'ited.depth': item.depth,
+            item: { ...item, file },
+            'item.depth': item.depth,
             'file.level': file.level,
 
             'sitem reach':
               file.level === 1 && (!item.depth || item.depth === Infinity)
                 ? Infinity
                 : file.level + (item.depth || 0),
-                
-                editors: editors.map((editor) => ({
-                  'editor.level': editor.level,
-                  'file.level': file.level,
-                  'item.depth': item.depth,
+
+            editors: editors.map((editor) => ({
+              editor,
+              'editor.level': editor.level,
+              'file.level': file.level,
+              'item.depth': item.depth,
               'item reach':
-                file.level === 1 &&
-                (!item.depth || item.depth === Infinity)
+                file.level === 1 && (!item.depth || item.depth === Infinity)
                   ? Infinity
                   : file.level + (item.depth || 0),
               'editor deeper': editor.level > file.level + (item.depth || 0),
               'item allowed':
-                (file.level === 1 && !item.depth) ||
+                (file.level === 1 && (!item.depth || item.depth === Infinity)) ||
                 (editor.level <= file.level + (item.depth || 0) &&
                   editor.level >= file.level),
-              editor,
             })),
-            // 'file deeper': file.level > item.file.level + item.depth,
-            // 'item allowed':
           })),
-        })),
-      }))
+        }))
 
-      console.log('🐥 [new items new flow] Stage 2', { stage2 })
+        .map((item) => ({
+          ...item,
+          // filter confs with disallowed files
+          items: item.items?.filter((item) =>
+            item.editors.find((editor) => editor['item allowed'])
+          ),
+        }))
+        // filter items without available confs
+        .filter((item) => !!item.items?.length)
+
+      // stage 4 - reduce to a single list of items
+      const stage4 = stage2
+        // stage 4.1 - extract the status bar items
+        .map((file) => file.items?.map((i) => i.item))
+        .reduce((acc, items) => [...(acc || []), ...(items || [])])
+
+        // stage 5 - remove already visible items
+        ?.filter((item) => activeNames.indexOf(item.name) === -1)
+
+      return stage4
     }
 
     const newItems = getNewItems(this._cache.files, editors, this._items)
-    console.log('🦞🐢 [updateVisible] New items result', { newItems })
-
-    const newEditors = editors.filter(
-      (editor) =>
-        this._cache.files.find(
-          (file) =>
-            editor.dirname === file.dirname ||
-            // Match editor relative path to file's dirname
-            (editor.relative.match(new RegExp(`^${file.dirname}`)) &&
-              // check if parent at sufficient depth
-              file.conf.statusbar?.items.find(
-                (item) => item.depth && item.depth + file.level >= editor.level
-              ))
-        ) && !this._items.find((item) => editor.dirname === item.file.dirname)
-    )
-    console.log('🦞🐢 [updateVisible] New editors', { newEditors })
-
-    if (newEditors.length) {
-      const newCofs = this._cache.files.filter((file) =>
-        newEditors.find(
-          (editor) =>
-            editor.dirname === file.dirname ||
-            (editor.dirname.match(new RegExp(`^${file.dirname}`)) &&
-              file.conf.statusbar?.items.find(
-                (item) => item.depth && item.depth + file.level >= editor.level
-              ))
-        )
-      )
-      newCofs.forEach((file) => this.updateFile(file))
-    }
+    if (newItems?.length)
+      newItems?.forEach((item) => {
+        this.addItem(item.name, item.options, item.file, item.depth)
+      })
   }
 
   public async updateActive(editor?: UpdateEditor) {

@@ -130,11 +130,6 @@ export const importPlainFile = async (uri: vscode.Uri) => {
   const ext = extname(uri.fsPath)
   const data = readData.toString()
 
-  console.log('🧜 IMPORTING PLAIN', { uri, data, ext })
-  console.log('🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜')
-  console.log('🧜 DATA: 🧜', data)
-  console.log('🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜🧜')
-
   if (!ext || ext === '.cb' || ext === '.yml') {
     const yaml = YAML.parse(data, {})
 

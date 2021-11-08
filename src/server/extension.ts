@@ -75,13 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
     },
   }
 
-  // initPlainWatcher(context, {
-  //   ...handlers,
-  //   onReady: (files) => {
-  //     readyCheck.filesPlain = true
-  //     handlers.onReady(files)
-  //   },
-  // })
+  // Plain (.cb, .cb.json, .cb.yml)
   initFileWatcher(['**/*.cb', '**/*.cb.json', '**/*.cb.yml'], context, {
     ...handlers,
     onReady: (files) => {
@@ -90,6 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
     },
   }, false)
 
+  // Executable (.pb)
   initFileWatcher(['**/*.pb'], context, {
     ...handlers,
     onReady: (files) => {
@@ -97,13 +92,6 @@ export function activate(context: vscode.ExtensionContext) {
       handlers.onReady(files)
     },
   }, true)
-  // initExecutableWatcher(context, {
-  //   ...handlers,
-  //   onReady: (files) => {
-  //     readyCheck.filesExecutable = true
-  //     handlers.onReady(files)
-  //   },
-  // })
 
   initEditorWatcher(context, {
     onVisibileUpdate: (visibleEditors) => {
