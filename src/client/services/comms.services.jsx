@@ -2,7 +2,8 @@ import React, { useCallback } from "react"
 import { vscode } from "./vscode"
 
 export const CommServiceContext = React.createContext()
-export const CommService = ({ children }) => {
+
+const CommService = ({ children }) => {
   const [state] = React.useState({
     loaded: false,
   })
@@ -74,3 +75,5 @@ export const getNonce = () => {
   }
   return text
 }
+
+export default CommService

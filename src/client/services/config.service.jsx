@@ -4,7 +4,8 @@ import { vscode } from './vscode'
 
 
 export const ConfigServiceContext = React.createContext()
-export const ConfigService = ({ children }) => {
+
+const ConfigService = ({ children }) => {
   const comms = useComms()
 
   const [state, setState] = React.useState(vscode.getState()?.config || {
@@ -74,3 +75,5 @@ export const ConfigService = ({ children }) => {
 }
 
 export const useConfig = () => React.useContext(ConfigServiceContext)
+
+export default ConfigService

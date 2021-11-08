@@ -3,7 +3,7 @@ import { escapeRegex } from '../utils'
 import { useConfig } from './config.service'
 
 export const BannersContext = createContext()
-export const BannersService = ({ children }) => {
+const BannersService = ({ children }) => {
   const config = useConfig()
 
   const [state, setState] = useState({})
@@ -54,3 +54,5 @@ export const BannersService = ({ children }) => {
 }
 
 export const useBanners = () => useContext(BannersContext)
+
+export default BannersService
