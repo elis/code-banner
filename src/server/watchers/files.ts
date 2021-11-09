@@ -129,7 +129,7 @@ export const importPlainFile = async (uri: vscode.Uri) => {
   const data = readData.toString()
 
   if (!ext || ext === '.cb' || ext === '.yml') {
-    const yaml = YAML.parse(data, {})
+    const yaml = YAML.parse(data.replace(new RegExp(`(\t)`, 'g'), '  '), {})
 
     return yaml
   }

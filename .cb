@@ -43,16 +43,33 @@ explorer:
             background: none
             padding: 10px
             flex: 1 1 auto
-            overflow: hidden
+            minWidth: 120px
           items:
             - type: text
               text: $(package.displayName)
               style:
-                fontSize: 16px
-            - type: text
+                fontSize: 14px
+                fontWeight: bold
+                textTransform: uppercase
+            - type: container
               style:
-                transition: all 60ms ease-in-out
-              text: "by: $(package.author.name, name)"
+                display: flex
+                flexDirection: row
+                columnGap: 4px
+                flexWrap: wrap
+              items:
+                - type: text
+                  style:
+                    transition: all 60ms ease-in-out
+                    fontFamily: var(--monaco-monospace-font)
+                    fontSize: 11px
+                    marginBottom: 4px
+                  text: "aka: $(package.name, code-banner)"
+                - type: text
+                  style:
+                    transition: all 60ms ease-in-out
+                    fontSize: 11px
+                  text: "by: $(package.author.name, name)"
             - type: container
               style:
                 height: 3px
@@ -65,13 +82,13 @@ explorer:
               items:
                 - type: text
                   style:
-                    fontSize: 12px
+                    fontSize: 11px
                     cursor: pointer
                   text: "$(codicon:github) Repo"
                   click: command:editor.action.openLink:https://github.com/elis/code-banner
                 - type: text
                   style:
-                    fontSize: 12px
+                    fontSize: 11px
                     cursor: pointer
                   text: "$(codicon:extensions) Extn."
                   click: command:extension.open:EliSklar.code-banner

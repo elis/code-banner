@@ -1,0 +1,18 @@
+explorer:
+  rows:
+    - xstyle:
+        border: 8px solid red
+      items:
+      - type: codicon
+        codicon: info
+        style:
+          fontSize: 23px
+          padding: 6px
+      - type: container
+        style:
+          marginRight: 3vw
+        items:
+          - type: markdown
+            markdown: Media servers `static` files for the banners to load from
+
+
