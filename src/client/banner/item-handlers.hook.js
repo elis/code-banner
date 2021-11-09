@@ -20,6 +20,10 @@ const useItemHandlers = (item) => {
     }
   }, [item.click])
 
+  useEffect(() => {
+    setStyles(item.style)
+  }, [item.style])
+
   const onClick = useMemo(() => {
     return () => {
       if (typeof item.click === 'string') {
