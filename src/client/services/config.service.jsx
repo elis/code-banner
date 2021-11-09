@@ -26,6 +26,7 @@ const ConfigService = ({ children }) => {
       setState((v) => ({ ...v, files: message.files }))
     })
     const releaseFile = comms.actions.subscribe('file-updated', (message) => {
+      console.log('⛈ File Updated:', { message })
       setState((v) => ({
         ...v,
         files: [
@@ -37,7 +38,13 @@ const ConfigService = ({ children }) => {
     const releaseVisible = comms.actions.subscribe(
       'visible-updated',
       (message) => {
-        setState((v) => ({ ...v, visible: message.editors }))
+        setState((v) => ({
+          ...v,
+          visible: message.editors.map((editor) => ({
+            ...editor,
+            isActive: v.active.relative === editor.relative,
+          })),
+        }))
       }
     )
     const releaseActive = comms.actions.subscribe(
@@ -46,6 +53,10 @@ const ConfigService = ({ children }) => {
         setState((v) => ({
           ...v,
           active: message.editor,
+          visible: v.visible.map((editor) => ({
+            ...editor,
+            isActive: message.editor.relative === editor.relative,
+          })),
         }))
       }
     )
@@ -58,7 +69,10 @@ const ConfigService = ({ children }) => {
       setState((v) => ({
         ...v,
         active: result.activeEditor,
-        visible: result.visibleEditors,
+        visible: result.visibleEditors.map((editor) => ({
+          ...editor,
+          isActive: editor.relative === result.activeEditor?.relative,
+        })),
         files: result.files,
       }))
     })

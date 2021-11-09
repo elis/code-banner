@@ -18,13 +18,17 @@ export const ItemDisplay = ({ item, index }) => {
     markdown: MarkdownItem,
     hr: HorizontalRuleItem,
     span: SpanItem,
-    codicon: CodiconItem
+    codicon: CodiconItem,
   }
 
   const Comp = types[item.type] || UnknownItem
   return (
     <BannerItemErrorBoundary item={item}>
-      <Comp item={item} index={index} />
+      <>
+        {/* {console.log('🗽🗽🗽🗽 ITEMS DISPILAY', { item })} */}
+
+        <Comp item={item} index={index} />
+      </>
     </BannerItemErrorBoundary>
   )
 }
@@ -32,11 +36,14 @@ export const ItemDisplay = ({ item, index }) => {
 export const ItemsDisplay = ({ items }) =>
   items?.length > 0 ? (
     items.map((item, index) => (
-      <ItemDisplay
-        key={`item-${item.type}-${index}`}
-        item={item}
-        index={index}
-      />
+      <>
+        {/* {console.log('🗽 ITEMS DISPILAY', { item })} */}
+        <ItemDisplay
+          key={`item-${item.type}-${index}`}
+          item={item}
+          index={index}
+        />
+      </>
     ))
   ) : (
     <></>

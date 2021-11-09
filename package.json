@@ -78,6 +78,7 @@
     "class-names": "^1.0.0",
     "deep-object-diff": "^1.1.0",
     "esbuild-sass-plugin": "^1.7.0",
+    "minimatch": "^3.0.4",
     "object-hash": "^2.2.0",
     "object-path": "^0.11.8",
     "path": "^0.12.7",

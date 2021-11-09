@@ -64,6 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
       checkit()
     },
     onUpdate: (file: ParsedFile) => {
+      console.log('🌈 File update:', { file })
       explorerPanelProvider.updateFile(file)
       debugPanelProvider.updateFile(file)
       testPanelProvider.updateFile(file)

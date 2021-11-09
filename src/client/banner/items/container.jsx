@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import classnames from 'class-names'
 import { ItemsDisplay } from '.'
 import useItemHandlers from '../item-handlers.hook'
