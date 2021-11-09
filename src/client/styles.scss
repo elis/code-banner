@@ -1,0 +1,42 @@
+html, body {
+	padding: 0;
+	margin: 0;
+}
+
+.banners {
+	display: flex;
+	flex-direction: column;
+	.codicon[class*='codicon-'] {
+		display: inline-block;
+	}
+	> .banner {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		span:empty {
+			flex: 1 1 auto;
+			display: inline-block;
+			line-height: 1px;
+		}
+		p, h1, h2, h3, h4, h5, h6 {
+			padding: 0;
+			margin: 0;
+		}
+		.codicon {
+			font-size: 0.8em;
+		}
+		.error {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			column-gap: 4px;
+
+			border: 2px solid orange;
+			border-radius: 3px;
+			padding: 2px;
+			.help {
+				font-size: 22px;
+			}
+		}
+	}
+}

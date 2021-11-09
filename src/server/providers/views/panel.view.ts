@@ -6,6 +6,7 @@ import * as YAML from 'yaml'
 
 import { escapeRegex, getNonce } from '../../utils'
 import { ParsedFile, UpdateEditor } from '../../../types'
+import { dirname } from 'path'
 
 export type TestingResult = {
   output: string
@@ -104,14 +105,12 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async _handleClientRequest(data: ResponseRequest) {
-    const respond = (result: any) =>
+    const respond = (result: any) => {
       this._view?.webview.postMessage({
         type: data.type + '-' + data.id,
         result,
       })
-
-    console.log('🍊 Handling client request:', { data })
-
+    }
     // ! bootup
     if (data.type === 'bootup') {
       respond({ ...this._cache })
@@ -134,26 +133,26 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
             )
             if (!workspace) continue
 
-            const jsonUri = vscode.Uri.file(
-              path.join(workspace?.uri.fsPath, v)
-            )
+            const jsonUri = vscode.Uri.file(path.join(workspace?.uri.fsPath, v))
 
             try {
               const buffer = await vscode.workspace.fs.readFile(jsonUri)
               const jsonData = buffer.toString()
 
-              const json = ['yml', 'yaml'].indexOf(v.match(/.(json|ya?ml)$/)[1]) >= 0 ? YAML.parse(jsonData) : JSON.parse(jsonData)
-              const result =
-                objectPath.get(json, defs) || missing
+              const json =
+                ['yml', 'yaml'].indexOf(v.match(/.(json|ya?ml)$/)[1]) >= 0
+                  ? YAML.parse(jsonData)
+                  : JSON.parse(jsonData)
+              const result = objectPath.get(json, defs) || missing
               response = response.replace(
                 new RegExp(`${escapeRegex(item)}`, 'g'),
                 result
               )
             } catch (err) {
-              // noop
+              response = { error: err }
             }
-          } 
-          
+          }
+
           // Support for `$(package.some.path)`
           else if (v.match(/^package\./)) {
             const workspace = vscode.workspace.workspaceFolders?.find(
@@ -177,7 +176,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
                 result
               )
             } catch (err) {
-              // noop
+              response = { error: err }
             }
           }
         }
@@ -186,14 +185,61 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     }
 
     // ! get-webview-uri
+    else if (data.type === 'execute-command') {
+      console.log('🧑‍🦳 Execute command:', { data })
+
+      const makeCommand = (
+        command: string,
+        args?: string[],
+        caller?: string,
+        workspaceName?: string
+      ) => {
+        if (!command) throw new Error('Command not provided')
+
+        const [fullpath] = command
+        const workspace = vscode.workspace.workspaceFolders?.find(
+          ({ name }) => name === workspaceName
+        )
+        const callerDirname = dirname(caller || '')
+
+        if (command === 'vscode.openFolder') {
+          const uri = vscode.Uri.file(
+            workspace
+              ? vscode.Uri.joinPath(
+                  workspace.uri,
+                  callerDirname,
+                  args?.[0] || ''
+                ).fsPath
+              : args?.[0] || ''
+          )
+          return { command, args: [uri] }
+        }
+
+        return { command, args }
+      }
+
+      const { command, args } = makeCommand(
+        data.payload.command,
+        data.payload.args,
+        data.payload.caller,
+        data.payload.workspace
+      )
+      vscode.commands.executeCommand(command, ...(args || []))
+    }
+
+    // ! get-webview-uri
     else if (data.type === 'get-webview-uri') {
       this.importMedia(
         data.payload.fullpath,
         data.payload.workspace || '',
         data.payload.caller || ''
-      ).then((importedMedia) => {
-        respond(importedMedia)
-      })
+      )
+        .then((importedMedia) => {
+          respond(importedMedia)
+        })
+        .catch((error) => {
+          respond({ error })
+        })
     }
   }
 
@@ -207,7 +253,26 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'out/client/', 'code-banner.css')
     )
+    const codiconsUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        'node_modules',
+        '@vscode/codicons',
+        'dist',
+        'codicon.css'
+      )
+    )
 
+    // const uitoolkitUri = webview.asWebviewUri(
+    //   vscode.Uri.joinPath(
+    //     this._extensionUri,
+    //     'node_modules',
+    //     '@vscode',
+    //     'webview-ui-toolkit',
+    //     'dist',
+    //     'toolkit.js'
+    //   )
+    // )
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce()
 
@@ -222,19 +287,13 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
 				-->
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; img-src ${
-            webview.cspSource
-          } https: ${webview.cspSource.replace(
-      'https:',
-      'vscode-resource:'
-    )}  vscode-resource:; script-src ${webview.cspSource}; style-src ${
-      webview.cspSource
-    };"
+          content="default-src 'none'; img-src ${webview.cspSource} https:; font-src ${webview.cspSource}; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
         />
       
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<link href="${styleUri}" rel="stylesheet">
+				<link href="${codiconsUri}" rel="stylesheet">
 				
 				<title>Cat Colors</title>
 			</head>
@@ -253,6 +312,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     const workspace = vscode.workspace.workspaceFolders?.find(
       ({ name }) => name === workspaceName
     )
+
     if (!workspace)
       return { error: 'No active workspace found ' + workspaceName }
 

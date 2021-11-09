@@ -1,7 +1,7 @@
 {
   "name": "code-banner",
   "description": "Upgrade your project in VSCode and make it pop!",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "publisher": "EliSklar",
   "enableProposedApi": false,
   "displayName": "Code Banner",
@@ -66,31 +66,28 @@
     "vscode:prepublish": "npm run compile",
     "compile:server": "tsc -p ./",
     "compile:client": "node build.js",
-    "compile": "concurrently -n \"npm:compile:server\" \"npm:compile:client\"",
+    "compile": "npm run compile:server && npm run compile:client",
     "lint": "eslint . --ext .ts,.tsx",
     "watch": "npm run compile:client && tsc -w -p ./",
     "watch:both": "concurrently -n \"npm:watch:server\" \"npm:watch:client\"",
     "watch:server": "tsc -w -p ./",
-    "watch:client": "node build.js --watch",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "watch:client": "node build.js --watch"
   },
   "dependencies": {
+    "@vscode/codicons": "^0.0.26",
+    "class-names": "^1.0.0",
     "deep-object-diff": "^1.1.0",
     "esbuild-sass-plugin": "^1.7.0",
     "object-hash": "^2.2.0",
     "object-path": "^0.11.8",
     "path": "^0.12.7",
     "react-markdown": "^7.1.0",
+    "react-string-replace": "^0.4.4",
     "styled-components": "^5.3.3",
     "yaml": "^1.10.2"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
-    "@storybook/addon-actions": "^6.3.12",
-    "@storybook/addon-essentials": "^6.3.12",
-    "@storybook/addon-links": "^6.3.12",
-    "@storybook/react": "^6.3.12",
     "@types/node": "^16.11.6",
     "@types/object-hash": "^2.2.1",
     "@types/object-path": "^0.11.1",
@@ -101,9 +98,8 @@
     "esbuild": "^0.13.12",
     "eslint": "^7.21.0",
     "prettier": "2.4.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "storybook-dark-mode": "^1.0.8",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "typescript": "^4.2.2"
   }
 }

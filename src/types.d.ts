@@ -1,16 +1,16 @@
 import * as vscode from 'vscode'
 
 export type CodeBannerConfig = {
-  statusbar?: StatusBarConfig,
+  statusbar?: StatusBarConfig
   explorer?: ExplorerPanelConfig
 }
 
 export type StatusBarConfig = {
-	items: StatusBarItem[]
+  items: StatusBarItem[]
 }
 
 export type ExplorerPanelConfig = {
-	items?: BannerItem[]
+  items?: BannerItem[]
 }
 
 export type BannerItem = BannerItemBase | BannerItemText
@@ -24,28 +24,27 @@ export type BannerItemText = BannerItemBase & {
   text: string
 }
 
-
 export type StatusBarItem = {
-	name: string
-	depth?: number
-	options: StatusBarItemOptions
+  name: string
+  depth?: number
+  options: StatusBarItemOptions
 }
 
 export type StatusBarItemOptions = {
-	text: string
+  text: string
   alignment?: vscode.StatusBarAlignment
   priority?: number
-	visible?: boolean
-	color?: string
-	command?: string
-	name?: string
-	tooltip?: string
-	id?: string
+  visible?: boolean
+  color?: string
+  command?: string
+  name?: string
+  tooltip?: string
+  id?: string
 
-	/**
-	 * See: https://code.visualstudio.com/api/references/theme-color
-	 */
-	backgroundColor?: string
+  /**
+   * See: https://code.visualstudio.com/api/references/theme-color
+   */
+  backgroundColor?: string
 }
 
 export type ParsedFile = ParsedExecutableFile | ParsedConfigFile
@@ -55,38 +54,36 @@ export type ParsedBaseFile = {
   conf: CodeBannerConfig
   relative: string
   workspace: string
-	dirname: string
+  dirname: string
 }
 
 export type ParsedExecutableFile = ParsedBaseFile & {
-	executable: true
+  executable: true
 }
 export type ParsedConfigFile = ParsedBaseFile & {
-	executable: false
+  executable: false
 }
-
 
 export type StatusItems = {
-	items: {
-		name: string
-		options: Partial<StatusBarItemOptions>
-	}[],
-	confs: Record<string, string[]>
+  items: {
+    name: string
+    options: Partial<StatusBarItemOptions>
+  }[]
+  confs: Record<string, string[]>
 }
 
-
 export type UpdateEditor = {
-	editor: vscode.TextEditor
-	options: vscode.TextEditorOptions
-	document: vscode.TextDocument
-	dirname: string
-	uri: vscode.Uri
-	version: number
-	lineCount: number
-	languageId: string
-	isVisible?: boolean
-	isActive?: boolean
-	level: number
-	relative: string
-	workspace: string
+  editor: vscode.TextEditor
+  options: vscode.TextEditorOptions
+  document: vscode.TextDocument
+  dirname: string
+  uri: vscode.Uri
+  version: number
+  lineCount: number
+  languageId: string
+  isVisible?: boolean
+  isActive?: boolean
+  level: number
+  relative: string
+  workspace: string
 }

@@ -3,7 +3,7 @@ import { escapeRegex } from '../utils'
 import { useConfig } from './config.service'
 
 export const BannersContext = createContext()
-export const BannersService = ({ children }) => {
+const BannersService = ({ children }) => {
   const config = useConfig()
 
   const [state, setState] = useState({})
@@ -16,7 +16,11 @@ export const BannersService = ({ children }) => {
 
     const confs = files
       .filter((file) => {
-        if (file.level === 1 && file.conf[config.viewContainer]?.depth === undefined) return true
+        if (
+          file.level === 1 &&
+          file.conf[config.viewContainer]?.depth === undefined
+        )
+          return true
         if (active && file.dirname === active.dirname) return true
         if (visible?.find((editor) => editor.dirname === file.dirname))
           return true
@@ -25,9 +29,10 @@ export const BannersService = ({ children }) => {
         if (
           visible?.find(
             (editor) =>
-              (file.level === 1 || editor.dirname.match(
-                new RegExp(`^${escapeRegex(file.dirname)}`)
-              )) &&
+              (file.level === 1 ||
+                editor.dirname.match(
+                  new RegExp(`^${escapeRegex(file.dirname)}`)
+                )) &&
               file.conf[config.viewContainer]?.depth + file.level >=
                 editor.level
           )
@@ -54,3 +59,5 @@ export const BannersService = ({ children }) => {
 }
 
 export const useBanners = () => useContext(BannersContext)
+
+export default BannersService

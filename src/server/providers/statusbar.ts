@@ -288,7 +288,8 @@ class StatusBar {
                   : file.level + (item.depth || 0),
               'editor deeper': editor.level > file.level + (item.depth || 0),
               'item allowed':
-                (file.level === 1 && (!item.depth || item.depth === Infinity)) ||
+                (file.level === 1 &&
+                  (!item.depth || item.depth === Infinity)) ||
                 (editor.level <= file.level + (item.depth || 0) &&
                   editor.level >= file.level),
             })),

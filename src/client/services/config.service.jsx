@@ -2,21 +2,23 @@ import React, { useEffect } from 'react'
 import { useComms } from './comms.services'
 import { vscode } from './vscode'
 
-
 export const ConfigServiceContext = React.createContext()
-export const ConfigService = ({ children }) => {
+
+const ConfigService = ({ children }) => {
   const comms = useComms()
 
-  const [state, setState] = React.useState(vscode.getState()?.config || {
-    files: [],
-  })
+  const [state, setState] = React.useState(
+    vscode.getState()?.config || {
+      files: [],
+    }
+  )
 
   const viewContainer = document.getElementById('root').dataset.viewContainer
 
-	useEffect(() => {
-		const st = vscode.getState()
-		vscode.setState({ ...st, config: state })
-	}, [state])
+  useEffect(() => {
+    const st = vscode.getState()
+    vscode.setState({ ...st, config: state })
+  }, [state])
   const actions = {}
 
   React.useEffect(() => {
@@ -32,26 +34,32 @@ export const ConfigService = ({ children }) => {
         ],
       }))
     })
-    const releaseVisible = comms.actions.subscribe('visible-updated', (message) => {
-      setState((v) => ({ ...v, visible: message.editors }))
-    })
-    const releaseActive = comms.actions.subscribe('active-updated', (message) => {
-      setState((v) => ({
-        ...v,
-        active: message.editor
-      }))
-    })
+    const releaseVisible = comms.actions.subscribe(
+      'visible-updated',
+      (message) => {
+        setState((v) => ({ ...v, visible: message.editors }))
+      }
+    )
+    const releaseActive = comms.actions.subscribe(
+      'active-updated',
+      (message) => {
+        setState((v) => ({
+          ...v,
+          active: message.editor,
+        }))
+      }
+    )
 
     let bootCanceled
     const releaseBoot = () => {
       bootCanceled = true
     }
-    comms.actions.requestResponse('bootup').then(result => {
-      setState(v => ({
+    comms.actions.requestResponse('bootup').then((result) => {
+      setState((v) => ({
         ...v,
         active: result.activeEditor,
         visible: result.visibleEditors,
-        files: result.files
+        files: result.files,
       }))
     })
 
@@ -74,3 +82,5 @@ export const ConfigService = ({ children }) => {
 }
 
 export const useConfig = () => React.useContext(ConfigServiceContext)
+
+export default ConfigService

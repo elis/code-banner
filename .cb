@@ -1,0 +1,98 @@
+explorer:
+  style:
+    borderBottom: 1px solid var(--vscode-badge-background)
+  items:
+    - type: container
+      style:
+        alignItems: center
+        justifyContent: center
+        background: none
+        padding: 10px
+      items:
+        - type: svg
+          svg: media/assets/code-banner.svg
+          click: command:workbench.action.webview.reloadWebviewAction:1234
+          style:
+            width: 30
+            transition: all 120ms ease-in-out
+
+        - type: hr
+          style:
+            margin: 5px 5px
+            height: 0px
+            borderBottom: none
+        - type: text
+          text: "v$(package.version)"
+          style:
+            textAlign: center
+            fontSize: 9px
+            fontFamily: var(--monaco-monospace-font)
+    - type: span
+      style:
+        flex: 0 0 auto
+        borderLeft: 1px solid gray
+        opacity: 0.3
+        width: 2px
+        height: 40px
+        display: block
+    - type: container
+      style:
+        alignItems: flex-start
+        justifyContent: flex-start
+        background: none
+        padding: 10px
+        flex: 1 1 auto
+        overflow: hidden
+      items:
+        - type: text
+          text: $(package.displayName)
+          style:
+            fontSize: 16px
+        - type: text
+          style:
+            transition: all 60ms ease-in-out
+          text: "by: $(package.author.name, name)"
+        - type: container
+          style:
+            height: 3px
+            border: none
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            columnGap: 8px
+          items:
+            - type: text
+              style:
+                fontSize: 12px
+                cursor: pointer
+              text: "$(codicon:github) Repo"
+              click: command:editor.action.openLink:https://github.com/elis/code-banner
+            - type: text
+              style:
+                fontSize: 12px
+                cursor: pointer
+              text: "$(codicon:extensions) Extn."
+              click: command:extension.open:EliSklar.code-banner
+    - type: codicon
+      style:
+        fontSize: 28px
+        padding: 0 10px
+      codicon: rocket
+
+statusbar:
+  items:
+    - name: reload window
+      options:
+        text: "[R] Window"
+        visible: true
+        priority: 20002
+        command: "workbench.action.reloadWindow"
+    - name: reload webviews
+      depth: 4
+      options:
+        text: "[R] Webviews"
+        visible: true
+        priority: 20000
+        command: "workbench.action.webview.reloadWebviewAction"
+
