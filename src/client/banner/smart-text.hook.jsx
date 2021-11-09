@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useBanner } from '.'
 import { useComms } from '../services/comms.services'
 import { escapeRegex } from '../utils'
+import reactStringReplace from 'react-string-replace'
 
 export const useSmartText = (text) => {
   const banner = useBanner()
@@ -12,6 +13,31 @@ export const useSmartText = (text) => {
   useEffect(() => {
     let release
     ;(async () => {
+      let response = text
+
+      const replacables = text.match(/(\$\(([^)]*)+\))+/g)
+      if (replacables?.length > 0)
+        for (const item of replacables) {
+          const [, x] = item.match(/^\$\(([^)]+)\)$/)
+          const [v] = x.split(', ')
+
+          if (v.match(/^codicon:/i)) {
+            const [, icon] = v.split(':')
+
+            const output = reactStringReplace(
+              response,
+              new RegExp(`(${escapeRegex(item)})`, 'g'),
+              (match, index) => (
+                <i
+                  key={`codicon-${index}`}
+                  className={`codicon codicon-${icon}`}
+                />
+              )
+            )
+            return setDisplay(output)
+          }
+        }
+
       const parsed = await comms.actions.requestResponse('parse-text-content', {
         text,
         workspace: banner.workspace,

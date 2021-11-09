@@ -1,20 +1,27 @@
 import React from 'react'
 import BannerItemErrorBoundary from '../../error-boundries/banner-item.error-boundry'
+import CodiconItem from './codicon'
 import ContainerItem from './container'
+import HorizontalRuleItem from './hr'
 import MarkdownItem from './markdown'
-import SVGItem from './svg'
+import SpanItem from './span'
+import ImageItem from './image'
 import TextItem from './text'
 import UnknownItem from './unknown'
 
 export const ItemDisplay = ({ item, index }) => {
-  const handlers = {
+  const types = {
     text: TextItem,
-    svg: SVGItem,
+    svg: ImageItem,
+    image: ImageItem,
     container: ContainerItem,
     markdown: MarkdownItem,
+    hr: HorizontalRuleItem,
+    span: SpanItem,
+    codicon: CodiconItem
   }
 
-  const Comp = handlers[item.type] || UnknownItem
+  const Comp = types[item.type] || UnknownItem
   return (
     <BannerItemErrorBoundary item={item}>
       <Comp item={item} index={index} />

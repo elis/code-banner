@@ -2,8 +2,6 @@ import React, { useMemo } from 'react'
 import { useBanners } from './services/banners.service'
 import Banner from './banner'
 
-import './testing.scss'
-
 const Panel = () => {
   const banners = useBanners()
 

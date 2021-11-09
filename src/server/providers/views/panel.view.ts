@@ -106,14 +106,11 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
 
   private async _handleClientRequest(data: ResponseRequest) {
     const respond = (result: any) => {
-      console.log('RESPONDING:', { data, result })
       this._view?.webview.postMessage({
         type: data.type + '-' + data.id,
         result,
       })
     }
-    console.log('🍊 Handling client request:', { data })
-
     // ! bootup
     if (data.type === 'bootup') {
       respond({ ...this._cache })
@@ -128,15 +125,6 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
         for (const item of replacables) {
           const [, x] = item.match(/^\$\(([^)]+)\)$/)
           const [v, defs, missing] = x.split(', ')
-          console.log('🙆‍♀️ Parsing text content:', {
-            x,
-            v,
-            defs,
-            missing,
-            item,
-            text,
-            replacables,
-          })
 
           // Support for $(dir/file.yaml, some.path)
           if (v.match(/.(json|ya?ml)$/)) {
@@ -214,14 +202,6 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
         )
         const callerDirname = dirname(caller || '')
 
-        console.log('🍀🦩 Make command request handler', {
-          callerDirname,
-          workspace,
-          workspaceName,
-          caller,
-          folders: [...(vscode.workspace.workspaceFolders || [])],
-        })
-
         if (command === 'vscode.openFolder') {
           const uri = vscode.Uri.file(
             workspace
@@ -234,29 +214,6 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
           )
           return { command, args: [uri] }
         }
-        // if (!workspace)
-        //   return { error: 'No active workspace found ' + workspaceName }
-
-        // const uri = vscode.Uri.parse(fullpath)
-
-        // const newpath = vscode.Uri.joinPath(workspace.uri, fullpath)
-
-        // const newFolderPath = hash({
-        //   caller,
-        //   workspaceName,
-        //   workspacePath: workspace.uri.fsPath,
-        // })
-        // const newFileName = hash({ fullpath, workspaceName })
-        // const ext = path.extname(fullpath)
-        // const newFullpath = vscode.Uri.joinPath(
-        //   this._extensionUri,
-        //   'media/cache',
-        //   newFolderPath,
-        //   `${newFileName}${ext}`
-        // )
-
-        // // if (command === 'vscode.openFolder') {
-        // // }
 
         return { command, args }
       }
@@ -356,11 +313,6 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
       ({ name }) => name === workspaceName
     )
 
-    console.log('🌃🗾 Import media request handler', {
-      workspace,
-      folders: [...(vscode.workspace.workspaceFolders || [])],
-    })
-
     if (!workspace)
       return { error: 'No active workspace found ' + workspaceName }
 
@@ -382,17 +334,6 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
       `${newFileName}${ext}`
     )
 
-    console.log('🌃🗾 Preparing media', {
-      fullpath,
-      workspaceName,
-      caller,
-      workspace,
-      newpath,
-      newFolderPath,
-      newFileName,
-      ext,
-      newFullpath,
-    })
     await (async () => {
       return vscode.workspace.fs.delete(newFullpath).then(
         () => {

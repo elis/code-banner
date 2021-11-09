@@ -13,9 +13,17 @@ html, body {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		span:empty {
+			flex: 1 1 auto;
+			display: inline-block;
+			line-height: 1px;
+		}
 		p, h1, h2, h3, h4, h5, h6 {
 			padding: 0;
 			margin: 0;
+		}
+		.codicon {
+			font-size: 0.8em;
 		}
 		.error {
 			display: flex;
@@ -29,14 +37,6 @@ html, body {
 			.help {
 				font-size: 22px;
 			}
-		}
-		.item {
-			&.click {
-				cursor: pointer;
-				&:hover {
-				}
-			}
-
 		}
 	}
 }

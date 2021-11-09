@@ -3,7 +3,7 @@ import PanelViewProvider from './panel.view'
 
 class TestPanelViewProvider extends PanelViewProvider {
   public static readonly viewType = 'codeBanner.testPanel'
-	protected viewContainer = 'test'
+  protected viewContainer = 'test'
 
   protected attach() {
     this._context.subscriptions.push(

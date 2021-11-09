@@ -7,11 +7,11 @@ const useItemHandlers = (item) => {
   const banner = useBanner()
 
   const [classes, setClasses] = useState({})
+  const [styles, setStyles] = useState(item.style || {})
 
   useEffect(() => {
     if (typeof item.click === 'string') {
       const action = item.click.match(/^command:(.*)$/i)
-      console.log('👩‍🦳 Item handler action:', { action })
       if (action?.[1]) {
         setClasses((v) => ({ ...v, click: true }))
       }
@@ -22,14 +22,11 @@ const useItemHandlers = (item) => {
 
   const onClick = useMemo(() => {
     return () => {
-      console.log('👩‍🦳 Item click:', { item })
       if (typeof item.click === 'string') {
         const action = item.click.match(/^command:(.*)$/i)
-        console.log('👩‍🦳 Item handler action:', { action })
         if (action?.[1]) {
           const [command, ...args] = action[1].split(':')
           setClasses((v) => ({ ...v, click: true }))
-          console.log('👩‍🦳 Command execution request:', { command, args })
 
           comms.actions
             .requestResponse('execute-command', {
@@ -48,11 +45,31 @@ const useItemHandlers = (item) => {
       }
     }
   }, [item.click])
+
+  const onMouseEnter = useCallback(() => {
+    if (item.hoverStyle) {
+      setStyles((v) => ({ ...v, ...item.hoverStyle }))
+    }
+  }, [item.hoverStyle])
+  const onMouseLeave = useCallback(() => {
+    if (item.style && item.hoverStyle) {
+      setStyles(item.style)
+    } else if (item.hoverStyle) setStyles({})
+  }, [item.style])
+
   const handlers = {
+    style: styles,
     ...(item.click ? { onClick } : {}),
+    ...(item.hoverStyle
+      ? {
+          onMouseEnter,
+          onMouseLeave,
+        }
+      : {}),
   }
 
   return {
+    styles,
     classes,
     handlers,
   }

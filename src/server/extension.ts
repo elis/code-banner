@@ -26,9 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
     visible: false,
   }
   let booted = false
-  vscode.commands.getCommands().then(commands => {
-    console.log('🌈 Commands', { commands })
-  })
 
   const checkit = () => {
     if (
@@ -76,22 +73,32 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   // Plain (.cb, .cb.json, .cb.yml)
-  initFileWatcher(['**/*.cb', '**/*.cb.json', '**/*.cb.yml'], context, {
-    ...handlers,
-    onReady: (files) => {
-      readyCheck.filesPlain = true
-      handlers.onReady(files)
+  initFileWatcher(
+    ['**/*.cb', '**/*.cb.json', '**/*.cb.yml'],
+    context,
+    {
+      ...handlers,
+      onReady: (files) => {
+        readyCheck.filesPlain = true
+        handlers.onReady(files)
+      },
     },
-  }, false)
+    false
+  )
 
   // Executable (.pb)
-  initFileWatcher(['**/*.pb'], context, {
-    ...handlers,
-    onReady: (files) => {
-      readyCheck.filesExecutable = true
-      handlers.onReady(files)
+  initFileWatcher(
+    ['**/*.pb'],
+    context,
+    {
+      ...handlers,
+      onReady: (files) => {
+        readyCheck.filesExecutable = true
+        handlers.onReady(files)
+      },
     },
-  }, true)
+    true
+  )
 
   initEditorWatcher(context, {
     onVisibileUpdate: (visibleEditors) => {

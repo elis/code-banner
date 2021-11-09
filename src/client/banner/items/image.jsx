@@ -5,21 +5,21 @@ import { useComms } from '../../services/comms.services'
 import useItemHandlers from '../item-handlers.hook'
 import ErrorItem from './error'
 
-const SVGItem = ({ item }) => {
-  const { svg, style } = item
+const ImageItem = ({ item }) => {
+  const { svg, image, path, elementStyle, style } = item
   const banner = useBanner()
   const comms = useComms()
 
   const [url, setUrl] = useState('')
   const [urlError, setUrlError] = useState(null)
-  const { handlers, classes } = useItemHandlers(item)
+  const { handlers, classes, styles } = useItemHandlers(item)
 
   useEffect(() => {
     let release
     setUrlError()
     ;(async () => {
       const uri = await comms.actions.requestResponse('get-webview-uri', {
-        fullpath: svg,
+        fullpath: svg || image || path,
         workspace: banner.workspace,
         caller: banner.relative,
       })
@@ -32,22 +32,21 @@ const SVGItem = ({ item }) => {
     return () => {
       release = true
     }
-  }, [svg, banner.workspace])
+  }, [svg || image || path, banner.workspace])
 
   if (urlError) {
-    return <ErrorItem error={urlError} item={item} title={<>SVG Error</>} />
+    return <ErrorItem error={urlError} item={item} title={<>Image Error</>} />
   }
 
   return (
     <div
-      className={classnames('item item-svg', classes)}
-
-      style={{ '--svg-url': url, ...(style || {}) }}
-      {...handlers}
+    {...handlers}
+      className={classnames('item', `item-${item.type}`, classes)}
+      style={{ [`--${item.type}-url`]: url, ...(styles || {}) }}
     >
-      <img src={url} style={style} />
+      <img src={url} style={elementStyle} />
     </div>
   )
 }
 
-export default SVGItem
+export default ImageItem

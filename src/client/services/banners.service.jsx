@@ -16,7 +16,11 @@ const BannersService = ({ children }) => {
 
     const confs = files
       .filter((file) => {
-        if (file.level === 1 && file.conf[config.viewContainer]?.depth === undefined) return true
+        if (
+          file.level === 1 &&
+          file.conf[config.viewContainer]?.depth === undefined
+        )
+          return true
         if (active && file.dirname === active.dirname) return true
         if (visible?.find((editor) => editor.dirname === file.dirname))
           return true
@@ -25,9 +29,10 @@ const BannersService = ({ children }) => {
         if (
           visible?.find(
             (editor) =>
-              (file.level === 1 || editor.dirname.match(
-                new RegExp(`^${escapeRegex(file.dirname)}`)
-              )) &&
+              (file.level === 1 ||
+                editor.dirname.match(
+                  new RegExp(`^${escapeRegex(file.dirname)}`)
+                )) &&
               file.conf[config.viewContainer]?.depth + file.level >=
                 editor.level
           )

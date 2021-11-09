@@ -1,5 +1,5 @@
-import React, { useCallback } from "react"
-import { vscode } from "./vscode"
+import React, { useCallback } from 'react'
+import { vscode } from './vscode'
 
 export const CommServiceContext = React.createContext()
 

@@ -1,5 +1,5 @@
 import React, { useContext, createContext } from 'react'
-import BannerErrorBoundary from "../error-boundries/banner.error-boundry"
+import BannerErrorBoundary from '../error-boundries/banner.error-boundry'
 import { useConfig } from '../services/config.service'
 import { ItemsDisplay } from './items'
 

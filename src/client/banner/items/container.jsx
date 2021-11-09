@@ -1,9 +1,14 @@
 import React from 'react'
+import classnames from 'class-names'
 import { ItemsDisplay } from '.'
+import useItemHandlers from '../item-handlers.hook'
 
-const ContainerItem = ({ item: { items, style } }) => {
+const ContainerItem = ({ item }) => {
+  const { items } = item
+  const { handlers, classes } = useItemHandlers(item)
+
   return (
-    <div className="item item-container" style={{ ...(style || {}) }}>
+    <div {...handlers} className={classnames('item item-container', classes)}>
       <ItemsDisplay items={items} />
     </div>
   )
