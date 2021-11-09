@@ -26,7 +26,6 @@ const ConfigService = ({ children }) => {
       setState((v) => ({ ...v, files: message.files }))
     })
     const releaseFile = comms.actions.subscribe('file-updated', (message) => {
-      console.log('⛈ File Updated:', { message })
       setState((v) => ({
         ...v,
         files: [

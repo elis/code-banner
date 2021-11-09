@@ -15,8 +15,6 @@ export const initFileWatcher = async (
   api: FileWatcherAPI,
   executable = false
 ) => {
-  // const globs = ['**/*.cb', '**/*.cb.json', '**/*.cb.yml']
-
   const onUpdate = (newData: ParsedFile) => {
     api.onUpdate(newData)
   }

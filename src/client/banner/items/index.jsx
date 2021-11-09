@@ -24,11 +24,7 @@ export const ItemDisplay = ({ item, index }) => {
   const Comp = types[item.type] || UnknownItem
   return (
     <BannerItemErrorBoundary item={item}>
-      <>
-        {/* {console.log('🗽🗽🗽🗽 ITEMS DISPILAY', { item })} */}
-
-        <Comp item={item} index={index} />
-      </>
+      <Comp item={item} index={index} />
     </BannerItemErrorBoundary>
   )
 }
@@ -36,14 +32,11 @@ export const ItemDisplay = ({ item, index }) => {
 export const ItemsDisplay = ({ items }) =>
   items?.length > 0 ? (
     items.map((item, index) => (
-      <>
-        {/* {console.log('🗽 ITEMS DISPILAY', { item })} */}
-        <ItemDisplay
-          key={`item-${item.type}-${index}`}
-          item={item}
-          index={index}
-        />
-      </>
+      <ItemDisplay
+        key={`item-${item.type}-${index}`}
+        item={item}
+        index={index}
+      />
     ))
   ) : (
     <></>
