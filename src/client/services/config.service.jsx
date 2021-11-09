@@ -41,7 +41,7 @@ const ConfigService = ({ children }) => {
           ...v,
           visible: message.editors.map((editor) => ({
             ...editor,
-            isActive: v.active.relative === editor.relative,
+            isActive: v.active?.relative === editor.relative,
           })),
         }))
       }
