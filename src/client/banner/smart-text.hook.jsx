@@ -19,7 +19,7 @@ export const useSmartText = (text) => {
       if (replacables?.length > 0)
         for (const item of replacables) {
           const [, x] = item.match(/^\$\(([^)]+)\)$/)
-          const [v] = x.split(', ')
+          const [v, defs, missing] = x.split(', ')
 
           if (v.match(/^codicon:/i)) {
             const [, icon] = v.split(':')
@@ -31,6 +31,10 @@ export const useSmartText = (text) => {
                 <i
                   key={`codicon-${index}`}
                   className={`codicon codicon-${icon}`}
+                  style={{
+                    ...(defs ? { fontSize: defs } : {}),
+                    ...(missing ? { color: missing } : {}),
+                  }}
                 />
               )
             )

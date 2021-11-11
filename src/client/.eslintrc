@@ -2,6 +2,8 @@
   "globals": {
     "window": true,
     "console": true,
-    "document": true
+    "document": true,
+    "setTimeout": true,
+    "clearTimeout": true
   }
 }

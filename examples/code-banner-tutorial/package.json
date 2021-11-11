@@ -1,0 +1,33 @@
+{
+  "name": "code-banner-tutorial",
+  "version": "1.0.0",
+  "description": "Example of how to use Code Banner",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elis/code-banner.git"
+  },
+  "keywords": [
+    "code-banner",
+    "code",
+    "banner",
+    "customize",
+    "custom",
+    "actions",
+    "information",
+    "info",
+    "details",
+    "quick",
+    "status",
+    "statusbar"
+  ],
+  "author": "Eli Sklar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elis/code-banner/issues"
+  },
+  "homepage": "https://github.com/elis/code-banner#readme"
+}

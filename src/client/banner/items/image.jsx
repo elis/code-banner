@@ -6,7 +6,7 @@ import useItemHandlers from '../item-handlers.hook'
 import ErrorItem from './error'
 
 const ImageItem = ({ item }) => {
-  const { svg, image, path, elementStyle, style } = item
+  const { svg, image, path, url: userUrl, elementStyle } = item
   const banner = useBanner()
   const comms = useComms()
 
@@ -18,8 +18,12 @@ const ImageItem = ({ item }) => {
     let release
     setUrlError()
     ;(async () => {
+      const fullpath = svg || image || path || userUrl
+      if (fullpath.match(/^https/i)) {
+        return setUrl(fullpath)
+      }
       const uri = await comms.actions.requestResponse('get-webview-uri', {
-        fullpath: svg || image || path,
+        fullpath,
         workspace: banner.workspace,
         caller: banner.relative,
       })
@@ -32,7 +36,7 @@ const ImageItem = ({ item }) => {
     return () => {
       release = true
     }
-  }, [svg || image || path, banner.workspace])
+  }, [svg, image, path, userUrl, banner.workspace])
 
   if (urlError) {
     return <ErrorItem error={urlError} item={item} title={<>Image Error</>} />
@@ -40,7 +44,7 @@ const ImageItem = ({ item }) => {
 
   return (
     <div
-    {...handlers}
+      {...handlers}
       className={classnames('item', `item-${item.type}`, classes)}
       style={{ [`--${item.type}-url`]: url, ...(styles || {}) }}
     >

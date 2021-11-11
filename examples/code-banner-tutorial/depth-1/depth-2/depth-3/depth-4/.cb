@@ -1,0 +1,21 @@
+explorer:
+	rows:
+		- sensitivity: 2
+			items:
+				- type: text
+					text: This will appear three level up!
+        - type: text
+          text: "Current version: $(package.version)"
+          style:
+            fontSize: 24px
+            color: blue
+		- sensitivity: 1
+			items:
+        - type: svg
+          url: https://cdn.worldvectorlogo.com/logos/react-2.svg
+          style:
+            padding: 3px
+          elementStyle:
+            width: 40px
+				- type: text
+					text: This will appear even at the parent dir level!

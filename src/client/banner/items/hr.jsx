@@ -6,7 +6,10 @@ const HorizontalRuleItem = ({ item }) => {
   const { handlers, classes } = useItemHandlers(item)
 
   return (
-    <hr {...handlers} className={classnames('item item-hr', classes)} />
+    <hr
+      {...handlers}
+      className={classnames('item item-hr', classes, { vr: item.vertical })}
+    />
   )
 }
 

@@ -60,6 +60,25 @@
           "icon": "media/assets/icon.svg"
         }
       ]
+    },
+    "configuration": {
+      "title": "Code Banner",
+      "properties": {
+        "codeBanner.allowExecutableConfiguration": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Allow extensionn to load `?.pb` files and execute them as javascript"
+        }
+      }
+    },
+    "capabilities": {
+      "untrustedWorkspaces": {
+        "supported": "limited",
+        "description": "Executable configurations are disabled",
+        "restrictedConfigurations": [
+          "codeBanner.aallowExecutableConfiguration"
+        ]
+      }
     }
   },
   "scripts": {

@@ -133,7 +133,13 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
             )
             if (!workspace) continue
 
-            const jsonUri = vscode.Uri.file(path.join(workspace?.uri.fsPath, v))
+            const callerDirname = this._cache.files.find(
+              (file) => file.relative === data.payload.caller
+            )?.dirname
+
+            const jsonUri = vscode.Uri.file(
+              path.join(workspace?.uri.fsPath, callerDirname || '', v)
+            )
 
             try {
               const buffer = await vscode.workspace.fs.readFile(jsonUri)
@@ -143,7 +149,9 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
                 ['yml', 'yaml'].indexOf(v.match(/.(json|ya?ml)$/)[1]) >= 0
                   ? YAML.parse(jsonData)
                   : JSON.parse(jsonData)
-              const result = objectPath.get(json, defs) || missing
+              const result =
+                objectPath.get(json, defs) ||
+                objectPath.get(json, defs.split(':'), missing)
               response = response.replace(
                 new RegExp(`${escapeRegex(item)}`, 'g'),
                 result
@@ -184,7 +192,19 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
       respond(response)
     }
 
-    // ! get-webview-uri
+    // ! execute-command
+    else if (data.type === 'open-external') {
+      const uri = vscode.Uri.parse(data.payload.url || data.payload.path)
+      vscode.env.openExternal(uri).then(
+        () => respond('success'),
+        (error) => {
+          vscode.window.showErrorMessage('Unable to open external: ' + error)
+          respond({ error })
+        }
+      )
+    }
+
+    // ! execute-command
     else if (data.type === 'execute-command') {
       console.log('🧑‍🦳 Execute command:', { data })
 
@@ -316,9 +336,15 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     if (!workspace)
       return { error: 'No active workspace found ' + workspaceName }
 
-    const uri = vscode.Uri.parse(fullpath)
+    const callerDirname = this._cache.files.find(
+      (file) => file.relative === caller
+    )?.dirname
 
-    const newpath = vscode.Uri.joinPath(workspace.uri, fullpath)
+    const newpath = vscode.Uri.joinPath(
+      workspace.uri,
+      callerDirname || '',
+      fullpath
+    )
 
     const newFolderPath = hash({
       caller,

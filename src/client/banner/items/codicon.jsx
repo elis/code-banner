@@ -7,7 +7,10 @@ const CodiconItem = ({ item }) => {
 
   return (
     <span className={classnames('item item-codicon', classes)} {...handlers}>
-      <i className={`codicon codicon-${item.codicon}`} />
+      <i
+        className={`codicon codicon-${item.codicon}`}
+        style={item.elementStyle || {}}
+      />
     </span>
   )
 }

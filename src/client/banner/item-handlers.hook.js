@@ -27,10 +27,10 @@ const useItemHandlers = (item) => {
   const onClick = useMemo(() => {
     return () => {
       if (typeof item.click === 'string') {
-        const action = item.click.match(/^command:(.*)$/i)
-        if (action?.[1]) {
-          const [command, ...args] = action[1].split(':')
+        const [, action, args] = item.click.match(/^([^:]+):(.*)$/i)
+        if (action === 'command' && args) {
           setClasses((v) => ({ ...v, click: true }))
+          const [command, ...args] = args.split(':')
 
           comms.actions
             .requestResponse('execute-command', {
@@ -44,6 +44,21 @@ const useItemHandlers = (item) => {
             })
             .catch((error) => {
               console.log('👩‍🦳 Command execution resulted in error:', { error })
+            })
+        } else if (action === 'open') {
+          setClasses((v) => ({ ...v, active: true }))
+
+          comms.actions
+            .requestResponse('open-external', {
+              url: args,
+              workspace: banner.workspace,
+              caller: banner.relative,
+            })
+            .then((result) => {
+              if (result === 'success') {
+                setClasses((v) => ({ ...v, success: true }))
+              }
+              setClasses((v) => ({ ...v, active: false }))
             })
         }
       }
@@ -60,6 +75,33 @@ const useItemHandlers = (item) => {
       setStyles(item.style)
     } else if (item.hoverStyle) setStyles({})
   }, [item.style])
+
+  useEffect(() => {
+    if (typeof item.successStyle !== 'undefined') {
+      setStyles((v) => ({
+        ...v,
+        ...(classes.active ? item.successStyle : item.style || {}),
+      }))
+
+      if (classes.active) {
+        const tid = setTimeout(() => {
+          setStyles((v) => ({
+            ...(item.style || {}),
+          }))
+        }, 2500)
+
+        return () => clearTimeout(tid)
+      }
+    }
+  }, [classes.success])
+
+  useEffect(() => {
+    if (typeof item.activeStyle !== 'undefined') {
+      setStyles((v) => ({
+        ...(classes.active ? { ...v, ...item.activeStyle } : item.style || {}),
+      }))
+    }
+  }, [item.activeStyle, classes.active])
 
   const handlers = {
     style: styles,

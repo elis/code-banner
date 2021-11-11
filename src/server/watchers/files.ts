@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 import * as YAML from 'yaml'
 import { extname } from 'path'
 import { ParsedFile, ParsedExecutableFile } from '../../types'
+import { YAMLSemanticError, YAMLSyntaxError } from 'yaml/util'
 
 export type FileWatcherAPI = {
   onReady: (files: ParsedFile[]) => void
@@ -129,11 +130,31 @@ export const importPlainFile = async (uri: vscode.Uri) => {
   const data = readData.toString()
 
   if (!ext || ext === '.cb' || ext === '.yml') {
-    const yaml = YAML.parse(data.replace(new RegExp(`(\t)`, 'g'), '  '), {})
+    try {
+      const yaml = YAML.parse(data.replace(new RegExp(`(\t)`, 'g'), '  '), {})
 
-    return yaml
+      return yaml
+    } catch (error) {
+      if (error instanceof YAMLSyntaxError)
+        vscode.window.showErrorMessage(
+          `Error parsing YAML file\n\nError: ${error.message}`
+        )
+      else if (error instanceof YAMLSemanticError)
+        vscode.window.showErrorMessage(
+          `Error parsing YAML file\n\nError: ${error.message}`
+        )
+      else vscode.window.showErrorMessage('Error parsing YAML file')
+    }
   }
-  if (ext === '.json') return JSON.parse(readData.toString())
+  if (ext === '.json') {
+    try {
+      const json = JSON.parse(readData.toString())
+      return json
+    } catch (error) {
+      console.log('Error with JSON', error)
+      vscode.window.showErrorMessage('Error parsing JSON file')
+    }
+  }
 }
 
 export const importExecutableFile = async (uri: vscode.Uri) => {

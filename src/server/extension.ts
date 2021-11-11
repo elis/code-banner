@@ -16,8 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
   const statusbarProvider = new StatusBar(context)
 
   const responses: ParsedFile[][] = []
-  let responses2: UpdateEditor[] = []
-  let response3: UpdateEditor | undefined
+  let visibleEditors: UpdateEditor[] = []
+  let activeEditor: UpdateEditor | undefined
 
   const readyCheck = {
     active: false,
@@ -36,6 +36,8 @@ export function activate(context: vscode.ExtensionContext) {
       console.log('🌈 PENDING COMPLETE - CHECKS Clear', {
         readyCheck,
         allFiles,
+        visibleEditors,
+        activeEditor,
       })
 
       explorerPanelProvider.updateFiles(allFiles)
@@ -44,17 +46,17 @@ export function activate(context: vscode.ExtensionContext) {
       scmPanelProvider.updateFiles(allFiles)
       statusbarProvider.updateFiles(allFiles)
 
-      explorerPanelProvider.updateVisible(responses2)
-      debugPanelProvider.updateVisible(responses2)
-      testPanelProvider.updateVisible(responses2)
-      scmPanelProvider.updateVisible(responses2)
-      statusbarProvider.updateVisible(responses2)
+      explorerPanelProvider.updateVisible(visibleEditors)
+      debugPanelProvider.updateVisible(visibleEditors)
+      testPanelProvider.updateVisible(visibleEditors)
+      scmPanelProvider.updateVisible(visibleEditors)
+      statusbarProvider.updateVisible(visibleEditors)
 
-      explorerPanelProvider.updateActive(response3)
-      debugPanelProvider.updateActive(response3)
-      testPanelProvider.updateActive(response3)
-      scmPanelProvider.updateActive(response3)
-      statusbarProvider.updateActive(response3)
+      explorerPanelProvider.updateActive(activeEditor)
+      debugPanelProvider.updateActive(activeEditor)
+      testPanelProvider.updateActive(activeEditor)
+      scmPanelProvider.updateActive(activeEditor)
+      statusbarProvider.updateActive(activeEditor)
       booted = true
     }
   }
@@ -63,7 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
       responses.push(files)
       checkit()
     },
-    onUpdate: (file: ParsedFile) => {
+    onUpdate: (file: ParsedFile | undefined) => {
+      if (!file) return
+
       explorerPanelProvider.updateFile(file)
       debugPanelProvider.updateFile(file)
       testPanelProvider.updateFile(file)
@@ -91,35 +95,53 @@ export function activate(context: vscode.ExtensionContext) {
     ['**/*.pb'],
     context,
     {
-      ...handlers,
+      onUpdate: (file: ParsedFile) => {
+        const extConfig = vscode.workspace.getConfiguration('codeBanner')
+        // console.log('🌈 🌈 🌈  EXT CONFIGURATION', { extConfig })
+
+        handlers.onUpdate(
+          vscode.workspace.isTrusted && extConfig.allowExecutableConfiguration
+            ? file
+            : undefined
+        )
+      },
       onReady: (files) => {
+        const extConfig = vscode.workspace.getConfiguration('codeBanner')
+        // console.log('🌈 🌈 🌈  EXT CONFIGURATION', { extConfig })
+
         readyCheck.filesExecutable = true
-        handlers.onReady(files)
+        handlers.onReady(
+          vscode.workspace.isTrusted && extConfig.allowExecutableConfiguration
+            ? files
+            : []
+        )
       },
     },
     true
   )
 
   initEditorWatcher(context, {
-    onVisibileUpdate: (visibleEditors) => {
-      responses2 = visibleEditors
+    onVisibileUpdate: (editors) => {
+      visibleEditors = editors
+      // console.log('🌈 🌈 🌈  VISIBLE EDITORS UPDATED', { editors })
       readyCheck.visible = true
-      explorerPanelProvider.updateVisible(visibleEditors)
-      debugPanelProvider.updateVisible(visibleEditors)
-      testPanelProvider.updateVisible(visibleEditors)
-      scmPanelProvider.updateVisible(visibleEditors)
-      statusbarProvider.updateVisible(visibleEditors)
+      explorerPanelProvider.updateVisible(editors)
+      debugPanelProvider.updateVisible(editors)
+      testPanelProvider.updateVisible(editors)
+      scmPanelProvider.updateVisible(editors)
+      statusbarProvider.updateVisible(editors)
       checkit()
     },
-    onActiveUpdate: (activeEditor) => {
-      response3 = activeEditor
+    onActiveUpdate: (editor) => {
+      activeEditor = editor
+      // console.log('🌈 🌈 🌈  ACTIVE EDITOR UPDATED', { editor })
       readyCheck.active = true
 
-      explorerPanelProvider.updateActive(activeEditor)
-      debugPanelProvider.updateActive(activeEditor)
-      testPanelProvider.updateActive(activeEditor)
-      scmPanelProvider.updateActive(activeEditor)
-      statusbarProvider.updateActive(activeEditor)
+      explorerPanelProvider.updateActive(editor)
+      debugPanelProvider.updateActive(editor)
+      testPanelProvider.updateActive(editor)
+      scmPanelProvider.updateActive(editor)
+      statusbarProvider.updateActive(editor)
       checkit()
     },
   })

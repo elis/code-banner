@@ -11,8 +11,12 @@ explorer:
             padding: 10px
           items:
             - type: svg
-              svg: media/assets/code-banner.svg
-              click: command:workbench.action.webview.reloadWebviewAction:1234
+              svg: depth-1/logo-javascript.svg
+              click: open:../
+              activeStyle:
+                width: 12
+              successStyle:
+                width: 60
               style:
                 width: 30
                 transition: all 120ms ease-in-out
@@ -111,6 +115,6 @@ statusbar:
       options:
         text: "[R] Webviews"
         visible: true
-        priority: 20000
+        priority: 200000
         command: "workbench.action.webview.reloadWebviewAction"
 

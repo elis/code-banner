@@ -1,0 +1,48 @@
+explorer:
+	rows:
+		- style:
+				justifyContent: space-between
+			priority: 100
+			items:
+				- type: svg
+					style: 
+						flex: 0 0 30px
+						padding: 4px
+					elementStyle:
+						borderRadius: 3px
+						overflow: hidden
+					svg: logo-javascript.svg
+				- type: text
+					text: This is $(codicon:github) GIT HUB
+				- type: svg
+					style: 
+						flex: 0 0 30px
+						padding: 4px
+					elementStyle:
+						borderRadius: 3px
+						overflow: hidden
+						transform: rotate(180deg)
+					url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
+				# - type: markdown
+				 	# markdown: This will show only when `*.js` or `.cb` files have visible editors
+
+
+		- glob: "**/.eslintrc"
+			condition: editor.isActive
+			items:
+				- type: svg
+					url: https://cdn.worldvectorlogo.com/logos/eslint-1.svg
+					elementStyle:
+							width: 32px
+				- type: text
+					text: Visible `.eslintrc` is visible
+		- glob:
+				- "**/.eslintrc"
+				- "**/.prettierrc"
+			items:
+				- type: svg
+					url: https://cdn.worldvectorlogo.com/logos/prettier-2.svg
+					elementStyle:
+							width: 32px
+				- type: text
+					text: This will be shown if the files `.eslintrc` or `prettierrc` are visible

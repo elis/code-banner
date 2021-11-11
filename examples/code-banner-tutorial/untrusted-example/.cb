@@ -1,0 +1,22 @@
+explorer:
+  rows:
+    - items:
+      - type: image
+        elementStyle:
+          width: 56px
+        url: https://picsum.photos/56
+      - type: span
+      - type: svg
+        elementStyle:
+          width: 56px
+        path: https://picsum.photos/57
+    - items:
+      - type: markdown
+        markdown: "*The* _Revolution_ Will Be **Typed**"
+      - type: text
+        text: Inside plain!
+    - items:
+      - type: hr
+    - items:
+      - type: text
+        text: "JSON value: $(.vscode/settings.json, codeBanner.allowExecutableConfiguration, unset)"
