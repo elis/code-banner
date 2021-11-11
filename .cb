@@ -85,7 +85,7 @@ explorer:
                     fontSize: 11px
                     cursor: pointer
                   text: "$(codicon:github) Repo"
-                  click: command:editor.action.openLink:https://github.com/elis/code-banner
+                  click: open:https://github.com/elis/code-banner
                 - type: text
                   style:
                     fontSize: 11px

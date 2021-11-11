@@ -738,6 +738,10 @@ Status Bar Item Properties:
 - [ ] Configuration Assistant
 - [ ] Live-reload as-you-type for banners
 
+# History
+
+This project is the spiritual successor of [Project Banner](https://github.com/elis/project-banner) - I wanted this for the longest while, and I've needed it even longer.
+
 # License
 
 MIT License - See: [LICENCE.mds](./LICENSE.mds)
