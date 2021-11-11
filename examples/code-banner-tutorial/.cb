@@ -27,7 +27,7 @@ explorer:
                 height: 0px
                 borderBottom: none
             - type: text
-              text: "v$(package.version)"
+              text: "v$(package.version, 0.0.0)"
               style:
                 textAlign: center
                 fontSize: 9px
@@ -73,7 +73,7 @@ explorer:
                   style:
                     transition: all 60ms ease-in-out
                     fontSize: 11px
-                  text: "by: $(package.author.name, name)"
+                  text: "by: $(package.author, name)"
             - type: container
               style:
                 height: 3px
@@ -104,13 +104,13 @@ explorer:
         
 statusbar:
   items:
-    - name: reload window button
+    - name: xreload window buttonx
       options:
         text: "[R] Window"
         visible: false
         priority: 20002
         command: "workbench.action.reloadWindow"
-    - name: reload webviews button
+    - name: xreload webviews buttonx
       depth: 4
       options:
         text: "[R] Webviews"

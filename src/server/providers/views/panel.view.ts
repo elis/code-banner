@@ -184,6 +184,11 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
                 result
               )
             } catch (err) {
+              console.log(
+                'Error loading package.json in root workspace:',
+                { err },
+                { packageUri, v }
+              )
               response = { error: err }
             }
           }

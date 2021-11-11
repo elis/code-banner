@@ -8,6 +8,7 @@ const TextItem = ({ children, item }) => {
   const display = useSmartText(text || children)
   const { handlers, classes } = useItemHandlers(item)
 
+  console.log('-=-===-=-=-=-=-=-- DISPLAY TEXT ITEM', { text, display })
   return (
     <div {...handlers} className={classnames('item item-text', classes)}>
       {display}

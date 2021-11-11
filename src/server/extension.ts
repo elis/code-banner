@@ -18,6 +18,14 @@ export function activate(context: vscode.ExtensionContext) {
   const responses: ParsedFile[][] = []
   let visibleEditors: UpdateEditor[] = []
   let activeEditor: UpdateEditor | undefined
+  const channel = vscode.window.createOutputChannel('code-banner')
+
+  channel.appendLine('Code Banner Loading...')
+  channel.show(true)
+
+  const extConfig = vscode.workspace.getConfiguration('codeBanner')
+  channel.appendLine('Extension Configuration: ' + extConfig)
+  // console.log('🌈 🌈 🌈  EXT CONFIGURATION', { extConfig })
 
   const readyCheck = {
     active: false,
@@ -28,6 +36,9 @@ export function activate(context: vscode.ExtensionContext) {
   let booted = false
 
   const checkit = () => {
+    // console.log('🌈 Checks...', {
+    //   readyCheck,
+    // })
     if (
       !booted &&
       !Object.values(readyCheck).filter((ready) => !ready).length
@@ -39,6 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
         visibleEditors,
         activeEditor,
       })
+      channel.appendLine('🌈 PENDING COMPLETE - CHECKS Clear')
 
       explorerPanelProvider.updateFiles(allFiles)
       debugPanelProvider.updateFiles(allFiles)
@@ -83,11 +95,13 @@ export function activate(context: vscode.ExtensionContext) {
     {
       ...handlers,
       onReady: (files) => {
+        channel.appendLine('Plain files ready')
         readyCheck.filesPlain = true
         handlers.onReady(files)
       },
     },
-    false
+    false,
+    channel
   )
 
   // Executable (.pb)
@@ -108,6 +122,14 @@ export function activate(context: vscode.ExtensionContext) {
       onReady: (files) => {
         const extConfig = vscode.workspace.getConfiguration('codeBanner')
         // console.log('🌈 🌈 🌈  EXT CONFIGURATION', { extConfig })
+        channel.appendLine('Executable files ready')
+
+        if (
+          !(
+            vscode.workspace.isTrusted && extConfig.allowExecutableConfiguration
+          )
+        )
+          channel.appendLine('Executable files ignored - untrusted workspace')
 
         readyCheck.filesExecutable = true
         handlers.onReady(
@@ -117,7 +139,8 @@ export function activate(context: vscode.ExtensionContext) {
         )
       },
     },
-    true
+    true,
+    channel
   )
 
   initEditorWatcher(context, {

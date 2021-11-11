@@ -1,14 +1,26 @@
-exports.explorer = () => {
+import fs from 'fs'
+
+export const explorer = () => {
+  const files = fs.readdirSync(__dirname)
+
   return {
-    xrows: [
+    rows: [
       {
+        priority: 101010,
         items: [
           {
-            type: 'text',
-            text: 'Inside executable!'
-          }
-        ]
-      }
-    ]
+            type: 'container',
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+            },
+            items: files.map((file) => ({
+              type: 'text',
+              text: `File: ${file}`,
+            })),
+          },
+        ],
+      },
+    ],
   }
 }

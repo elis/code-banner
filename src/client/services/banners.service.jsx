@@ -30,7 +30,7 @@ const BannersService = ({ children }) => {
                 ...(visible.length
                   ? visible
                   : // Patch in a dummy editor if no editors visible
-                    [{ level: 1, relative: '.' }]),
+                    [{ level: 1, relative: '.', dirname: '.' }]),
               ]
                 .map((editor) => ({
                   _debug: {
@@ -95,12 +95,12 @@ const BannersService = ({ children }) => {
                     file.level - (row.sensitivity || 0) <= editor.level &&
                     editor.level <= file.level + (row.depth || 50) &&
                     // Match subdirectory
-                    ((file.level === 1 ||
+                    (file.level === 1 ||
                       editor.relative.match(
                         new RegExp(
                           `^${escapeRegex(file.dirname.replace(/^\.$/, ''))}`
                         )
-                      )) ||
+                      ) ||
                       file.relative.match(
                         new RegExp(
                           `^${escapeRegex(editor.dirname.replace(/^\.$/, ''))}`

@@ -57,7 +57,7 @@ export const useSmartText = (text) => {
 
   const result = useMemo(() => {
     let output = text
-    if (output !== display && !!display) return display
+    if (output !== display && !!display && !display.error) return display
 
     const replacables = text.match(/(\$\(([^)]*)+\))+/g)
 

@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as path from 'path'
 import * as vscode from 'vscode'
 import * as YAML from 'yaml'
 import { extname } from 'path'
+import { transform } from 'esbuild'
 import { ParsedFile, ParsedExecutableFile } from '../../types'
 import { YAMLSemanticError, YAMLSyntaxError } from 'yaml/util'
+import { escapeRegex } from '../utils'
 
 export type FileWatcherAPI = {
   onReady: (files: ParsedFile[]) => void
@@ -14,11 +17,16 @@ export const initFileWatcher = async (
   globs: string[] = [],
   context: vscode.ExtensionContext,
   api: FileWatcherAPI,
-  executable = false
+  executable = false,
+  channel: vscode.OutputChannel
 ) => {
   const onUpdate = (newData: ParsedFile) => {
     api.onUpdate(newData)
   }
+  // console.log('⚠️🌈 Initializing file watcher', { executable })
+  channel.appendLine(
+    '⚠️🌈 Initializing file watcher - ' + (executable ? 'Executables' : 'Plain')
+  )
 
   const parse = (files: vscode.Uri[]) => parseFiles(files, context, executable)
   const allFiles: vscode.Uri[] = []
@@ -40,12 +48,47 @@ export const initFileWatcher = async (
       allFiles.push(...files)
     })
   )
+  channel.appendLine(
+    '⚠️🌈 File watcher - ' +
+      (executable ? 'Executables' : 'Plain') +
+      ' - found ' +
+      allFiles.length +
+      ' files'
+  )
+  for (const file of allFiles) {
+    const relative = vscode.workspace.asRelativePath(file)
+    channel.appendLine(
+      '⚠️🌈\t\t File watcher - ' +
+        (executable ? 'Executables' : 'Plain') +
+        ' - found ' +
+        relative
+    )
+    channel.appendLine('⚠️🌈\t\t Depth: ' + relative.split('/').length)
+  }
+
+  // console.log('⚠️🌈 ALLFILES', { allFiles })
 
   // Read first time
   if (allFiles.length) {
     const results = (await parse(allFiles)) as ParsedFile[]
     const sorted = results.sort((a, b) => (a.level > b.level ? 1 : -1))
-
+    channel.appendLine(
+      '⚠️🌈 File watcher - ' +
+        (executable ? 'Executables' : 'Plain') +
+        ' - found ' +
+        allFiles.length +
+        ' files'
+    )
+    for (const file of allFiles) {
+      const relative = vscode.workspace.asRelativePath(file)
+      channel.appendLine(
+        '⚠️🌈\t\t File watcher - ' +
+          (executable ? 'Executables' : 'Plain') +
+          ' - found ' +
+          relative
+      )
+      channel.appendLine('⚠️🌈\t\t Depth: ' + relative.split('/').length)
+    }
     api.onReady(sorted)
   } else api.onReady([])
 }
@@ -93,6 +136,7 @@ export const parseFile =
 export const ingest =
   (context: vscode.ExtensionContext, executable = false) =>
   async (uri: vscode.Uri) => {
+    // console.log('⚠️🌈 INGESTING', { uri }, { executable })
     const loaded = executable
       ? await importExecutableFile(uri)
       : await importPlainFile(uri)
@@ -159,13 +203,45 @@ export const importPlainFile = async (uri: vscode.Uri) => {
 
 export const importExecutableFile = async (uri: vscode.Uri) => {
   const readData = await vscode.workspace.fs.readFile(uri)
-  const name = Math.floor(Math.random() * 1000000000).toString(32)
 
-  const nuri = vscode.Uri.parse(uri.path + name)
+  try {
+    const data = readData.toString()
 
-  await vscode.workspace.fs.writeFile(nuri, readData)
-  const tk = await import(nuri.path)
-  await vscode.workspace.fs.delete(nuri)
+    const v = await transform(data, {
+      target: 'node12',
+      format: 'cjs',
+      loader: 'jsx',
+    })
 
-  return tk
+    const requirer = (thang: string) => {
+      if (thang.match(/^\./)) {
+        throw new Error('Executables do not support local imports yet - ' + uri.path)
+      }
+      return require(thang)
+    }
+
+    const exposed = {
+      exports: {},
+      require: requirer,
+      console,
+      __dirname: requirer('path').dirname(uri.path),
+      __filename: uri.path
+    }
+
+    const exposee = Object.entries(exposed)
+    const exposesKeys = exposee.map(([key, val]) => key)
+    const exposesValues = exposee.map(([key, val]) => val)
+
+    const fnArgs = [...exposesKeys, v.code]
+    const execFnArgs = [...exposesValues]
+
+    const resultFn = Function(...fnArgs)
+    resultFn(...execFnArgs)
+    return exposed.exports
+  } catch (error) {
+    if (!uri.path.match(new RegExp(escapeRegex('/node_modules/'))))
+      vscode.window.showErrorMessage('Executable file ' + uri.path + ' filed to import: ' + error)
+    console.log('⚠️🌈 importExecutableFile Error', { uri }, { error })
+    return {}
+  }
 }

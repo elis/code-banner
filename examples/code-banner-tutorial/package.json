@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Example of how to use Code Banner",
   "main": "index.js",
+  "displayName": "Code Banner Tutorial",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
