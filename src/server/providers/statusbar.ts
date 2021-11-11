@@ -70,7 +70,7 @@ class StatusBar {
     statusable.map((item) => {
       if (item.conf.statusbar?.items.length) {
         item.conf.statusbar.items.forEach(({ name, options, depth }) => {
-          const api = this.addItem(name, options, item, depth)
+          this.addItem(name, options, item, depth)
           this.statusItems.items.push({ name, options })
           this.statusItems.confs[item.relative + item.workspace] = [
             ...(this.statusItems.confs[item.relative + item.workspace] || []),
@@ -116,7 +116,7 @@ class StatusBar {
       }
       if (
         file.conf.statusbar.items.length <
-        this.statusItems.confs[file.relative + file.workspace].length
+        this.statusItems.confs[file.relative + file.workspace]?.length
       ) {
         const missingNames = (
           this.statusItems.confs[file.relative + file.workspace] || []
@@ -175,7 +175,7 @@ class StatusBar {
     depth = 0
   ) {
     if (this._items.find((e) => e.name === name))
-      throw new Error(
+      return vscode.window.showErrorMessage(
         'Cannot create another statusbar item with the same name: ' + name
       )
 

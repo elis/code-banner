@@ -104,13 +104,13 @@ explorer:
         
 statusbar:
   items:
-    - name: reload window
+    - name: reload window button
       options:
         text: "[R] Window"
         visible: true
         priority: 20002
         command: "workbench.action.reloadWindow"
-    - name: reload webviews
+    - name: reload webviews button
       depth: 4
       options:
         text: "[R] Webviews"
