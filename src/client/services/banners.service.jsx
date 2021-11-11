@@ -19,19 +19,20 @@ const BannersService = ({ children }) => {
 
     const nextConfs = files
       // Convert rows to individual confs
+      // .map((file) => console.log('🧃 INSPECTING FILE', file.relative, { file, active, visible }) || file)
       .map((file) => ({
         file,
         rows:
           file.conf?.[config.viewContainer]?.rows
             ?.map((row) => ({
               ...row,
+              file,
               reach: (row.depth || 50) + file.level,
-              _matchingEditors: [
-                ...(visible.length
-                  ? visible
-                  : // Patch in a dummy editor if no editors visible
-                    [{ level: 1, relative: '.', dirname: '.' }]),
-              ]
+              _matchingEditors: (visible.length
+                ? visible
+                : // Patch in a dummy editor if no editors visible
+                  [{ level: 1, relative: '.', dirname: '.' }]
+              )
                 .map((editor) => ({
                   _debug: {
                     _1_level_sensitivity:
@@ -82,7 +83,7 @@ const BannersService = ({ children }) => {
 
                 // .map(
                 //   (editor) =>
-                //     console.log('🧃🧃🧃🧃 INSPECTING EDITOR', {
+                //     console.log('🧃🧃🧃🧃 INSPECTING EDITOR', editor.relative, {
                 //       editor,
                 //       row,
                 //       file,
@@ -124,7 +125,7 @@ const BannersService = ({ children }) => {
 
             // .map(
             //   (row) =>
-            //     console.log('🧃🧃🧃 INSPECTING ROW', { row, file }) || row
+            //     console.log('🧃🧃🧃 INSPECTING ROW', file.relative, { row, file }) || row
             // )
 
             .filter((row) => row._matchingEditors.length)
@@ -141,7 +142,7 @@ const BannersService = ({ children }) => {
             ) || [],
       }))
 
-      // .map((row) => console.log('🧃🧃 INSPECTING ROW', { row }) || row)
+      // .map((row) => console.log('🧃🧃 INSPECTING ROW', row.file.relative, { row }) || row)
 
       .filter((matched) => matched.rows.length)
       .sort((a, b) => (a.file.level > b.file.level ? 1 : -1))
