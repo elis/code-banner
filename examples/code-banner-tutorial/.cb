@@ -107,14 +107,14 @@ statusbar:
     - name: reload window button
       options:
         text: "[R] Window"
-        visible: true
+        visible: false
         priority: 20002
         command: "workbench.action.reloadWindow"
     - name: reload webviews button
       depth: 4
       options:
         text: "[R] Webviews"
-        visible: true
+        visible: false
         priority: 200000
         command: "workbench.action.webview.reloadWebviewAction"
 

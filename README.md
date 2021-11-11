@@ -725,11 +725,11 @@ Status Bar Item Properties:
   - [ ] Existing/Missing Files/Directories
 - [x] Types `v0.0.1`
 - [x] Error Handling
-  - [x] Parsing Configuration `v0.4.0`
+  - [x] Parsing Configuration `v0.3.3`
   - [x] Rows and Items `v0.3.0`
 - [ ] Welcome Mode
 - [ ] Tests
-- [x] Trusted Workspace Support `v0.4.0`
+- [x] Trusted Workspace Support `v0.3.3`
 - [ ] Custom Javascript Actions
 - [ ] Plugins
 - [ ] Shared Styles
