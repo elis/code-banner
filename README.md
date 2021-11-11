@@ -147,30 +147,30 @@ A slightly more involved example:
 
 ```yaml
 explorer:
-	rows:
-		- glob: 
-				- "**/.cb"
-				- "**/*.js"
-			items:
-				- type: svg
-					style: 
-						flex: 0 0 30px
-						padding: 4px
-					elementStyle:
-						borderRadius: 3px
-						overflow: hidden
-					svg: logo-javascript.svg
-				- type: svg
-					style: 
-						flex: 0 0 30px
-						padding: 4px
-					elementStyle:
-						borderRadius: 3px
-						overflow: hidden
-						transform: rotate(180deg)
-					url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
-				- type: markdown
-					markdown: This will show only when `*.js` or `.cb` files have visible editors
+  rows:
+    - glob: 
+        - "**/.cb"
+        - "**/*.js"
+      items:
+        - type: svg
+          style: 
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+          svg: https://cdn.worldvectorlogo.com/logos/logo-javascript.svg
+        - type: svg
+          style: 
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+            transform: rotate(180deg)
+          url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
+        - type: markdown
+          markdown: This will show only when `*.js` or `.cb` files have visible editors
 ```
 
 ### Panels

@@ -1,120 +1,25 @@
 explorer:
   rows:
-    - style:
-        borderBottom: 1px solid var(--vscode-badge-background)
+    - glob: 
+        - "**/.cb"
+        - "**/*.js"
       items:
-        - type: container
-          style:
-            alignItems: center
-            justifyContent: center
-            background: none
-            padding: 10px
-          items:
-            - type: svg
-              svg: depth-1/logo-javascript.svg
-              click: open:../
-              activeStyle:
-                width: 12
-              successStyle:
-                width: 60
-              style:
-                width: 30
-                transition: all 120ms ease-in-out
-
-            - type: hr
-              style:
-                margin: 5px 5px
-                height: 0px
-                borderBottom: none
-            - type: text
-              text: "v$(package.version, 0.0.0)"
-              style:
-                textAlign: center
-                fontSize: 9px
-                fontFamily: var(--monaco-monospace-font)
-        - type: span
-          style:
-            flex: 0 0 auto
-            borderLeft: 1px solid gray
-            opacity: 0.3
-            width: 2px
-            height: 40px
-            display: block
-        - type: container
-          style:
-            alignItems: flex-start
-            justifyContent: flex-start
-            background: none
-            padding: 10px
-            flex: 1 1 auto
-            minWidth: 120px
-          items:
-            - type: text
-              text: $(package.displayName)
-              style:
-                fontSize: 14px
-                fontWeight: bold
-                textTransform: uppercase
-            - type: container
-              style:
-                display: flex
-                flexDirection: row
-                columnGap: 4px
-                flexWrap: wrap
-              items:
-                - type: text
-                  style:
-                    transition: all 60ms ease-in-out
-                    fontFamily: var(--monaco-monospace-font)
-                    fontSize: 11px
-                    marginBottom: 4px
-                  text: "aka: $(package.name, code-banner)"
-                - type: text
-                  style:
-                    transition: all 60ms ease-in-out
-                    fontSize: 11px
-                  text: "by: $(package.author, name)"
-            - type: container
-              style:
-                height: 3px
-                border: none
-            - type: container
-              style:
-                display: flex
-                flexDirection: row
-                columnGap: 8px
-              items:
-                - type: text
-                  style:
-                    fontSize: 11px
-                    cursor: pointer
-                  text: "$(codicon:github) Repo"
-                  click: command:editor.action.openLink:https://github.com/elis/code-banner
-                - type: text
-                  style:
-                    fontSize: 11px
-                    cursor: pointer
-                  text: "$(codicon:extensions) Extn."
-                  click: command:extension.open:EliSklar.code-banner
-        - type: codicon
-          style:
-            fontSize: 28px
-            padding: 0 10px
-          codicon: rocket
-        
-statusbar:
-  items:
-    - name: xreload window buttonx
-      options:
-        text: "[R] Window"
-        visible: false
-        priority: 20002
-        command: "workbench.action.reloadWindow"
-    - name: xreload webviews buttonx
-      depth: 4
-      options:
-        text: "[R] Webviews"
-        visible: false
-        priority: 200000
-        command: "workbench.action.webview.reloadWebviewAction"
-
+        - type: svg
+          style: 
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+          svg: https://cdn.worldvectorlogo.com/logos/logo-javascript.svg
+        - type: svg
+          style: 
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+            transform: rotate(180deg)
+          url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
+        - type: markdown
+          markdown: This will show only when `*.js` or `.cb` files have visible editors
