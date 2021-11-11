@@ -2,7 +2,7 @@
 
 VSCode extension to add identifiable and useful information and actions to VSCode sidebare panels and status bar:
 
-![Example of [Code Banner](https://github.com/elis/code-banner)'s banner](docs/assets/example-1.png)
+![Example of [Code Banner](https://github.com/elis/code-banner)'s banner](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/example-1.png)
 
 Instantly add the information you need to have it available at a galnce exactly when needed!
 
@@ -43,7 +43,7 @@ explorer:
 
 Once the file is save, and you have the sidebar open on the `Explorer` section, and the `Code Banner` panel is visible and open, you should see your `Hello, World!`
 
-![Tutorial screenshot #1 - first banner](docs/assets/tutorial-01.png)
+![Tutorial screenshot #1 - first banner](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/tutorial-01.png)
 
 And you're done!
 
@@ -126,7 +126,7 @@ exports.statusbar = () => {
 > 
 > To enable executable configuration files you have to explicitly set it in the settings (`codeBanner.allowExecutableConfiguration = true`)
 > 
-> ![Enable executables](docs/assets/executables-setting.png)
+> ![Enable executables](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/executables-setting.png)
 
 ## Banners
 
