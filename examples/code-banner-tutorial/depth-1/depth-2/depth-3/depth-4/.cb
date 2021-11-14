@@ -1,5 +1,5 @@
 explorer:
-	rows:
+	xrows:
 		- sensitivity: 2
 			items:
 				- type: text
@@ -19,20 +19,3 @@ explorer:
             width: 40px
 				- type: text
 					text: This will appear even at the parent dir level!
-
-statusbar:
-  items:
-    - name: reload window button
-      options:
-        text: "[R] XWindow"
-        visible: true
-        priority: 20002
-        command: "workbench.action.reloadWindow"
-    - name: reload webviews button
-      depth: 4
-      options:
-        text: "[R] XWebviews"
-        visible: true
-        priority: 200000
-        command: "workbench.action.webview.reloadWebviewAction"
-

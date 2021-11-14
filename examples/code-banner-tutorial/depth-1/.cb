@@ -1,5 +1,5 @@
 explorer:
-	rows:
+	xrows:
 		- style:
 				justifyContent: space-between
 			priority: 100

@@ -1,5 +1,186 @@
 explorer:
   rows:
+
+    - items:
+        - type: container
+          classes: "relative px-4 shadow-lg sm:rounded-3xl sm:p-20"
+          items:
+            - type: text
+              classes: text-base leading-6 space-y-4 sm:text-lg sm:leading-7
+              text: sups! xx
+            - type: svg
+              url: https://raw.githubusercontent.com/tailwindlabs/heroicons/master/src/solid/credit-card.svg
+        
+        - type: container
+          items:
+            - type: text
+              classes: text-xs sm:text-xl text-green-800 sm:text-red-400 
+              text: this text will be small and green on small panels, and large and red in large panels
+
+    - label: React decorator
+      language: javascript react
+      classes: 
+      style:
+        padding: 5px
+        columnGap: 5px
+      items:
+        - type: svg
+          url: https://cdn.worldvectorlogo.com/logos/react-2.svg
+          style:
+            display: flex
+            alignItems: center
+            justifyContent: center
+          elementStyle:
+            minWidth: 18px
+            maxWidth: 42px
+        - type: container
+          style:
+            display: flex
+            flexWrap: wrap
+            alignItems: center
+            columnGap: 15px
+          items:
+          - type: container
+            items:
+            - type: text
+              text: React
+              click: open:https://www.npmjs.com/package/react
+              style:
+                cursor: pointer
+                fontSize: 1.20em
+              hoverStyle:
+                color: var(--vscode-textLink-foreground)
+          - type: hr
+            vertical: true
+          - type: container
+            items:
+            - type: text
+              text: docs
+              style:
+                fontSize: 0.8em
+                marginTop: 4px
+            - type: container
+              style:
+                display: flex
+                columnGap: 8px
+                flexWrap: wrap
+              items:
+              - type: text
+                click: open:https://eslint.org/docs/rules/
+                style:
+                  cursor: pointer
+                  display: flex
+                  flexDirection: row
+                  alignItems: center
+                  columnGap: 2px
+                hoverStyle:
+                  color: var(--vscode-textLink-foreground)
+                text: $(codicon:book, 1em) Rules
+
+              - type: text
+                click: open:https://eslint.org/docs/user-guide/command-line-interface
+                style:
+                  cursor: pointer
+                  display: flex
+                  flexDirection: row
+                  alignItems: center
+                  columnGap: 2px
+                hoverStyle:
+                  color: var(--vscode-textLink-foreground)
+                text: $(codicon:book, 1em) CLI
+    - label: ESLint Decorator
+      glob:
+        - "**/*.eslintrc"
+        - "**/*.eslintrc.js"
+        - "**/*.eslintrc.json"
+      style:
+        padding: 5px
+        columnGap: 5px
+      items:
+        - type: svg
+          url: https://cdn.worldvectorlogo.com/logos/eslint-1.svg
+          style:
+            display: flex
+            alignItems: center
+            justifyContent: center
+          elementStyle:
+            minWidth: 18px
+            maxWidth: 42px
+        - type: container
+          style:
+            display: flex
+            flexWrap: wrap
+            alignItems: center
+            columnGap: 15px
+          items:
+          - type: container
+            items:
+            - type: text
+              text: ESLint
+              click: open:https://www.npmjs.com/package/eslint
+              style:
+                cursor: pointer
+                fontSize: 1.20em
+              hoverStyle:
+                color: var(--vscode-textLink-foreground)
+            - type: text
+              text: v$(package.version)
+              style:
+                fontSize: 0.75em
+                fontFamily: var(--vscode-editor-font-family)
+          - type: hr
+            vertical: true
+          - type: container
+            items:
+            - type: text
+              text: docs
+              style:
+                fontSize: 0.8em
+                marginTop: 4px
+            - type: container
+              style:
+                display: flex
+                columnGap: 8px
+                flexWrap: wrap
+              items:
+              - type: text
+                click: open:https://eslint.org/docs/rules/
+                style:
+                  cursor: pointer
+                  display: flex
+                  flexDirection: row
+                  alignItems: center
+                  columnGap: 2px
+                hoverStyle:
+                  color: var(--vscode-textLink-foreground)
+                text: $(codicon:book, 1em) Rules
+
+              - type: text
+                click: open:https://eslint.org/docs/user-guide/command-line-interface
+                style:
+                  cursor: pointer
+                  display: flex
+                  flexDirection: row
+                  alignItems: center
+                  columnGap: 2px
+                hoverStyle:
+                  color: var(--vscode-textLink-foreground)
+                text: $(codicon:book, 1em) CLI
+
+
+
+    - style:
+        padding: 5px
+        columnGap: 5px
+      items:
+      - type: svg
+        url: https://vsmarketplacebadge.apphb.com/version/EliSklar.code-banner.svg?color=blue&style=?style=for-the-badge&logo=visual-studio-code
+      - type: svg
+        url: https://vsmarketplacebadge.apphb.com/installs/EliSklar.code-banner.svg?style=flat-square
+      - type: svg
+        url: https://vsmarketplacebadge.apphb.com/downloads/EliSklar.code-banner.svg
+
+
     - glob: 
         - "**/.cb"
         - "**/*.js"
@@ -23,3 +204,21 @@ explorer:
           url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
         - type: markdown
           markdown: This will show only when `*.js` or `.cb` files have visible editors
+
+
+statusbar:
+  items:
+    - name: reload window button
+      options:
+        text: "🖥 [R] Window"
+        visible: true
+        priority: 20002
+        command: "workbench.action.reloadWindow"
+    - name: reload webviews button
+      depth: 4
+      options:
+        text: "🌍 [R] Webviews"
+        visible: true
+        priority: 200000
+        command: "workbench.action.webview.reloadWebviewAction"
+
