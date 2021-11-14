@@ -777,6 +777,10 @@ Status Bar Item Properties:
 - [ ] Configuration Assistant
 - [ ] Live-reload as-you-type for banners
 
+# CHANGELOG
+
+To stay up-to-date on extension capabilities and APIs read the [CHANGELOG.md](./CHANGELOG.md) file.
+
 # History
 
 This project is the spiritual successor of [Project Banner](https://github.com/elis/project-banner) - I wanted this for the longest while, and I've needed it even longer.
