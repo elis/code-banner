@@ -22,6 +22,9 @@ const ConfigService = ({ children }) => {
   const actions = {}
 
   React.useEffect(() => {
+    const releaseTheme = comms.actions.subscribe('theme-updated', (message) => {
+      setState((v) => ({ ...v, theme: message.theme }))
+    })
     const releaseFiles = comms.actions.subscribe('files-updated', (message) => {
       setState((v) => ({ ...v, files: message.files }))
     })
@@ -73,10 +76,12 @@ const ConfigService = ({ children }) => {
           isActive: editor.relative === result.activeEditor?.relative,
         })),
         files: result.files,
+        theme: result.theme,
       }))
     })
 
     const release = () => {
+      releaseTheme()
       releaseFile()
       releaseFiles()
       releaseVisible()

@@ -7,7 +7,7 @@ export type EditorsWatcherAPI = {
   onActiveUpdate: (editor?: UpdateEditor) => void
 }
 
-export const initEditorWatcher = async (
+const initEditorWatcher = async (
   context: vscode.ExtensionContext,
   api: EditorsWatcherAPI
 ) => {
@@ -62,3 +62,6 @@ const makeUpdateEditor =
       ...overloads,
     } as UpdateEditor
   }
+
+  export default initEditorWatcher
+  

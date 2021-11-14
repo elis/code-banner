@@ -36,6 +36,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     files: ParsedFile[]
     visibleEditors: UpdateEditor[]
     activeEditor?: UpdateEditor
+    activeTheme?: vscode.ColorTheme
   } = {
     files: [],
     visibleEditors: [],
@@ -49,6 +50,13 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
 
   protected attach() {
     // noop
+  }
+
+  public async updateTheme(theme?: vscode.ColorTheme) {
+    this._cache.activeTheme = theme
+
+    if (this._view)
+      this._view.webview.postMessage({ type: 'theme-updated', theme })
   }
 
   public async updateFiles(files: ParsedFile[]) {
@@ -288,6 +296,16 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
       )
     )
 
+    const tailwindsUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        'node_modules',
+        'tailwindcss',
+        'dist',
+        'tailwind.css'
+      )
+    )
+
     // const uitoolkitUri = webview.asWebviewUri(
     //   vscode.Uri.joinPath(
     //     this._extensionUri,
@@ -302,7 +320,11 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     const nonce = getNonce()
 
     return `<!DOCTYPE html>
-			<html lang="en">
+			<html class="${
+        this._cache.activeTheme?.kind === vscode.ColorThemeKind.Dark
+          ? 'dark'
+          : ''
+      }" lang="en">
 			<head>
 				<meta charset="UTF-8">
 
@@ -312,13 +334,18 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
 				-->
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; img-src ${webview.cspSource} https:; font-src ${webview.cspSource}; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
+          content="default-src 'none'; img-src ${
+            webview.cspSource
+          } https:; font-src ${webview.cspSource}; script-src ${
+      webview.cspSource
+    }; style-src ${webview.cspSource};"
         />
       
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<link href="${styleUri}" rel="stylesheet">
 				<link href="${codiconsUri}" rel="stylesheet">
+				<link href="${tailwindsUri}" rel="stylesheet">
 				
 				<title>Cat Colors</title>
 			</head>

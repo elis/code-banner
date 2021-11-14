@@ -8,6 +8,17 @@ const useItemHandlers = (item) => {
 
   const [classes, setClasses] = useState({})
   const [styles, setStyles] = useState(item.style || {})
+  
+  useEffect(() => {
+    if (item.classes) {
+      if (typeof item.classes === 'string') {
+        setClasses(v => ({ ...v, [item.classes]: true}))
+        return () => {
+          setClasses(({ [item.classes]: x, ...v }) => v)
+        }
+      }
+    }
+  }, [item.classes])
 
   useEffect(() => {
     if (typeof item.click === 'string') {

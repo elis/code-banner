@@ -13,7 +13,7 @@ export type FileWatcherAPI = {
   onUpdate: (file: ParsedFile) => void
 }
 
-export const initFileWatcher = async (
+const initFileWatcher = async (
   globs: string[] = [],
   context: vscode.ExtensionContext,
   api: FileWatcherAPI,
@@ -245,3 +245,5 @@ export const importExecutableFile = async (uri: vscode.Uri) => {
     return {}
   }
 }
+
+export default initFileWatcher

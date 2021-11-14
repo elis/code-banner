@@ -5,8 +5,9 @@ import DebugPanelViewProvider from './providers/views/debug.panel.view'
 import SCMPanelViewProvider from './providers/views/scm.panel.view'
 import StatusBar from './providers/statusbar'
 import { ParsedFile, UpdateEditor } from '../types'
-import { initFileWatcher } from './watchers/files'
-import { initEditorWatcher } from './watchers/editors'
+import initFileWatcher from './watchers/files'
+import initEditorWatcher from './watchers/editors'
+import initThemeWatcher from './watchers/theme'
 
 export function activate(context: vscode.ExtensionContext) {
   const explorerPanelProvider = new ExplorerPanelViewProvider(context)
@@ -18,10 +19,10 @@ export function activate(context: vscode.ExtensionContext) {
   const responses: ParsedFile[][] = []
   let visibleEditors: UpdateEditor[] = []
   let activeEditor: UpdateEditor | undefined
+  let activeTheme: vscode.ColorTheme | undefined
   const channel = vscode.window.createOutputChannel('code-banner')
 
   channel.appendLine('Code Banner Loading...')
-  channel.show(true)
 
   const extConfig = vscode.workspace.getConfiguration('codeBanner')
   channel.appendLine('Extension Configuration: ' + extConfig)
@@ -32,6 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
     filesPlain: false,
     filesExecutable: false,
     visible: false,
+    theme: false
   }
   let booted = false
 
@@ -49,8 +51,14 @@ export function activate(context: vscode.ExtensionContext) {
         allFiles,
         visibleEditors,
         activeEditor,
+        activeTheme,
       })
       channel.appendLine('🌈 PENDING COMPLETE - CHECKS Clear')
+
+      explorerPanelProvider.updateTheme(activeTheme)
+      debugPanelProvider.updateTheme(activeTheme)
+      testPanelProvider.updateTheme(activeTheme)
+      scmPanelProvider.updateTheme(activeTheme)
 
       explorerPanelProvider.updateFiles(allFiles)
       debugPanelProvider.updateFiles(allFiles)
@@ -167,5 +175,20 @@ export function activate(context: vscode.ExtensionContext) {
       statusbarProvider.updateActive(editor)
       checkit()
     },
+  })
+
+  initThemeWatcher(context, {
+    onReady: (theme: vscode.ColorTheme) => {
+      readyCheck.theme = true
+      activeTheme = theme
+    },
+    onUpdate: (theme: vscode.ColorTheme) => {
+      activeTheme = theme
+
+      explorerPanelProvider.updateTheme(theme)
+      debugPanelProvider.updateTheme(theme)
+      testPanelProvider.updateTheme(theme)
+      scmPanelProvider.updateTheme(theme)
+    }
   })
 }

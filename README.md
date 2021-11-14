@@ -1,10 +1,22 @@
 # Code Banner
 
+Create visually pleasing and helpful "banners" with your projects custom logo and any additional useful information.
+
+Add custom actions, read and display local JSON/YAML data, and easily customize using styles.
+
+
+[![Badge for version for Visual Studio Code extension EliSklar.code-banner](https://vsmarketplacebadge.apphb.com/version/EliSklar.code-banner.svg?color=blue&style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=EliSklar.code-banner)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/EliSklar.code-banner.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock&WT.mc_id=javascript-0000-jopapa)
+[![Downloads](https://vsmarketplacebadge.apphb.com/downloads-short/EliSklar.code-banner.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock&WT.mc_id=javascript-0000-jopapa)
+
+[![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?color=blue&style=flat-square)](http://opensource.org/licenses/MIT)
+
+
 VSCode extension to add identifiable and useful information and actions to VSCode sidebare panels and status bar:
 
 ![Example of [Code Banner](https://github.com/elis/code-banner)'s banner](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/example-1.png)
 
-Instantly add the information you need to have it available at a galnce exactly when needed!
+Instantly add the information you need to have it available at a glance exactly when needed!
 
 ## Features
 
@@ -237,6 +249,29 @@ Each Banner row in your configuration will be displayed by Code Banner as an ind
           - type: codicon
             codicon: github
   ```
+
+  > *Note*: Check out the full list of all available VSCode CSS variables here: [VSCode Webview CSS Variables](./docs/vscode-webview-css-variables.md)
+
+- `classes` : `string` `string`
+
+  A string of classes to be appended to the element container.
+
+  Useful for working with CSS frameworks like [tailwind.css](https://tailwindcss.com/).
+
+  > *Note*: `tailwind.css` has been added to Code Banner in version v0.3.8
+
+  Example:
+  ```yaml
+  explorer:
+    rows:
+      - type: container
+        items:
+          - type: text
+            classes: text-xs sm:text-xl text-green-800 sm:text-red-400 
+            text: this text will be small and green on small panels, and large and red in large panels
+  ```
+
+
 
 - `glob` : `string | array` `string | string[]`
 
@@ -517,6 +552,10 @@ Options:
 - `path` : `string` 
 
   Path of the file to load 
+
+- `elementClasses` : `string` 
+
+  Class names to apply to the image element
 
 
 ### `markdown`

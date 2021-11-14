@@ -6,7 +6,7 @@ import useItemHandlers from '../item-handlers.hook'
 import ErrorItem from './error'
 
 const ImageItem = ({ item }) => {
-  const { svg, image, path, url: userUrl, elementStyle } = item
+  const { svg, image, path, url: userUrl, elementStyle, elementClasses } = item
   const banner = useBanner()
   const comms = useComms()
 
@@ -48,7 +48,7 @@ const ImageItem = ({ item }) => {
       className={classnames('item', `item-${item.type}`, classes)}
       style={{ [`--${item.type}-url`]: url, ...(styles || {}) }}
     >
-      <img src={url} style={elementStyle} />
+      <img src={url} style={elementStyle} className={elementClasses} />
     </div>
   )
 }

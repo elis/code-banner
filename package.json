@@ -105,6 +105,7 @@
     "react-markdown": "^7.1.0",
     "react-string-replace": "^0.4.4",
     "styled-components": "^5.3.3",
+    "tailwindcss": "^2.2.19",
     "yaml": "^1.10.2"
   },
   "devDependencies": {
