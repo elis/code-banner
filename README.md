@@ -779,7 +779,7 @@ Status Bar Item Properties:
 
 # CHANGELOG
 
-To stay up-to-date on extension capabilities and APIs read the [CHANGELOG.md](./CHANGELOG.md) file.
+To stay up-to-date on extension capabilities and APIs read the [CHANGELOG.md](https://github.com/elis/code-banner/blob/master/CHANGELOG.md) file.
 
 # History
 
