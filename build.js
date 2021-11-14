@@ -3,7 +3,7 @@
 const { sassPlugin } = require('esbuild-sass-plugin')
 const esbuild = require('esbuild')
 
-// console.log('process.argv', process.argv)
+const postcss = require('esbuild-postcss')
 
 esbuild
   .build({
@@ -12,7 +12,7 @@ esbuild
     outdir: './out/client',
     bundle: true,
     sourcemap: true,
-    plugins: [sassPlugin({})],
+    plugins: [sassPlugin({}), postcss()],
     ...(process.argv.find((e) => e === '--watch')
       ? {
           watch: {
@@ -27,4 +27,4 @@ esbuild
   .then((result) => {
     console.log('result of build:', result)
   })
-	.catch(() => process.exit(1))
+  .catch(() => process.exit(1))

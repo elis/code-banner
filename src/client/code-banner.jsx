@@ -7,7 +7,6 @@ import BannersService from './services/banners.service'
 
 import Panel from './panel'
 
-import 'tailwindcss/tailwind.css'
 import './styles.scss'
 
 const App = () => {

@@ -1,61 +1,70 @@
-html, body {
-	padding: 0;
-	margin: 0;
+@import 'tailwindcss/dist/base.css';
+@import 'tailwindcss/dist/components.css';
+@import 'tailwindcss/dist/utilities.css';
+
+html,
+body {
+  padding: 0;
+  margin: 0;
 }
 
 .banners {
-	display: flex;
-	flex-direction: column;
-	.codicon[class*='codicon-'] {
-		display: inline-block;
-	}
-	> .banner {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		span:empty {
-			flex: 1 1 auto;
-			display: inline-block;
-			line-height: 1px;
-		}
-		p, h1, h2, h3, h4, h5, h6 {
-			padding: 0;
-			margin: 0;
-		}
-		hr {
-			border: 0;
-			&:not(.vr) {
-				height: 0;
-				border-top: 1px solid rgba(0, 0, 0, 0.1);
-				border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-				
-			}
-			&.vr {
-				border-left: 1px solid rgba(0, 0, 0, 0.1);
-				border-right: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  .codicon[class*='codicon-'] {
+    display: inline-block;
+  }
+  > .banner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    span:empty {
+      flex: 1 1 auto;
+      display: inline-block;
+      line-height: 1px;
+    }
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      padding: 0;
+      margin: 0;
+    }
+    hr {
+      border: 0;
+      &:not(.vr) {
+        height: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      &.vr {
+        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      align-self: stretch;
+      &:only-child {
+        margin: 4px;
+        flex: 1 1 auto;
+      }
+    }
+    .codicon {
+      font-size: 0.8em;
+    }
+    .error {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      column-gap: 4px;
 
-			}
-			align-self: stretch;
-			&:only-child {
-				margin: 4px;
-				flex: 1 1 auto;
-			}
-		}
-		.codicon {
-			font-size: 0.8em;
-		}
-		.error {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			column-gap: 4px;
-
-			border: 2px solid orange;
-			border-radius: 3px;
-			padding: 2px;
-			.help {
-				font-size: 22px;
-			}
-		}
-	}
+      border: 2px solid orange;
+      border-radius: 3px;
+      padding: 2px;
+      .help {
+        font-size: 22px;
+      }
+    }
+  }
 }
