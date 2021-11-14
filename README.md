@@ -8,6 +8,7 @@ Add custom actions, read and display local JSON/YAML data, and easily customize 
 [![Badge for version for Visual Studio Code extension EliSklar.code-banner](https://vsmarketplacebadge.apphb.com/version/EliSklar.code-banner.svg?color=blue&style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=EliSklar.code-banner)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/EliSklar.code-banner.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock&WT.mc_id=javascript-0000-jopapa)
 [![Downloads](https://vsmarketplacebadge.apphb.com/downloads-short/EliSklar.code-banner.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock&WT.mc_id=javascript-0000-jopapa)
+[![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/codebanner?color=green&label=r%2Fcodebanner&logo=reddit&logoColor=white&style=flat-square)](https://reddit.com/r/codebanner)
 
 [![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?color=blue&style=flat-square)](http://opensource.org/licenses/MIT)
 
