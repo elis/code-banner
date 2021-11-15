@@ -23,6 +23,7 @@ explorer:
                 - type: text
                   text: New Python Project
                   style:
+                    fontWeight: bold
                     fontSize: 20
                 - type: text
                   text: More info
