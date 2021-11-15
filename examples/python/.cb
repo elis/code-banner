@@ -1,0 +1,29 @@
+explorer:
+  rows:
+    - items:
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            padding: 3px
+            columnGap: 3px
+          items:
+            - type: svg
+              elementStyle:
+                width: 32
+                margin: 5
+                padding: 5px
+              url: https://cdn.worldvectorlogo.com/logos/python-5.svg
+            - type: container
+              style:
+                display: flex
+                flexDirection: column
+                rowGap: 3px
+              items:
+                - type: text
+                  text: New Python Project
+                  style:
+                    fontWeight: bold
+                    fontSize: 20
+                - type: text
+                  text: More info
