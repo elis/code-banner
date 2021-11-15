@@ -15,7 +15,7 @@ Add custom actions, read and display local JSON/YAML data, and easily customize 
 
 VSCode extension to add identifiable and useful information and actions to VSCode sidebare panels and status bar:
 
-![Example of [Code Banner](https://github.com/elis/code-banner)'s banner](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/example-1.png)
+![Example of [Code Banner](https://github.com/elis/code-banner)'s banner](https://user-images.githubusercontent.com/63856101/141840086-f8208ce9-ab65-4d09-aed6-005af367a8be.png)
 
 Instantly add the information you need to have it available at a glance exactly when needed!
 
@@ -56,7 +56,7 @@ explorer:
 
 Once the file is save, and you have the sidebar open on the `Explorer` section, and the `Code Banner` panel is visible and open, you should see your `Hello, World!`
 
-![Tutorial screenshot #1 - first banner](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/tutorial-01.png)
+![Tutorial screenshot #1 - first banner](https://user-images.githubusercontent.com/63856101/141839449-17986de8-103d-4b86-946b-badebd0cb2cd.png)
 
 And you're done!
 
@@ -138,8 +138,8 @@ exports.statusbar = () => {
 > *Note*: Use executable configuration at your own risk! Currently (as of v0.3.0) Code Banner does not have any securities in place to verify the security or origin of the executable code!
 > 
 > To enable executable configuration files you have to explicitly set it in the settings (`codeBanner.allowExecutableConfiguration = true`)
-> 
-> ![Enable executables](https://raw.githubusercontent.com/elis/elis/main/random/code-banner/executables-setting.png)
+>
+> ![Enable executables](https://user-images.githubusercontent.com/63856101/141839452-72ba1903-65a1-4705-b259-f671b3c05f88.png)
 
 ## Banners
 
