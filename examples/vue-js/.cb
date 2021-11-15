@@ -24,5 +24,6 @@ explorer:
                   text: New Vue.js Project
                   style:
                     fontSize: 20
+                    fontWeight: bold
                 - type: text
                   text: More info
