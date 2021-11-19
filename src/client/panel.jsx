@@ -20,7 +20,7 @@ const Panel = () => {
     <div className={'banners'}>
       {confs?.map((file, index) => (
         <Banner
-          key={'bannenr ' + file.relative + '-' + index}
+          key={'banner ' + file.relative + '-' + index}
           workspace={file.workspace}
           config={file.conf}
           relative={file.relative}
