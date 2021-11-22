@@ -89,9 +89,9 @@ export function activate(context: vscode.ExtensionContext) {
       return true
     }
 
-    const isCBFileExists = async (uri: any) => {
+    const isCBFileExists = async (filePath: any) => {
       try {
-        await vscode.workspace.fs.stat(uri)
+        await vscode.workspace.fs.stat(filePath)
         return true
       } catch {
         return false
