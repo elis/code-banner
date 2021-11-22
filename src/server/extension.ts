@@ -8,6 +8,7 @@ import { ParsedFile, UpdateEditor } from '../types'
 import initFileWatcher from './watchers/files'
 import initEditorWatcher from './watchers/editors'
 import initThemeWatcher from './watchers/theme'
+import { posix } from 'path'
 
 export function activate(context: vscode.ExtensionContext) {
   const explorerPanelProvider = new ExplorerPanelViewProvider(context)
@@ -94,10 +95,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Command palette menus
     context.subscriptions.push(
-      vscode.commands.registerCommand('code-banner.generateBasicCBFile', () => {
-        if (!isWorkspaceOpen) return null
-        vscode.window.showInformationMessage('Generate Basic File')
-      })
+      vscode.commands.registerCommand(
+        'code-banner.generateBasicCBFile',
+        async () => {
+          if (!isWorkspaceOpen) return null
+          vscode.window.showInformationMessage('Generate Basic File')
+          const root = vscode.workspace.workspaceFolders![0]!.uri
+          const uri = root.with({ path: posix.join(root.path, '.cb') })
+          await vscode.workspace.fs.writeFile(uri, Buffer.from(''))
+        }
+      )
     )
 
     context.subscriptions.push(
