@@ -126,25 +126,37 @@ export function activate(context: vscode.ExtensionContext) {
           else return false
         })
     }
+
+    const createFile = async (type: string) => {
+      let code = ''
+      switch (type) {
+        case 'basic':
+          code = baseFiles.basic
+          break
+        case 'advanced':
+          code = baseFiles.advanced
+          break
+        default:
+          code = 'Something went wrong there'
+          break
+      }
+      const filePath = generateFilePath()
+      {
+        if (await isCBFileExists(filePath))
+          vscode.window.showErrorMessage('File Exists')
+        else {
+          await vscode.workspace.fs.writeFile(filePath, Buffer.from(code))
+          openFileShowMessages(filePath)
+        }
+      }
+    }
     // Command palette menus
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'code-banner.generateBasicCBFile',
         async () => {
           if (!isWorkspaceOpen()) return null
-
-          const filePath = generateFilePath()
-          {
-            if (await isCBFileExists(filePath))
-              vscode.window.showErrorMessage('File Exists')
-            else {
-              await vscode.workspace.fs.writeFile(
-                filePath,
-                Buffer.from(baseFiles.basic)
-              )
-              openFileShowMessages(filePath)
-            }
-          }
+          createFile('basic')
         }
       )
     )
@@ -154,18 +166,7 @@ export function activate(context: vscode.ExtensionContext) {
         'code-banner.generateAdvancedCBFIle',
         async () => {
           if (!isWorkspaceOpen()) return null
-          const filePath = generateFilePath()
-          {
-            if (await isCBFileExists(filePath))
-              vscode.window.showErrorMessage('File Exists')
-            else {
-              await vscode.workspace.fs.writeFile(
-                filePath,
-                Buffer.from(baseFiles.advanced)
-              )
-              openFileShowMessages(filePath)
-            }
-          }
+          createFile('advanced')
         }
       )
     )
