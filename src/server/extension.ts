@@ -138,7 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
-        'code-banner.generateExtensionSpecificCBFile',
+        'code-banner.generateAdvancedCBFIle',
         async () => {
           if (!isWorkspaceOpen()) return null
           const filePath = generateFilePath()

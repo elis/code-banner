@@ -16,7 +16,7 @@
   "activationEvents": [
     "*",
     "onCommand:code-banner.generateBasicCBFile",
-    "onCommand:code-banner.generateExtensionSpecificCBFile",
+    "onCommand:code-banner.generateAdvancedCBFIle",
     "onCommand:code-banner.guidedSetUpCBFile"
   ],
   "author": {
@@ -90,7 +90,7 @@
         "title": "Generate Basic Code Banner"
       },
       {
-        "command": "code-banner.generateExtensionSpecificCBFile",
+        "command": "code-banner.generateAdvancedCBFIle",
         "category": "Code Banner",
         "title": "Generate Advanced Code Banner"
       },
