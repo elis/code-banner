@@ -87,12 +87,12 @@
       {
         "command": "code-banner.generateBasicCBFile",
         "category": "Code Banner",
-        "title": "Generate Basic Banner Config File (Shown Project-Wide)"
+        "title": "Generate Basic Code Banner"
       },
       {
         "command": "code-banner.generateExtensionSpecificCBFile",
         "category": "Code Banner",
-        "title": "Generate File Extension Specific Config File"
+        "title": "Generate Advanced Code Banner"
       },
       {
         "command": "code-banner.guidedSetUpCBFile",

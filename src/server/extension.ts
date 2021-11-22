@@ -104,15 +104,23 @@ export function activate(context: vscode.ExtensionContext) {
         'code-banner.generateBasicCBFile',
         async () => {
           if (!isWorkspaceOpen()) return null
-          vscode.window.showInformationMessage('Generate Basic File')
           const root = vscode.workspace.workspaceFolders![0]!.uri
           const filePath = root.with({ path: posix.join(root.path, '.cb') })
           if (await isCBFileExists(filePath))
             vscode.window.showErrorMessage('File Exists')
-          await vscode.workspace.fs.writeFile(filePath, Buffer.from(''))
+          await vscode.workspace.fs.writeFile(
+            filePath,
+            Buffer.from(baseFiles.basic)
+          )
           vscode.workspace.openTextDocument(filePath).then((doc) => {
             vscode.window.showTextDocument(doc)
           })
+          vscode.window.showInformationMessage(
+            'Code Banner: Be Sure to Change File Type To YAML'
+          )
+          vscode.window.showInformationMessage(
+            'Code Banner: Save File To See Your Code Banner'
+          )
         }
       )
     )
@@ -122,8 +130,22 @@ export function activate(context: vscode.ExtensionContext) {
         'code-banner.generateExtensionSpecificCBFile',
         async () => {
           if (!isWorkspaceOpen()) return null
+          const root = vscode.workspace.workspaceFolders![0]!.uri
+          const filePath = root.with({ path: posix.join(root.path, '.cb') })
+          if (await isCBFileExists(filePath))
+            vscode.window.showErrorMessage('File Exists')
+          await vscode.workspace.fs.writeFile(
+            filePath,
+            Buffer.from(baseFiles.advanced)
+          )
+          vscode.workspace.openTextDocument(filePath).then((doc) => {
+            vscode.window.showTextDocument(doc)
+          })
           vscode.window.showInformationMessage(
-            'Generate Extension Specific File'
+            'Code Banner: Be Sure to Change File Type To YAML'
+          )
+          vscode.window.showInformationMessage(
+            'Code Banner: Save File To See Your Code Banner'
           )
         }
       )
@@ -250,4 +272,88 @@ export function activate(context: vscode.ExtensionContext) {
       scmPanelProvider.updateTheme(theme)
     },
   })
+}
+
+const baseFiles = {
+  basic: `explorer:
+  rows:
+    - items:
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            padding: 3px
+            columnGap: 3px
+          items:
+            - type: svg
+              elementStyle:
+                width: 50
+              url: https://cdn.worldvectorlogo.com/logos/typescript-2.svg
+            - type: container
+              style:
+                marginLeft: 8px
+                display: flex
+                flexDirection: column
+                justifyContent: center
+                rowGap: 3px
+              items:
+                - type: text
+                  text: Title
+                  style:
+                    fontSize: 20px
+                - type: text
+                  text: See Readme for more info about Code Banner
+`,
+  advanced: `explorer:
+  rows:
+    - items:
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            padding: 3px
+            columnGap: 3px
+          items:
+            - type: svg
+              elementStyle:
+                width: 50
+              url: https://cdn.worldvectorlogo.com/logos/typescript-2.svg
+            - type: container
+              style:
+                marginLeft: 8px
+                display: flex
+                flexDirection: column
+                justifyContent: center
+                rowGap: 3px
+              items:
+                - type: text
+                  text: Title
+                  style:
+                    fontSize: 20px
+                - type: text
+                  text: See Readme for more info about Code Banner
+    - glob:
+        - "**/.cb"
+        - "**/*.js"
+      items:
+        - type: svg
+          style:
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+          svg: https://cdn.worldvectorlogo.com/logos/logo-javascript.svg
+        - type: svg
+          style:
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+            transform: rotate(180deg)
+          url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
+        - type: markdown
+          markdown: This will show only when \`*.js\` or \`.cb\` files have visible editors
+`,
 }
