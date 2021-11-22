@@ -98,29 +98,40 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
 
+    const openFileShowMessages = (filePath: any) => {
+      vscode.workspace.openTextDocument(filePath).then((doc) => {
+        vscode.window.showTextDocument(doc)
+      })
+      vscode.window.showInformationMessage(
+        'Code Banner: Be Sure to Change File Type To YAML'
+      )
+      vscode.window.showInformationMessage(
+        'Code Banner: Save File To See Your Code Banner'
+      )
+    }
+
+    const generateFilePath = () => {
+      const root = vscode.workspace.workspaceFolders![0]!.uri
+      return root.with({ path: posix.join(root.path, '.cb') })
+    }
+
     // Command palette menus
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'code-banner.generateBasicCBFile',
         async () => {
           if (!isWorkspaceOpen()) return null
-          const root = vscode.workspace.workspaceFolders![0]!.uri
-          const filePath = root.with({ path: posix.join(root.path, '.cb') })
+
+          const filePath = generateFilePath()
+
           if (await isCBFileExists(filePath))
             vscode.window.showErrorMessage('File Exists')
+
           await vscode.workspace.fs.writeFile(
             filePath,
             Buffer.from(baseFiles.basic)
           )
-          vscode.workspace.openTextDocument(filePath).then((doc) => {
-            vscode.window.showTextDocument(doc)
-          })
-          vscode.window.showInformationMessage(
-            'Code Banner: Be Sure to Change File Type To YAML'
-          )
-          vscode.window.showInformationMessage(
-            'Code Banner: Save File To See Your Code Banner'
-          )
+          openFileShowMessages(filePath)
         }
       )
     )
@@ -130,23 +141,14 @@ export function activate(context: vscode.ExtensionContext) {
         'code-banner.generateExtensionSpecificCBFile',
         async () => {
           if (!isWorkspaceOpen()) return null
-          const root = vscode.workspace.workspaceFolders![0]!.uri
-          const filePath = root.with({ path: posix.join(root.path, '.cb') })
+          const filePath = generateFilePath()
           if (await isCBFileExists(filePath))
             vscode.window.showErrorMessage('File Exists')
           await vscode.workspace.fs.writeFile(
             filePath,
             Buffer.from(baseFiles.advanced)
           )
-          vscode.workspace.openTextDocument(filePath).then((doc) => {
-            vscode.window.showTextDocument(doc)
-          })
-          vscode.window.showInformationMessage(
-            'Code Banner: Be Sure to Change File Type To YAML'
-          )
-          vscode.window.showInformationMessage(
-            'Code Banner: Save File To See Your Code Banner'
-          )
+          openFileShowMessages(filePath)
         }
       )
     )
