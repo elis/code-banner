@@ -14,7 +14,8 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "*",
+    "onCommand:code-banner.generateBasicCBFile"
   ],
   "author": {
     "email": "eli.sklar@gmail.com",
@@ -79,7 +80,14 @@
           "codeBanner.aallowExecutableConfiguration"
         ]
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "code-banner.generateBasicCBFile",
+        "category": "Code Banner",
+        "title": "Generate Basic Banner (Shown Project-Wide)"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

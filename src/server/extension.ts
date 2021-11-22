@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
     filesPlain: false,
     filesExecutable: false,
     visible: false,
-    theme: false
+    theme: false,
   }
   let booted = false
 
@@ -79,6 +79,13 @@ export function activate(context: vscode.ExtensionContext) {
       statusbarProvider.updateActive(activeEditor)
       booted = true
     }
+
+    // Command palette menus
+    context.subscriptions.push(
+      vscode.commands.registerCommand('code-banner.generateBasicCBFile', () => {
+        vscode.window.showInformationMessage('Hello World!')
+      })
+    )
   }
   const handlers = {
     onReady: (files: ParsedFile[]) => {
@@ -189,6 +196,6 @@ export function activate(context: vscode.ExtensionContext) {
       debugPanelProvider.updateTheme(theme)
       testPanelProvider.updateTheme(theme)
       scmPanelProvider.updateTheme(theme)
-    }
+    },
   })
 }
