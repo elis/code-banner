@@ -106,10 +106,13 @@ export function activate(context: vscode.ExtensionContext) {
           if (!isWorkspaceOpen()) return null
           vscode.window.showInformationMessage('Generate Basic File')
           const root = vscode.workspace.workspaceFolders![0]!.uri
-          const uri = root.with({ path: posix.join(root.path, '.cb') })
-          if (await isCBFileExists(uri))
+          const filePath = root.with({ path: posix.join(root.path, '.cb') })
+          if (await isCBFileExists(filePath))
             vscode.window.showErrorMessage('File Exists')
-          await vscode.workspace.fs.writeFile(uri, Buffer.from(''))
+          await vscode.workspace.fs.writeFile(filePath, Buffer.from(''))
+          vscode.workspace.openTextDocument(filePath).then((doc) => {
+            vscode.window.showTextDocument(doc)
+          })
         }
       )
     )
