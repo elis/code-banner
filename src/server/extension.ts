@@ -115,6 +115,17 @@ export function activate(context: vscode.ExtensionContext) {
       return root.with({ path: posix.join(root.path, '.cb') })
     }
 
+    const confirmOverWriteCBFIle = () => {
+      vscode.window
+        .showInformationMessage(
+          'Do you want to overwrite .cb file?',
+          ...['Yes', 'No']
+        )
+        .then((answer) => {
+          if (answer === 'Yes') return true
+          else return false
+        })
+    }
     // Command palette menus
     context.subscriptions.push(
       vscode.commands.registerCommand(
