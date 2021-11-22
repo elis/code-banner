@@ -80,9 +80,22 @@ export function activate(context: vscode.ExtensionContext) {
       booted = true
     }
 
+    const isWorkspaceOpen = () => {
+      const workspaceExists =
+        vscode.workspace.workspaceFolders &&
+        vscode.workspace.workspaceFolders.length > 0
+      if (!vscode.window.activeTextEditor && !workspaceExists) {
+        vscode.window.showInformationMessage(
+          'You do not have any workspaces open.'
+        )
+        return false
+      }
+    }
+
     // Command palette menus
     context.subscriptions.push(
       vscode.commands.registerCommand('code-banner.generateBasicCBFile', () => {
+        if (!isWorkspaceOpen) return null
         vscode.window.showInformationMessage('Generate Basic File')
       })
     )
@@ -91,6 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'code-banner.generateExtensionSpecificCBFile',
         () => {
+          if (!isWorkspaceOpen) return null
           vscode.window.showInformationMessage(
             'Generate Extension Specific File'
           )
@@ -100,6 +114,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
       vscode.commands.registerCommand('code-banner.guidedSetUpCBFile', () => {
+        if (!isWorkspaceOpen) return null
         vscode.window.showInformationMessage('Guided Set-Up')
       })
     )
