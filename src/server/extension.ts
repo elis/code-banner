@@ -123,15 +123,17 @@ export function activate(context: vscode.ExtensionContext) {
           if (!isWorkspaceOpen()) return null
 
           const filePath = generateFilePath()
-
-          if (await isCBFileExists(filePath))
-            vscode.window.showErrorMessage('File Exists')
-
-          await vscode.workspace.fs.writeFile(
-            filePath,
-            Buffer.from(baseFiles.basic)
-          )
-          openFileShowMessages(filePath)
+          {
+            if (await isCBFileExists(filePath))
+              vscode.window.showErrorMessage('File Exists')
+            else {
+              await vscode.workspace.fs.writeFile(
+                filePath,
+                Buffer.from(baseFiles.basic)
+              )
+              openFileShowMessages(filePath)
+            }
+          }
         }
       )
     )
@@ -142,13 +144,17 @@ export function activate(context: vscode.ExtensionContext) {
         async () => {
           if (!isWorkspaceOpen()) return null
           const filePath = generateFilePath()
-          if (await isCBFileExists(filePath))
-            vscode.window.showErrorMessage('File Exists')
-          await vscode.workspace.fs.writeFile(
-            filePath,
-            Buffer.from(baseFiles.advanced)
-          )
-          openFileShowMessages(filePath)
+          {
+            if (await isCBFileExists(filePath))
+              vscode.window.showErrorMessage('File Exists')
+            else {
+              await vscode.workspace.fs.writeFile(
+                filePath,
+                Buffer.from(baseFiles.advanced)
+              )
+              openFileShowMessages(filePath)
+            }
+          }
         }
       )
     )
