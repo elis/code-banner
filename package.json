@@ -15,7 +15,9 @@
   ],
   "activationEvents": [
     "*",
-    "onCommand:code-banner.generateBasicCBFile"
+    "onCommand:code-banner.generateBasicCBFile",
+    "onCommand:code-banner.generateExtensionSpecificCBFile",
+    "onCommand:code-banner.guidedSetUpCBFile"
   ],
   "author": {
     "email": "eli.sklar@gmail.com",
@@ -85,7 +87,17 @@
       {
         "command": "code-banner.generateBasicCBFile",
         "category": "Code Banner",
-        "title": "Generate Basic Banner (Shown Project-Wide)"
+        "title": "Generate Basic Banner Config File (Shown Project-Wide)"
+      },
+      {
+        "command": "code-banner.generateExtensionSpecificCBFile",
+        "category": "Code Banner",
+        "title": "Generate File Extension Specific Config File"
+      },
+      {
+        "command": "code-banner.guidedSetUpCBFile",
+        "category": "Code Banner",
+        "title": "Guided Set-Up for Code Banner"
       }
     ]
   },

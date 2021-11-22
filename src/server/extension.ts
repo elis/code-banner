@@ -83,7 +83,24 @@ export function activate(context: vscode.ExtensionContext) {
     // Command palette menus
     context.subscriptions.push(
       vscode.commands.registerCommand('code-banner.generateBasicCBFile', () => {
-        vscode.window.showInformationMessage('Hello World!')
+        vscode.window.showInformationMessage('Generate Basic File')
+      })
+    )
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'code-banner.generateExtensionSpecificCBFile',
+        () => {
+          vscode.window.showInformationMessage(
+            'Generate Extension Specific File'
+          )
+        }
+      )
+    )
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand('code-banner.guidedSetUpCBFile', () => {
+        vscode.window.showInformationMessage('Guided Set-Up')
       })
     )
   }
