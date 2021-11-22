@@ -88,6 +88,14 @@ export function activate(context: vscode.ExtensionContext) {
       }
       return true
     }
+
+    const isCBFileExists = async (uri: any) => {
+      try {
+        await vscode.workspace.fs.stat(uri)
+        return true
+      } catch {
+        return false
+      }
     }
 
     // Command palette menus
