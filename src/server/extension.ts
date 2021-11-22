@@ -86,6 +86,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No Folders Open')
         return false
       }
+      return true
+    }
     }
 
     // Command palette menus
