@@ -82,13 +82,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     const isWorkspaceOpen = () => {
-      const workspaceExists =
-        vscode.workspace.workspaceFolders &&
-        vscode.workspace.workspaceFolders.length > 0
-      if (!vscode.window.activeTextEditor && !workspaceExists) {
-        vscode.window.showInformationMessage(
-          'You do not have any workspaces open.'
-        )
+      if (!vscode.workspace.workspaceFolders) {
+        vscode.window.showErrorMessage('No Folders Open')
         return false
       }
     }
@@ -98,7 +93,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'code-banner.generateBasicCBFile',
         async () => {
-          if (!isWorkspaceOpen) return null
+          if (!isWorkspaceOpen()) return null
           vscode.window.showInformationMessage('Generate Basic File')
           const root = vscode.workspace.workspaceFolders![0]!.uri
           const uri = root.with({ path: posix.join(root.path, '.cb') })
@@ -110,8 +105,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'code-banner.generateExtensionSpecificCBFile',
-        () => {
-          if (!isWorkspaceOpen) return null
+        async () => {
+          if (!isWorkspaceOpen()) return null
           vscode.window.showInformationMessage(
             'Generate Extension Specific File'
           )
@@ -120,10 +115,13 @@ export function activate(context: vscode.ExtensionContext) {
     )
 
     context.subscriptions.push(
-      vscode.commands.registerCommand('code-banner.guidedSetUpCBFile', () => {
-        if (!isWorkspaceOpen) return null
-        vscode.window.showInformationMessage('Guided Set-Up')
-      })
+      vscode.commands.registerCommand(
+        'code-banner.guidedSetUpCBFile',
+        async () => {
+          if (!isWorkspaceOpen()) return null
+          vscode.window.showInformationMessage('Guided Set-Up')
+        }
+      )
     )
   }
   const handlers = {
