@@ -8,8 +8,17 @@ import { ParsedFile, UpdateEditor } from '../types'
 import initFileWatcher from './watchers/files'
 import initEditorWatcher from './watchers/editors'
 import initThemeWatcher from './watchers/theme'
+import { SidebarProvider } from './SidebarProvider'
 
 export function activate(context: vscode.ExtensionContext) {
+  const sidebarProvider = new SidebarProvider(context.extensionUri)
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      'code-banner-sidebar',
+      sidebarProvider
+    )
+  )
+
   const explorerPanelProvider = new ExplorerPanelViewProvider(context)
   const debugPanelProvider = new DebugPanelViewProvider(context)
   const testPanelProvider = new TestPanelViewProvider(context)
@@ -33,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
     filesPlain: false,
     filesExecutable: false,
     visible: false,
-    theme: false
+    theme: false,
   }
   let booted = false
 
@@ -189,6 +198,6 @@ export function activate(context: vscode.ExtensionContext) {
       debugPanelProvider.updateTheme(theme)
       testPanelProvider.updateTheme(theme)
       scmPanelProvider.updateTheme(theme)
-    }
+    },
   })
 }
