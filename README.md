@@ -34,7 +34,23 @@ After installation the extension you will have a new panel in your explorer, deb
 
 This panel's content is entirely controlled by the content of your workspace, allowing you to display information such as text, images, json data, or any combination of those and preferform custom actions all defined in `.cb` or `.pb` files in your workspaces.
 
-## Tutorial
+## Set Up Via Command Palette
+
+Set up a basic `code banner` by opening the command palette (CMD/CTRL+SHIFT+P) and typing `code banner`. This will give you three options:
+
+### Generate Basic Code Banner
+
+Will create a `.cb` file with a basic banner set up, which you can edit the code of to reflect your project. This banner will be shown in every file of your project in the sidebar.
+
+### Generate Advanced Code Banner
+
+Will create a `.cb` file with a more advanced banner set up. This set up will inlcude a code banner that will show on every file, but also a code banner that will only show up when a `.cb` or `.js` file is open. Use this template to customize your code banner how you see fit.
+
+### View Read Me
+
+Opens this README.md for future reference to the documentation
+
+## In Depth Tutorial
 
 ### Step 1: Create .cb file
 
