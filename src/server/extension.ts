@@ -102,11 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.workspace.openTextDocument(filePath).then((doc) => {
         vscode.window.showTextDocument(doc)
       })
-      vscode.window.showInformationMessage(
-        'Code Banner: Be Sure to Change File Type To YAML'
-      )
-      vscode.window.showInformationMessage(
-        'Code Banner: Save File To See Your Code Banner'
+      vscode.window.showWarningMessage(
+        'Code Banner: Change File Type To YAML, Then Save File'
       )
     }
 
