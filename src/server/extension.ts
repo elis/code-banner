@@ -139,12 +139,12 @@ export function activate(context: vscode.ExtensionContext) {
           )
           .then(async (answer) => {
             if (answer === 'Yes') {
-              createCBFile(filePath, code)
+              await createCBFile(filePath, code)
               openFileShowMessages(filePath)
             } else return null
           })
       } else {
-        createCBFile(filePath, code)
+        await createCBFile(filePath, code)
         openFileShowMessages(filePath)
       }
     }
