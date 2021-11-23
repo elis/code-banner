@@ -17,7 +17,6 @@
     "*",
     "onCommand:code-banner.generateBasicCBFile",
     "onCommand:code-banner.generateAdvancedCBFIle",
-    "onCommand:code-banner.guidedSetUpCBFile",
     "onCommand:code-banner.showReadMe"
   ],
   "author": {
@@ -94,11 +93,6 @@
         "command": "code-banner.generateAdvancedCBFIle",
         "category": "Code Banner",
         "title": "Generate Advanced Code Banner"
-      },
-      {
-        "command": "code-banner.guidedSetUpCBFile",
-        "category": "Code Banner",
-        "title": "Guided Set-Up for Code Banner"
       },
       {
         "command": "code-banner.showReadMe",

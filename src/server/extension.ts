@@ -170,16 +170,6 @@ export function activate(context: vscode.ExtensionContext) {
     )
 
     context.subscriptions.push(
-      vscode.commands.registerCommand(
-        'code-banner.guidedSetUpCBFile',
-        async () => {
-          if (!isWorkspaceOpen()) return null
-          vscode.window.showInformationMessage('Guided Set-Up')
-        }
-      )
-    )
-
-    context.subscriptions.push(
       vscode.commands.registerCommand('code-banner.showReadMe', async () => {
         const readmePath = context.asAbsolutePath('README.md')
         vscode.commands.executeCommand(
