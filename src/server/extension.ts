@@ -124,7 +124,11 @@ export function activate(context: vscode.ExtensionContext) {
         })
     }
 
-    const createFile = async (type: string) => {
+    const createCBFile = async (filePath: any, code: string) => {
+      await vscode.workspace.fs.writeFile(filePath, Buffer.from(code))
+    }
+
+    const preCreation = async (type: string) => {
       let code = ''
       switch (type) {
         case 'basic':
@@ -134,17 +138,26 @@ export function activate(context: vscode.ExtensionContext) {
           code = baseFiles.advanced
           break
         default:
-          code = 'Something went wrong there'
+          code = 'Something went wrong in createFile()'
           break
       }
       const filePath = generateFilePath()
-      {
-        if (await isCBFileExists(filePath))
-          vscode.window.showErrorMessage('File Exists')
-        else {
-          await vscode.workspace.fs.writeFile(filePath, Buffer.from(code))
-          openFileShowMessages(filePath)
-        }
+
+      if (await isCBFileExists(filePath)) {
+        vscode.window
+          .showWarningMessage(
+            'Do you want to do overwrite and lose your Code Banner?',
+            ...['Yes', 'No']
+          )
+          .then(async (answer) => {
+            if (answer === 'Yes') {
+              createCBFile(filePath, code)
+              openFileShowMessages(filePath)
+            } else return null
+          })
+      } else {
+        createCBFile(filePath, code)
+        openFileShowMessages(filePath)
       }
     }
     // Command palette menus
@@ -153,7 +166,7 @@ export function activate(context: vscode.ExtensionContext) {
         'code-banner.generateBasicCBFile',
         async () => {
           if (!isWorkspaceOpen()) return null
-          createFile('basic')
+          preCreation('basic')
         }
       )
     )
@@ -163,7 +176,7 @@ export function activate(context: vscode.ExtensionContext) {
         'code-banner.generateAdvancedCBFIle',
         async () => {
           if (!isWorkspaceOpen()) return null
-          createFile('advanced')
+          preCreation('advanced')
         }
       )
     )
