@@ -178,6 +178,16 @@ export function activate(context: vscode.ExtensionContext) {
         }
       )
     )
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand('code-banner.showReadMe', async () => {
+        const readmePath = context.asAbsolutePath('README.md')
+        vscode.commands.executeCommand(
+          'markdown.showPreview',
+          vscode.Uri.file(readmePath)
+        )
+      })
+    )
   }
   const handlers = {
     onReady: (files: ParsedFile[]) => {

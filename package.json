@@ -17,7 +17,8 @@
     "*",
     "onCommand:code-banner.generateBasicCBFile",
     "onCommand:code-banner.generateAdvancedCBFIle",
-    "onCommand:code-banner.guidedSetUpCBFile"
+    "onCommand:code-banner.guidedSetUpCBFile",
+    "onCommand:code-banner.showReadMe"
   ],
   "author": {
     "email": "eli.sklar@gmail.com",
@@ -98,6 +99,11 @@
         "command": "code-banner.guidedSetUpCBFile",
         "category": "Code Banner",
         "title": "Guided Set-Up for Code Banner"
+      },
+      {
+        "command": "code-banner.showReadMe",
+        "category": "Code Banner",
+        "title": "View Read Me"
       }
     ]
   },
