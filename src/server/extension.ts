@@ -103,7 +103,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showTextDocument(doc)
       })
       vscode.window.showWarningMessage(
-        'Code Banner: Change File Type To YAML, Then Save File'
+        'Code Banner: Change Language Mode To YAML, Then Save File'
       )
     }
 
