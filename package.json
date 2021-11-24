@@ -14,7 +14,10 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "*",
+    "onCommand:code-banner.generateBasicCBFile",
+    "onCommand:code-banner.generateAdvancedCBFIle",
+    "onCommand:code-banner.showReadMe"
   ],
   "author": {
     "email": "eli.sklar@gmail.com",
@@ -79,7 +82,24 @@
           "codeBanner.aallowExecutableConfiguration"
         ]
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "code-banner.generateBasicCBFile",
+        "category": "Code Banner",
+        "title": "Generate Basic Code Banner"
+      },
+      {
+        "command": "code-banner.generateAdvancedCBFIle",
+        "category": "Code Banner",
+        "title": "Generate Advanced Code Banner"
+      },
+      {
+        "command": "code-banner.showReadMe",
+        "category": "Code Banner",
+        "title": "View Read Me"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

@@ -8,6 +8,7 @@ import { ParsedFile, UpdateEditor } from '../types'
 import initFileWatcher from './watchers/files'
 import initEditorWatcher from './watchers/editors'
 import initThemeWatcher from './watchers/theme'
+import { posix } from 'path'
 
 export function activate(context: vscode.ExtensionContext) {
   const explorerPanelProvider = new ExplorerPanelViewProvider(context)
@@ -33,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
     filesPlain: false,
     filesExecutable: false,
     visible: false,
-    theme: false
+    theme: false,
   }
   let booted = false
 
@@ -79,6 +80,104 @@ export function activate(context: vscode.ExtensionContext) {
       statusbarProvider.updateActive(activeEditor)
       booted = true
     }
+
+    const isWorkspaceOpen = () => {
+      if (!vscode.workspace.workspaceFolders) {
+        vscode.window.showErrorMessage('No Folders Open')
+        return false
+      }
+      return true
+    }
+
+    const isCBFileExists = async (filePath: any) => {
+      try {
+        await vscode.workspace.fs.stat(filePath)
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    const openFileShowMessages = (filePath: any) => {
+      vscode.workspace.openTextDocument(filePath).then((doc) => {
+        vscode.window.showTextDocument(doc)
+      })
+      vscode.window.showWarningMessage(
+        'Code Banner: Change Language Mode To YAML, Then Save File'
+      )
+    }
+
+    const generateFilePath = () => {
+      const root = vscode.workspace.workspaceFolders![0]!.uri
+      return root.with({ path: posix.join(root.path, '.cb') })
+    }
+
+    const createCBFile = async (filePath: any, code: string) => {
+      await vscode.workspace.fs.writeFile(filePath, Buffer.from(code))
+    }
+
+    const preCreation = async (type: string) => {
+      let code = ''
+      switch (type) {
+        case 'basic':
+          code = baseFiles.basic
+          break
+        case 'advanced':
+          code = baseFiles.advanced
+          break
+        default:
+          code = 'Something went wrong in createFile()'
+          break
+      }
+      const filePath = generateFilePath()
+
+      if (await isCBFileExists(filePath)) {
+        vscode.window
+          .showWarningMessage(
+            'Do you want to do overwrite and lose your Code Banner?',
+            ...['Yes', 'No']
+          )
+          .then(async (answer) => {
+            if (answer === 'Yes') {
+              await createCBFile(filePath, code)
+              openFileShowMessages(filePath)
+            } else return null
+          })
+      } else {
+        await createCBFile(filePath, code)
+        openFileShowMessages(filePath)
+      }
+    }
+    // Command palette menus
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'code-banner.generateBasicCBFile',
+        async () => {
+          if (!isWorkspaceOpen()) return null
+          preCreation('basic')
+        }
+      )
+    )
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'code-banner.generateAdvancedCBFIle',
+        async () => {
+          if (!isWorkspaceOpen()) return null
+          preCreation('advanced')
+        }
+      )
+    )
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand('code-banner.showReadMe', async () => {
+        const readmePath = context.asAbsolutePath('README.md')
+        vscode.commands.executeCommand(
+          'markdown.showPreview',
+          vscode.Uri.file(readmePath)
+        )
+      })
+    )
   }
   const handlers = {
     onReady: (files: ParsedFile[]) => {
@@ -189,6 +288,90 @@ export function activate(context: vscode.ExtensionContext) {
       debugPanelProvider.updateTheme(theme)
       testPanelProvider.updateTheme(theme)
       scmPanelProvider.updateTheme(theme)
-    }
+    },
   })
+}
+
+const baseFiles = {
+  basic: `explorer:
+  rows:
+    - items:
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            padding: 3px
+            columnGap: 3px
+          items:
+            - type: svg
+              elementStyle:
+                width: 50
+              url: https://cdn.worldvectorlogo.com/logos/typescript-2.svg
+            - type: container
+              style:
+                marginLeft: 8px
+                display: flex
+                flexDirection: column
+                justifyContent: center
+                rowGap: 3px
+              items:
+                - type: text
+                  text: Title
+                  style:
+                    fontSize: 20px
+                - type: text
+                  text: See Readme for more info about Code Banner
+`,
+  advanced: `explorer:
+  rows:
+    - items:
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            padding: 3px
+            columnGap: 3px
+          items:
+            - type: svg
+              elementStyle:
+                width: 50
+              url: https://cdn.worldvectorlogo.com/logos/typescript-2.svg
+            - type: container
+              style:
+                marginLeft: 8px
+                display: flex
+                flexDirection: column
+                justifyContent: center
+                rowGap: 3px
+              items:
+                - type: text
+                  text: Title
+                  style:
+                    fontSize: 20px
+                - type: text
+                  text: See Readme for more info about Code Banner
+    - glob:
+        - "**/.cb"
+        - "**/*.js"
+      items:
+        - type: svg
+          style:
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+          svg: https://cdn.worldvectorlogo.com/logos/logo-javascript.svg
+        - type: svg
+          style:
+            flex: 0 0 30px
+            padding: 4px
+          elementStyle:
+            borderRadius: 3px
+            overflow: hidden
+            transform: rotate(180deg)
+          url: https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg
+        - type: markdown
+          markdown: This will show only when \`*.js\` or \`.cb\` files have visible editors
+`,
 }
