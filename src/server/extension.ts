@@ -8,7 +8,7 @@ import { ParsedFile, UpdateEditor } from '../types'
 import initFileWatcher from './watchers/files'
 import initEditorWatcher from './watchers/editors'
 import initThemeWatcher from './watchers/theme'
-import { SidebarProvider } from './SidebarProvider'
+import { SidebarProvider } from './providers/SidebarProvider'
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri)
