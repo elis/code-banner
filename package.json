@@ -15,6 +15,7 @@
   ],
   "activationEvents": [
     "*",
+    "onView:code-banner-sidebar",
     "onCommand:code-banner.generateBasicCBFile",
     "onCommand:code-banner.generateAdvancedCBFIle",
     "onCommand:code-banner.showReadMe"
@@ -30,15 +31,31 @@
   "main": "./out/server/extension.js",
   "contributes": {
     "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "code-banner-sidebar-view",
+          "title": "Code Banner",
+          "icon": "media/bookmark.svg"
+        }
+      ],
       "codebanner": [
         {
-          "id": "code-baner",
+          "id": "code-banner",
           "title": "Code Banner",
           "icon": "media/assets/icon.svg"
         }
       ]
     },
     "views": {
+      "code-banner-sidebar-view": [
+        {
+          "type": "webview",
+          "id": "code-banner-sidebar",
+          "name": "code-banner",
+          "icon": "media/bookmark.svg",
+          "contextualTitle": "code-banner"
+        }
+      ],
       "explorer": [
         {
           "type": "webview",
