@@ -21,7 +21,7 @@ const ConfigService = ({ children }) => {
   }, [state])
   const actions = {}
 
-  React.useEffect(() => {
+  useEffect(() => {
     const releaseTheme = comms.actions.subscribe('theme-updated', (message) => {
       setState((v) => ({ ...v, theme: message.theme }))
     })

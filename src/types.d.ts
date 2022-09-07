@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 export type CodeBannerConfig = {
   statusbar?: StatusBarConfig
   explorer?: ExplorerPanelConfig
+  data?: Record<string, any>
 }
 
 export type StatusBarConfig = {

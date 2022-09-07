@@ -35,7 +35,9 @@ export function activate(context: vscode.ExtensionContext) {
   channel.appendLine('Code Banner Loading...')
 
   const extConfig = vscode.workspace.getConfiguration('codeBanner')
-  channel.appendLine('Extension Configuration: ' + extConfig)
+  channel.appendLine(
+    `Extension Configuration: ${JSON.stringify(extConfig, null, 1)}`
+  )
   // console.log('🌈 🌈 🌈  EXT CONFIGURATION', { extConfig })
 
   const readyCheck = {
