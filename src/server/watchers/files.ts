@@ -234,10 +234,20 @@ export const enrichWithContext = async (
   if (Array.isArray(data)) {
     const result = await data.reduce(
       (p, value) =>
-        p.then(async (acc: any[]) => [
-          ...acc,
-          await enrichWithContext(uri, value, parentContext, templates),
-        ]),
+        p.then(async (acc: any[]) => {
+          const res = await enrichWithContext(
+            uri,
+            value,
+            parentContext,
+            templates
+          )
+          return [
+            ...acc,
+            ...(typeof value === 'string' && value.match(/\|expand$/)
+              ? [...res]
+              : [res]),
+          ]
+        }),
       Promise.resolve([])
     )
 
@@ -253,9 +263,10 @@ export const enrichWithContext = async (
           if (key === 'context' || key === 'templates') {
             return acc
           }
+          const res = await enrichWithContext(uri, value, context, templates)
           return {
             ...acc,
-            [key]: await enrichWithContext(uri, value, context, templates),
+            ...(key === '...' ? { ...res } : { [key]: res }),
           }
         }),
       Promise.resolve({})
@@ -456,16 +467,15 @@ const withContext = async (
 export const contextString = async (str: string, context: any) => {
   const objectPath = require('object-path')
 
-  const args = commandSpreader(`string:${str}`, 'name', 'default?')
-
   const regex = /\${([^}]+)}/g
 
   return str.replace(regex, (match, key) => {
-    const coalesce = key.split(',').length > 1
+    const args = commandSpreader(`string:${key}`, 'name', 'default?')
+    const coalesce = args.name.split(',').length > 1
 
     const value = objectPath[coalesce ? 'coalesce' : 'get'](
       context,
-      coalesce ? key.split(',') : key,
+      coalesce ? args.name.split(',') : args.name,
       args.default
     )
     if (typeof value !== 'undefined') {
@@ -527,7 +537,7 @@ export const contextify = async (
 
         return {
           ...acc,
-          [key]: 'sup',
+          [key]: value,
         }
       }),
     Promise.resolve({})
