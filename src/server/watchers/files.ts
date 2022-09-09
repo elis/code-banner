@@ -299,6 +299,17 @@ export const importFile = async (uri: vscode.Uri) => {
   }
 }
 
+// failsafe include code-banner config
+export const includeFile = async (uri: vscode.Uri) => {
+  try {
+    const result = await importPlainFile(uri)
+    return result
+  } catch (error) {
+    console.error('⚠️🌈 INCLUDE ERROR', { uri }, { error })
+    return { error }
+  }
+}
+
 const commandSpreader = (command: string, ...names: string[]) => {
   const [, ...rest] = command.split(':')
   const args = rest.join(':').split('|')
@@ -403,6 +414,21 @@ const withContext = async (
     )
 
     return rendered
+  } else if (type === 'include') {
+    // "include:./relative/file/path|key?" -> import
+    const args = commandSpreader(str, 'path', 'key?')
+    const filePath = composeFilePath(uri, args.path)
+    const reqd = await includeFile(filePath)
+    const result = await contextify(uri, reqd, templates, context)
+
+    const coalesce = args.key?.split(',').length > 1
+
+    return args.key
+      ? objectPath[coalesce ? 'coalesce' : 'get'](
+          result,
+          coalesce ? args.key.split(',') : args.key
+        )
+      : result
   } else if (type === 'each') {
     // "each:context.value|template|array?" -> ...
     const args = commandSpreader(str, 'key', 'template', 'array?')
@@ -453,12 +479,13 @@ const withContext = async (
     const args = commandSpreader(str, 'name', 'default?')
 
     const coalesce = args.name.split(',').length > 1
-
-    return objectPath[coalesce ? 'coalesce' : 'get'](
+    const result = objectPath[coalesce ? 'coalesce' : 'get'](
       context,
       coalesce ? args.name.split(',') : args.name,
       args.default
     )
+
+    return result
   }
 
   return str
@@ -507,7 +534,9 @@ export const contextify = async (
             [key]: value.map((item) => {
               if (typeof item === 'string') {
                 return item.replace(/\$\{(\w+)\}/g, (_, name) => {
-                  return selfContext[name]
+                  return ({ ...selfContext, ...acc } as Record<string, any>)[
+                    name
+                  ]
                 })
               } else {
                 return item
@@ -519,7 +548,7 @@ export const contextify = async (
           const result = await withContext(
             uri,
             context[key],
-            selfContext,
+            { ...selfContext, ...acc },
             templates
           )
 
@@ -529,9 +558,13 @@ export const contextify = async (
           }
         }
         if (value && typeof value === 'object') {
+          const res = await contextify(uri, value, templates, {
+            ...selfContext,
+            ...acc,
+          })
           return {
             ...acc,
-            [key]: await contextify(uri, value, templates, selfContext),
+            [key]: res,
           }
         }
 
