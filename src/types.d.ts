@@ -15,9 +15,7 @@ export type Options = {
 }
 
 export type ResponsiveConfig = {
-  [key: string]: {
-    [option: string]: number
-  }
+  [key: string]: Record<ResponsiveOption, number>
 }
 
 export type ResponsiveOption =

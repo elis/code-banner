@@ -1,4 +1,11 @@
-import React, { useContext, createContext, useEffect, useMemo, useState } from 'react'
+import objectPath from 'object-path'
+import React, {
+  useContext,
+  createContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import BannerErrorBoundary from '../error-boundries/banner.error-boundry'
 import { ItemsDisplay } from './items'
 
@@ -6,10 +13,17 @@ const BannerContext = createContext()
 
 export const useBanner = () => useContext(BannerContext)
 
-const Banner = ({ config, relative, workspace, ...rest }) => {
-  const { items = [], style = {}, responsive, 'if-responsive': ifResponsive } = config
+const Banner = ({ config, relative, workspace }) => {
+  const {
+    context,
+    items = [],
+    style = {},
+    responsive,
+    'if-responsive': ifResponsive,
+    'if-context': ifContext,
+  } = config
 
-  const {width, height} = useWindowSize()
+  const { width, height } = useWindowSize()
 
   const resps = useMemo(() => {
     if (responsive) {
@@ -48,26 +62,48 @@ const Banner = ({ config, relative, workspace, ...rest }) => {
     }
   }, [responsive, width, height])
 
-  const shouldDisplay = useMemo(() => {
+  const shouldDisplayResponsive = useMemo(() => {
     const result = resps?.length
-    ? ifResponsive
-      ? (typeof ifResponsive === 'string'
-          ? ifResponsive.split(',')
-          : Array.isArray(ifResponsive)
-          ? ifResponsive
-          : []
-        )
-          .filter((key) => resps.indexOf(key) > -1)
-          .reduce((a, b) => a || b, false)
+      ? ifResponsive
+        ? (typeof ifResponsive === 'string'
+            ? ifResponsive.split(',')
+            : Array.isArray(ifResponsive)
+            ? ifResponsive
+            : []
+          )
+            .filter((key) => resps.indexOf(key) > -1)
+            .reduce((a, b) => a || b, false)
+        : true
       : true
-    : true
-    
+
     return result
   }, [resps, ifResponsive])
 
-  if (!shouldDisplay) {return null}
+  const shouldDisplayContext = useMemo(() => {
+    const result = ifContext
+      ? (typeof ifContext === 'string'
+          ? ifContext.split(',')
+          : Array.isArray(ifContext)
+          ? ifContext
+          : []
+        ).filter((key) => {
+          const coalesce = Array.isArray(key) || key.split(',').length > 1
 
+          return objectPath[coalesce ? 'coalesce' : 'get'](
+            context,
+            coalesce ? (typeof key === 'string' ? key.split(',') : key) : key
+          )
+        })
+        .reduce((a, b) => a || b, false)
+      : true
+
+    return result
+  }, [ifContext, context])
   
+  if (!(shouldDisplayResponsive && shouldDisplayContext)) {
+    return null
+  }
+
   return (
     <BannerContext.Provider
       value={{ config, relative, workspace, responsive: resps }}

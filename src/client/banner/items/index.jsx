@@ -8,6 +8,7 @@ import SpanItem from './span'
 import ImageItem from './image'
 import TextItem from './text'
 import UnknownItem from './unknown'
+import objectPath from 'object-path'
 
 export const ItemDisplay = ({ item, index, responsive }) => {
   const types = {
@@ -46,10 +47,25 @@ export const ItemsDisplay = ({ items, responsive }) =>
                 .reduce((a, b) => a || b, false)
             : true
           : true,
+          item['if-context']
+      ? (typeof item['if-context'] === 'string'
+          ? item['if-context'].split(',')
+          : Array.isArray(item['if-context'])
+          ? item['if-context']
+          : []
+        ).filter((key) => {
+          const coalesce = Array.isArray(key) || key.split(',').length > 1
+          return objectPath[coalesce ? 'coalesce' : 'get'](
+            item.context,
+            coalesce ? (typeof key === 'string' ? key.split(',') : key) : key
+          )
+        })
+        .reduce((a, b) => a || b, false)
+      : true
       ])
       .map(
-        ([item, respi], index) =>
-          (respi && (
+        ([item, respi, contexi], index) =>
+          (respi && contexi && (
             <ItemDisplay
               key={`item-${item.type}-${index}`}
               item={item}
