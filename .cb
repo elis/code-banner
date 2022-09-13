@@ -1,103 +1,118 @@
 explorer:
   rows:
-    - style:
-        borderBottom: 1px solid var(--vscode-badge-background)
-      items:
-        - type: container
-          style:
-            alignItems: center
-            justifyContent: center
-            background: none
-            padding: 10px
-          items:
-            - type: svg
-              svg: media/assets/code-banner.svg
-              click: command:workbench.action.webview.reloadWebviewAction:1234
-              style:
-                width: 30
-                transition: all 120ms ease-in-out
-
-            - type: hr
-              style:
-                margin: 5px 5px
-                height: 0px
-                borderBottom: none
-            - type: text
-              text: "v$(package.version)"
-              style:
-                textAlign: center
-                fontSize: 9px
-                fontFamily: var(--monaco-monospace-font)
-        - type: span
-          style:
-            flex: 0 0 auto
-            borderLeft: 1px solid gray
-            opacity: 0.3
-            width: 2px
-            height: 40px
-            display: block
-        - type: container
-          style:
-            alignItems: flex-start
-            justifyContent: flex-start
-            background: none
-            padding: 10px
-            flex: 1 1 auto
-            minWidth: 120px
-          items:
-            - type: text
-              text: $(package.displayName)
-              style:
-                fontSize: 14px
-                fontWeight: bold
-                textTransform: uppercase
-            - type: container
-              style:
-                display: flex
-                flexDirection: row
-                columnGap: 4px
-                flexWrap: wrap
-              items:
-                - type: text
-                  style:
-                    transition: all 60ms ease-in-out
-                    fontFamily: var(--monaco-monospace-font)
-                    fontSize: 11px
-                    marginBottom: 4px
-                  text: "aka: $(package.name, code-banner)"
-                - type: text
-                  style:
-                    transition: all 60ms ease-in-out
-                    fontSize: 11px
-                  text: "by: $(package.author.name, name)"
-            - type: container
-              style:
-                height: 3px
-                border: none
-            - type: container
-              style:
-                display: flex
-                flexDirection: row
-                columnGap: 8px
-              items:
-                - type: text
-                  style:
-                    fontSize: 11px
-                    cursor: pointer
-                  text: "$(codicon:github) Repo"
-                  click: open:https://github.com/elis/code-banner
-                - type: text
-                  style:
-                    fontSize: 11px
-                    cursor: pointer
-                  text: "$(codicon:extensions) Extn."
-                  click: command:extension.open:EliSklar.code-banner
-        - type: codicon
-          style:
-            fontSize: 28px
-            padding: 0 10px
-          codicon: rocket
+    - template:project-row
         
+context:
+  pkg: json:package.json
+  ext: EliSklar.code-banner
+  commands:
+    open-extension: command:extension.open:${ext}
+    open-repo: open:${pkg.repository.url}
+  
+templates:
+  project-row:
+    style:
+      borderBottom: 1px solid var(--vscode-badge-background)
+    templates:
+      title:
+        
+    items:
+      - type: container
+        style:
+          alignItems: center
+          justifyContent: center
+          background: none
+          padding: 10px
+        items:
+          - type: svg
+            svg: media/assets/code-banner.svg
+            style:
+              width: 30
+              transition: all 120ms ease-in-out
+
+          - type: hr
+            style:
+              margin: 5px 5px
+              height: 0px
+              borderBottom: none
+          - type: text
+            text: "v$(package.version)"
+            style:
+              textAlign: center
+              fontSize: 9px
+              fontFamily: var(--monaco-monospace-font)
+      - template:vertical-serperator
+      - type: container
+        style:
+          alignItems: flex-start
+          justifyContent: flex-start
+          background: none
+          padding: 10px
+          flex: 1 1 auto
+          minWidth: 120px
+        items:
+          - type: text
+            text: $(package.displayName)
+            style:
+              fontSize: 14px
+              fontWeight: bold
+              textTransform: uppercase
+          - type: container
+            style:
+              display: flex
+              flexDirection: row
+              columnGap: 4px
+              flexWrap: wrap
+              font-size: 0.7em
+            items:
+              - type: text
+                style:
+                  transition: all 60ms ease-in-out
+                  fontFamily: var(--vscode-editor-font-family)
+                  marginBottom: 4px
+                text: "aka: $(package.name, code-banner)"
+              - type: text
+                style:
+                  transition: all 60ms ease-in-out
+                text: "by: $(package.author.name, name)"
+          - type: container
+            style:
+              height: 3px
+              border: none
+          - type: container
+            style:
+              display: flex
+              flexDirection: row
+              columnGap: 8px
+            items:
+              - type: text
+                style:
+                  fontSize: 11px
+                  cursor: pointer
+                text: "$(codicon:github) Repo"
+                click: context:commands.open-repo
+              - type: text
+                style:
+                  fontSize: 11px
+                  cursor: pointer
+                text: "$(codicon:extensions) Extn."
+                click: context:commands.open-extension
+      - type: codicon
+        style:
+          fontSize: 28px
+          padding: 0 10px
+        codicon: rocket
+      
+  vertical-serperator:
+    type: span
+    style:
+      flex: 0 0 auto
+      borderLeft: 1px solid gray
+      opacity: 0.3
+      width: 2px
+      height: 40px
+      display: block
+
 statusbar:
   items:
     - name: reload window
