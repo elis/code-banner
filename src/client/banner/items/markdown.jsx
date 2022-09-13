@@ -10,12 +10,9 @@ const MarkdownItem = ({ item }) => {
   const { handlers, classes } = useItemHandlers(item)
 
   return (
-    <ReactMarkdown
-      {...handlers}
-      className={classnames('item item-markdown', classes)}
-    >
-      {display}
-    </ReactMarkdown>
+    <div {...handlers} className={classnames('item item-markdown', classes)}>
+      <ReactMarkdown>{display}</ReactMarkdown>
+    </div>
   )
 }
 

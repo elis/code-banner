@@ -32,7 +32,7 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
-# v0.4.0 - 2022-09-10
+# v0.4.0 - 2022-09-14
 
 ## Added
 
@@ -578,6 +578,10 @@ Multiple values can be provide to the `if-context` property to match multiple va
 
 
 
+
+## Fixed
+
+### Fix markdown not rendering styles
 
 
 # v0.3.8 - 2021-11-14
