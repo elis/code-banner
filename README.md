@@ -1232,6 +1232,76 @@ explorer:
     - items: each:colors|colorRowItem
 ```
 
+### Responsive Layout
+
+Rows and items can be conditionally shown based on the viewporrt size.
+
+You can declare a custom `reposponive` object anywhere in your config and use it in the `if-responsive` property of any `row` or `item`.
+
+```yaml
+
+# Define a custom responsive object
+responsive:
+  small:
+    max-width: 280
+  medium:
+    min-width: 280
+    max-width: 600
+  large:
+    min-width: 600
+
+explorer:
+  rows:
+    - items:
+      - type: text
+        text: This will be shown on all viewports
+      - type: text
+        text: This will be shown on large viewports
+        if-responsive: large
+      - type: text
+        text: This will be shown small viewports
+        if-responsive: small
+      - type: text
+        text: This will be shown on medium and large viewports
+        if-responsive: medium,large
+```
+
+`responsive` object can be provided anywhere throughout your config - for example in rows and items - to override and define a custom responsive object.
+
+Multiple values can be provide to the `if-responsive` property to match multiple viewports. The values can be comma separated or an array.
+
+### Conditional Rendering
+
+Rows and items can be conditionally shown based on the value of a context key.
+
+You can use the `if-context` property of any `row` or `item` to conditionally show it based on the value of a context key - if the value is truthy the element will show, if the value is falsy the element will not be rendered.
+
+```yaml
+
+context:
+  show: 
+    first: truthy
+    third: truthy
+
+
+explorer:
+  rows:
+    - items:
+      - type: text
+        text: This will be shown
+        if-context: show.first
+      - type: text
+        text: This will not be shown
+        if-context: show.second
+      - type: text
+        text: This will be shown
+        if-context: show.second,show.third
+
+```
+
+Multiple values can be provide to the `if-context` property to match multiple values. The values can be comma separated or an array.
+
+
 
 # Development Roadmap
 
@@ -1256,7 +1326,10 @@ explorer:
   - [x] Active Editor `v0.3.0`
   - [x] Visible Editors `v0.3.0`
   - [x] Glob Pattern `v0.3.0`
-  - [x] Existing/Missing Files/Directories
+  - [x] Existing/Missing Files/Directories `v0.4.0`
+  - [x] Responsive `v0.4.0`
+  - [x] Context `v0.4.0`
+
 - [x] Types `v0.0.1`
 - [x] Error Handling
   - [x] Parsing Configuration `v0.3.3`
@@ -1266,7 +1339,7 @@ explorer:
 - [x] Trusted Workspace Support `v0.3.3`
 - [ ] Custom Javascript Actions
 - [ ] Plugins
-- [ ] Shared Styles
+- [x] Shared Styles `v0.4.0`
 - [x] Componentize
 - [ ] React Component Support
 - [ ] Configuration Assistant

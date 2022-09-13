@@ -226,6 +226,7 @@ export const ingest =
       ),
       templates: loaded.templates || {},
       options: loaded.options || {},
+      responsive: loaded.responsive || {}
     }
     const sections = 'explorer, scm, debug, test, statusbar'.split(', ')
     for (const section of sections) {
@@ -277,6 +278,11 @@ export const ingest =
               ...(loaded[key].templates || {}),
             }
 
+            const responsive = {
+              ...conf.responsive,
+              ...(loaded[key].responsive || {}),
+            }
+
             const result = await enrichWithContext(
               uri,
               loaded[key],
@@ -288,6 +294,7 @@ export const ingest =
               [section]: {
                 context,
                 templates,
+                responsive,
                 ...result,
               },
             })
