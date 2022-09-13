@@ -27,6 +27,8 @@ Instantly add the information you need to have it available at a glance exactly 
 * 🪄 Markdown, plain text, and smart tags
 * ⏱ Fast and responsive
 * ⌗ Read and display data from `package.json` or any yaml/json file
+* 🖼 Templating support and templates for common use cases
+* 💾 Custom data context - read and display data from any file
 
 ## Usage
 
@@ -113,7 +115,9 @@ A configuration file evetually is expected to represent a configuration object w
   "debug": { ... }, // Configuration for the debug panel
   "explorer|scm": { ... }, // Share configuration for the explorer and source control panels
   "debug|scm|explorer": { ... }, // Share configuration for the debug, source control, and explorer panels
-  "statusbar": { ... } // Configuration for the statusbar
+  "statusbar": { ... }, // Configuration for the statusbar
+  "context": { ... }, // Configuration for the data context
+  "templates": { ... }, // Configuration for the templates
 }
 ```
 
@@ -755,6 +759,480 @@ Status Bar Item Properties:
 
   The identifier of this item.
 
+## Context
+
+Providing a context to the configuration file allows to use variables in the configuration file, load data from json/yaml files, and more.
+
+Example:
+
+```yaml
+
+context:
+  some:
+    data:
+      value: "Hello, World!"
+
+explorer:
+  rows:
+    - items:
+        - type: text
+          text: ${some.data.value}
+
+```
+
+Notice the similar syntax to the `Smart Tags` mentioned earlier - these two features work very differently and are not related even if some of the functionality is similar.
+
+Accessing context data is done using the `${}` syntax, similar to Javascript template literals.
+
+Data loaded in context section is available to all other sections, and can be overridden in any other sections' `context` property. Thing includes any templates and their properties.
+
+### Context Capabilities
+
+Context values can be transformed into other values using the various directives available.
+
+Directives are invoked by providing a string in the following format: `directiveName:directiveArgument|directiveArgument|...`
+
+Available directives:
+
+  - [JSON/YAML](/#JSON/YAML)
+  - [Text File](/#TextFile)
+  - [Files](/#Files)
+  - [ENV Variables](/#Env)
+  - [ENV File](/#EnvFiles)
+  - [Include Config](/#Include)
+  - [Each](/#Each)
+  - [Context](/#Context)
+  - [String Interpolation](/#StringInterpolation)
+
+#### JSON/YAML
+
+Read JSON/YAML data from a workspace file and load it or parts of it into the context.
+##### Directive
+  
+  - `json:path|key?|default?`
+  
+  - `yaml:path|key?|default?`
+
+##### Arguments
+
+- `path` : `string`
+
+  Relative path to the json/yaml file
+
+- `key` : `string` - optional
+  
+    Key to access in the json/yaml file object (dot notation) - see object-path link: https://www.npmjs.com/package/object-path
+
+    If key is provided with commas (`,`) it will be split and the value will be used as a cloascing request to `object-path`.
+
+    If key is not provided, the entire file will be loaded.
+
+
+- `default` : `string` - optional
+  
+    Default value to use if the key is not found in the json/yaml file or the fail failed to load.
+
+#### Text File
+
+Read a text file or parts of it from the workspace and load it into the context.
+
+Load plain-text file content. If `line` is provided, only that line will be loaded. If `lineEnd` is provided, all lines from `line` to `lineEnd` will be loaded.
+##### Directive
+  
+`file:path|line?|lineEnd?|default?`
+
+##### Arguments
+
+- `path` : `string`
+
+  Relative path to the file
+
+- `line` : `number` - optional
+  
+    Line number to read from the file.
+
+- `lineEnd` : `number` - optional
+    
+      Line number to read to from the file.
+
+- `default` : `string` - optional
+    
+      Default value to use file doesn't exist or failed to load.
+
+
+Example:
+  
+```yaml
+context:
+  readmeTitle: file:README.md|1
+  readmeContent: file:README.md|2|5
+```
+
+#### Files
+
+Read a list of files/folders from the workspace and load it into the context.
+##### Directive
+  
+`files:path|pattern?|default?`
+
+##### Arguments
+
+- `path` : `string`
+
+  Relative path to the file
+
+- `pattern` : `string`
+  
+    Glob pattern to match files in the directory.
+
+- `default` : `string` - optional
+    
+      Default value to use if the directory doesn't exist or there aren't any files.
+
+##### Result
+
+The result is an array of objects with the following properties:
+
+```json
+[
+  [name, vscode.FileType], ...
+]
+```
+
+Example:
+  
+```yaml
+context:
+  packages: files:packages|** # Loads all folders in the packages directory
+
+template:
+  packageItem:
+    type: text
+    text: "Package: packages/${name}"
+
+explorer:
+  rows:
+    - items:
+        - each:packages:packageItem|expand
+```
+
+#### Environment Variables
+
+Directive:
+
+  - `env:variableName|default?`
+
+Arguments:
+
+- `variableName` : `string`
+
+  Name of the environment variable to load.
+
+- `default` : `string` - optional
+  
+    Default value to use if the environment variable is not found
+
+
+
+Context can be used to load data from JSON or YAML files, partially or in full.
+
+Example:
+
+```yaml
+context:
+  data: json:data.json
+  data-with-specific-path: json:package.json|name
+  data-with-specific-path-and-default: json:package.json|name|not-found
+```
+
+
+#### Environment Files
+
+Load environment variables from a file.
+##### Directive
+
+  - `env-file:path|name?|default?`
+
+##### Arguments
+
+- `path` : `string`
+
+  Relative path to the file
+
+- `name` : `string` - optional
+  
+    Name of the environment variable to load. If not provided the entire env file is loaded as an object.
+
+- `default` : `string` - optional
+    
+      Default value to use if the environment variable is not found or file fails to load.
+  
+##### Example
+
+```yaml
+context:
+  env: env-file:.env
+  env-with-specific-path: env-file:.env|SOME_VAR
+  env-with-specific-path-and-default: env-file:.env|SOME_VAR|not-found
+```
+
+
+#### Include
+
+Include another configuration file. 
+
+##### Directive
+
+  - `include:path|key?`
+
+##### Arguments
+
+- `path` : `string`
+
+  Relative path to the file
+
+
+- `key` : `string` - optional
+  
+    Key to access in the included file object (dot notation) - see object-path link: https://www.npmjs.com/package/object-path
+
+    If key is provided with commas (`,`) it will be split and the value will be used as a cloascing request to `object-path`.
+
+    If key is not provided, the entire file will be loaded.
+
+##### Example
+
+```yaml
+context:
+  data: include:other-config.cb
+  data-with-specific-path: include:other-config.cb|some.data.value
+```
+
+
+
+#### Each
+
+Iterate over an array or object keys and map their values to a template.
+
+##### Directive
+
+  - `each:arrayOrObject:template|expand?`
+
+##### Arguments
+
+- `arrayOrObject` : `string`
+
+  Name of the array or object to iterate over from the context.
+
+- `template` : `string`
+  
+    Template to use for each item.
+
+- `expand` : `boolean` - optional
+
+    If true, the template will be expanded before being used. This is useful if you want to include the results as part of another array of rows/items.
+
+##### Example
+
+```yaml
+context:
+  packages: files:packages|**
+
+template:
+  packageItem:
+    type: text
+    text: "Package: ${name}"
+
+explorer:
+  rows:
+    - items:
+        - each:packages:packageItem|expand
+```
+
+#### Context
+
+Load a value from the context.
+
+##### Directive
+
+  - `context:key|default?`
+
+##### Arguments
+
+- `key` : `string`
+
+  Key to access in the context object (dot notation) - see object-path link: https://www.npmjs.com/package/object-path
+
+  If key is provided with commas (`,`) it will be split and the value will be used as a cloascing request to `object-path`.
+
+- `default` : `string` - optional
+  
+    Default value to use if the key is not found in the context.
+
+##### Example
+  
+  ```yaml
+  context:
+    myJson: json:data.json
+    fromContext: context:myJson.some.data.value
+  ```
+
+#### String Interpolation
+
+Interpolate a string with values from the context.
+
+Use `${key}` inside any string to access the value of any context key. If the key is not found, the string will be returned as is.
+
+##### Directive
+
+  - `${key[,alt.key?]|default?}`
+
+##### Arguments
+
+- `key` : `string`
+
+  Key to access in the context object (dot notation) - see object-path link: https://www.npmjs.com/package/object-path
+
+  If key is provided with commas (`,`) it will be split and the value will be used as a cloascing request to `object-path`.
+
+- `default` : `string` - optional
+  
+    Default value to use if the key is not found in the context.
+
+##### Example
+
+```yaml
+context:
+  data: json:data.json
+  env: env-file:.env
+  env-with-specific-path: env-file:.env|SOME_VAR
+  env-with-specific-path-and-default: env-file:.env|SOME_VAR|not-found
+  packages: files:packages|**
+  fromContext: context:myJson.${data.some.value}.value
+
+templates:
+  packageItem:
+    context:
+      name: value.0
+    type: text
+    text: "Package: ${name}"
+
+explorer:
+  rows:
+    - items:
+      - type: text
+        text: "Context: ${context:data.some.data.value}"
+      - type: text
+        text: "Env: ${env:SOME_VAR}"
+
+      - type: text
+        text: "Packages:"
+        
+      - type: container
+        style:
+          display: flex
+          flex-direciton: column
+        items: each:packages:packagesItem
+```
+
+### Templates
+
+Templates are used to define the structure of a repeating item. They can be used anywhere in the data except for the `context` section.
+
+Templates can be defined at the top level and at the top level of any `explorer`, `scm`, and other sections.
+
+Templates can be defined as a string or an object. If defined as a string, it will be used as the `text` property of a `text` type template.
+
+Each Template can have it's own context and local context can refer to the parent context.
+
+#### Examples
+
+```yaml
+context:
+  names:
+    - Adam
+    - Bob
+    - Charlie
+
+# Top level template
+template:
+  topTemplate:
+    type: text
+    text: "Hello, ${item}"
+
+# Template in explorer
+explorer:
+  template:
+    myTemplate:
+      context:
+        item: value.0
+      ...: template:topTemplate
+
+  rows:
+    - items: each:names:topTemplate
+    - items: each:names:myTemplate
+
+```
+
+### Expantion Tags
+
+In certain cases you'd want to expand the results of a template into the parent array/object.
+
+To do so there are two ways depending on the type of the parent.
+
+#### Array
+
+To expand the results of a template into an array, use the `expand` tag in combination with the `each` directive.
+
+```yaml
+context:
+  names:
+    - Adam
+    - Bob
+    - Charlie
+
+templates:
+	topTemplate:
+		context:
+			name: context:value
+		type: text
+		text: "My name is: ${name}"
+
+explorer:
+  rows:
+    - items:
+      - each:names:topTemplate|expand
+```
+
+
+#### Object
+
+To expand the results of a template into an object, use the `...` key in any object in combination with a `template` directive.
+
+```yaml
+context:
+  colors:
+    - blue
+    - green
+    - red
+
+templates:
+  colorItem:
+    style:
+      color: ${color}
+    type: text
+    text: "Color: ${color}"
+
+  colorRowItem:
+    context:
+      color: context:value
+    ...: template:colorItem
+explorer:
+  rows:
+    - items: each:colors|colorRowItem
+```
+
+
 # Development Roadmap
 
 - [x] Nested Configuration `v0.0.1`
@@ -774,11 +1252,11 @@ Status Bar Item Properties:
 - [x] Smart Text `v0.2.0`
 - [x] Context Aware `v0.2.2`
 - [x] Custom Styling `v0.0.1`
-- [ ] Conditional Banners
+- [x] Conditional Banners
   - [x] Active Editor `v0.3.0`
   - [x] Visible Editors `v0.3.0`
   - [x] Glob Pattern `v0.3.0`
-  - [ ] Existing/Missing Files/Directories
+  - [x] Existing/Missing Files/Directories
 - [x] Types `v0.0.1`
 - [x] Error Handling
   - [x] Parsing Configuration `v0.3.3`
@@ -789,7 +1267,7 @@ Status Bar Item Properties:
 - [ ] Custom Javascript Actions
 - [ ] Plugins
 - [ ] Shared Styles
-- [ ] Componentize
+- [x] Componentize
 - [ ] React Component Support
 - [ ] Configuration Assistant
 - [ ] Live-reload as-you-type for banners

@@ -2,6 +2,7 @@
 import * as path from 'path'
 import * as vscode from 'vscode'
 import * as YAML from 'yaml'
+import axios from 'axios'
 import { extname } from 'path'
 import { transform } from 'esbuild'
 import { ParsedFile, ParsedExecutableFile } from '../../types'
@@ -23,68 +24,149 @@ const initFileWatcher = async (
   const onUpdate = (newData: ParsedFile) => {
     api.onUpdate(newData)
   }
-  // console.log('⚠️🌈 Initializing file watcher', { executable })
+
   channel.appendLine(
-    `⚠️🌈 Initializing file watcher - ${executable ? 'Executables' : 'Plain'}`
+    `Initializing file watcher - ${executable ? 'Executables' : 'Plain'}`
   )
+
+  // Lets wait for 1 second
+  await new Promise((resolve) => setTimeout(resolve, 1200))
 
   const parse = (files: vscode.Uri[]) => parseFiles(files, context, executable)
   const allFiles: vscode.Uri[] = []
 
-  await Promise.all(
-    globs.map(async (glob) => {
-      const watcher = vscode.workspace.createFileSystemWatcher(glob)
-      context.subscriptions.push(
-        watcher.onDidChange(
-          fileChanged(
-            context,
-            (data: ParsedFile) => onUpdate(data as ParsedFile),
-            executable
+  await globs.reduce(
+    (p, glob) =>
+      p.then(async () => {
+        const watcher = vscode.workspace.createFileSystemWatcher(glob)
+        context.subscriptions.push(
+          watcher.onDidChange(
+            fileChanged(
+              context,
+              (data: ParsedFile) => onUpdate(data as ParsedFile),
+              executable
+            )
           )
         )
-      )
 
-      const files = await vscode.workspace.findFiles(glob)
-      allFiles.push(...files)
-    })
+        const files = await vscode.workspace.findFiles(glob)
+        channel.appendLine(
+          `File locator - "${glob}" - found ${files.length} files`
+        )
+        allFiles.push(...files)
+      }),
+    Promise.resolve()
   )
-  channel.appendLine(
-    `⚠️🌈 File watcher - ${executable ? 'Executables' : 'Plain'} - found ${
-      allFiles.length
-    } files`
-  )
+
   for (const file of allFiles) {
     const relative = vscode.workspace.asRelativePath(file)
     channel.appendLine(
-      `⚠️🌈\t\t File watcher - ${
+      `File watcher - ${
         executable ? 'Executables' : 'Plain'
       } - found ${relative}`
     )
-    channel.appendLine(`⚠️🌈\t\t Depth: ${relative.split('/').length}`)
+    channel.appendLine(`Depth: ${relative.split('/').length}`)
   }
 
-  // console.log('⚠️🌈 ALLFILES', { allFiles })
+  let subscriptions: ((() => void) | undefined)[] = []
 
   // Read first time
   if (allFiles.length) {
     const results = (await parse(allFiles)) as ParsedFile[]
     const sorted = results.sort((a, b) => (a.level > b.level ? 1 : -1))
     channel.appendLine(
-      `⚠️🌈 File watcher - ${executable ? 'Executables' : 'Plain'} - found ${
+      `File watcher - ${executable ? 'Executables' : 'Plain'} - found ${
         allFiles.length
       } files`
     )
     for (const file of allFiles) {
       const relative = vscode.workspace.asRelativePath(file)
       channel.appendLine(
-        `⚠️🌈\t\t File watcher - ${
-          executable ? 'Executables' : 'Plain'
-        } - found ${relative}`
+        `File watcher found: \n${YAML.stringify({
+          type: executable ? 'Executables' : 'Plain',
+          relative,
+          depth: relative.split('/').length,
+        })}`
       )
-      channel.appendLine(`⚠️🌈\t\t Depth: ${relative.split('/').length}`)
     }
+
+    // convert string like "2m 30s" to number like 150000
+    const regexp = /((\d+)([smhd]))/g
+    const convert = (str: string) => {
+      const matches = str.matchAll(regexp)
+      if (!matches) return 0
+      return [...matches].reduce((acc, match) => {
+        const [, , num, unit] = match
+        const multiplier = {
+          s: 1000,
+          m: 1000 * 60,
+          h: 1000 * 60 * 60,
+          d: 1000 * 60 * 60 * 24,
+        }
+
+        //
+        return acc + Number(num) * multiplier[unit as 's' | 'm' | 'h' | 'd']
+      }, 0)
+    }
+    // Subscribe to refereshes if configs has options.referesh set
+    subscriptions = sorted
+      .filter((file) => file.conf.options?.refresh)
+      .map((file) => {
+        if (file.conf.options?.refresh) {
+          const time = convert(file.conf.options.refresh)
+          channel.appendLine(
+            `Create subscription for ${file.relative} to ${file.conf.options.refresh} (${time})`
+          )
+          let release = false
+          let removeTimeout = () => {
+            // noop
+          }
+          const invoke = () => {
+            const start = Date.now()
+            const tid = setTimeout(async () => {
+              const invoked = Date.now()
+              if (release) {
+                return
+              }
+              const parsed = await parseFile(context, file.executable)(file.uri)
+              const end = Date.now()
+              channel.appendLine(
+                `Refreshed ${file.relative} - took ${end - start}ms`
+              )
+              await api.onUpdate(parsed)
+
+              invoke()
+            }, time)
+
+            removeTimeout = () => clearTimeout(tid)
+          }
+
+          invoke()
+
+          return () => {
+              channel.appendLine(
+                `Refresh discontinued ${file.relative}`
+              )
+              release = true
+              removeTimeout()
+            }
+          }
+      })
+    channel.appendLine(
+      `Subscriptions: ${JSON.stringify(subscriptions, null, 2)}`
+    )
+
     api.onReady(sorted)
-  } else api.onReady([])
+  } else {
+    api.onReady([])
+  }
+
+  const onRelease = () => {
+    for (const subscription of subscriptions) {
+      subscription?.()
+    }
+  }
+  return onRelease
 }
 
 export const fileChanged =
@@ -143,6 +225,7 @@ export const ingest =
         loaded.templates || {}
       ),
       templates: loaded.templates || {},
+      options: loaded.options || {},
     }
     const sections = 'explorer, scm, debug, test, statusbar'.split(', ')
     for (const section of sections) {
@@ -283,8 +366,20 @@ export const importJson = async (uri: vscode.Uri) => {
     const json = JSON.parse(file.toString())
     return json
   } catch (error) {
-    console.error('⚠️🌈 JSON ERROR', { uri }, { error })
-    return { error }
+    console.error('JSON ERROR', { uri }, { error })
+    return { error, uri }
+  }
+}
+
+// failsaife YAML loading from file
+export const importYaml = async (uri: vscode.Uri) => {
+  try {
+    const file = await vscode.workspace.fs.readFile(uri)
+    const yaml = YAML.parse(file.toString())
+    return yaml
+  } catch (error) {
+    console.error('YAML ERROR', { uri }, { error })
+    return { error, uri }
   }
 }
 
@@ -294,7 +389,7 @@ export const importFile = async (uri: vscode.Uri) => {
     const file = await vscode.workspace.fs.readFile(uri)
     return file.toString()
   } catch (error) {
-    console.error('⚠️🌈 FILE ERROR', { uri }, { error })
+    console.error('FILE ERROR', { uri }, { error })
     return ''
   }
 }
@@ -305,8 +400,8 @@ export const includeFile = async (uri: vscode.Uri) => {
     const result = await importPlainFile(uri)
     return result
   } catch (error) {
-    console.error('⚠️🌈 INCLUDE ERROR', { uri }, { error })
-    return { error }
+    console.error('INCLUDE ERROR', { uri }, { error })
+    return { error, uri }
   }
 }
 
@@ -348,11 +443,30 @@ const withContext = async (
 
   const [type] = str.split(':')
 
-  if (type === 'json') {
-    const args = commandSpreader(str, 'path', 'key', 'default?')
+  if (type === 'json' || type === 'yaml') {
+    // "json:./path/to/file.json|key?|default?"
+    // "yaml:./path/to/file.yaml|key?|default?"
+    const args = commandSpreader(str, 'path', 'key?', 'default?')
 
+    if (['https', 'http'].indexOf(args.path.split(':')[0]) > -1) {
+      try {
+        const response = await axios.get(args.path)
+        const data = response.data
+        const coalesce = args.key?.split(',').length > 1
+
+        return args.key
+          ? objectPath[coalesce ? 'coalesce' : 'get'](
+              data,
+              coalesce ? args.key.split(',') : args.key,
+              args.default
+            )
+          : data
+      } catch (error) {
+        return { error, uri: args.path }
+      }
+    }
     const filePath = composeFilePath(uri, args.path)
-    const json = await importJson(filePath)
+    const json = await (type === 'json' ? importJson : importYaml)(filePath)
 
     const coalesce = args.key?.split(',').length > 1
 
@@ -382,7 +496,7 @@ const withContext = async (
 
     return vscode.env[args.name as keyof typeof vscode.env] || args.default
   } else if (type === 'env-file') {
-    // "env-file:./relative/path|ENV_VAR|default?" -> process.env[ENV_VAR] || default
+    // "env-file:./relative/path|ENV_VAR?|default?" -> process.env[ENV_VAR] || default
     const args = commandSpreader(str, 'path', 'name?', 'default?')
     const filePath = composeFilePath(uri, args.path)
     const file = await importFile(filePath)
@@ -414,6 +528,28 @@ const withContext = async (
     )
 
     return rendered
+  } else if (type === 'count') {
+    // "count:array" -> number
+    const args = commandSpreader(str, 'name')
+    const arr = context[args.name]
+
+    const result = arr?.length
+
+    return result
+  } else if (type === 'keys' || type === 'entries') {
+    // "keys:object" -> array
+    const args = commandSpreader(str, 'name')
+
+    const coalesce = args.name.split(',').length > 1
+    const obj = objectPath[coalesce ? 'coalesce' : 'get'](
+      context,
+      coalesce ? args.name.split(',') : args.name,
+      args.default
+    )
+
+    const result = type === 'keys' ? Object.keys(obj) : Object.entries(obj)
+
+    return result
   } else if (type === 'include') {
     // "include:./relative/file/path|key?" -> import
     const args = commandSpreader(str, 'path', 'key?')
@@ -474,7 +610,7 @@ const withContext = async (
       return result
     }
 
-    return 'smooz'
+    return []
   } else if (type === 'context') {
     const args = commandSpreader(str, 'name', 'default?')
 
@@ -659,7 +795,7 @@ export const importExecutableFile = async (uri: vscode.Uri) => {
         `Executable file ${uri.path} filed to import: ${error}`
       )
     }
-    console.log('⚠️🌈 importExecutableFile Error', { uri }, { error })
+    console.log('importExecutableFile Error', { uri }, { error })
     return {}
   }
 }

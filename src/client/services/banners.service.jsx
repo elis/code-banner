@@ -19,13 +19,34 @@ const BannersService = ({ children }) => {
 
     const nextConfs = files
       // Convert rows to individual confs
-      // .map((file) => console.log('🧃 INSPECTING FILE', file.relative, { file, active, visible }) || file)
+      // .map(
+      //   (file) =>
+      //     console.log('🧃 INSPECTING FILE', file.relative, {
+      //       file,
+      //       active,
+      //       visible,
+      //       'config.viewContainer': config.viewContainer,
+
+      //       ...(file.conf?.[config.viewContainer]?.responsive
+      //         ? { responsive: file.conf?.[config.viewContainer]?.responsive }
+      //         : {}),
+      //     }) || file
+      // )
       .map((file) => ({
         file,
+        ...(file.conf?.[config.viewContainer]?.responsive
+          ? { responsive: file.conf?.[config.viewContainer]?.responsive }
+          : {}),
         rows:
           file.conf?.[config.viewContainer]?.rows
             ?.map((row) => ({
               ...row,
+
+              ...(row['responsive']
+                ? { responsive: row['responsive'] }
+                : file.conf?.[config.viewContainer]?.responsive
+                ? { responsive: file.conf?.[config.viewContainer]?.responsive }
+                : {}),
               file,
               reach: (row.depth || 50) + file.level,
               _matchingEditors: (visible.length
@@ -125,7 +146,10 @@ const BannersService = ({ children }) => {
 
             // .map(
             //   (row) =>
-            //     console.log('🧃🧃🧃 INSPECTING ROW', file.relative, { row, file }) || row
+            //     console.log('🧃🧃🧃 INSPECTING ROW', file.relative, {
+            //       row,
+            //       file,
+            //     }) || row
             // )
 
             .filter((row) => row._matchingEditors.length)
@@ -142,7 +166,10 @@ const BannersService = ({ children }) => {
             ) || [],
       }))
 
-      // .map((row) => console.log('🧃🧃 INSPECTING ROW', row.file.relative, { row }) || row)
+      // .map(
+      //   (row) =>
+      //     console.log('🧃🧃 INSPECTING ROW', row.file.relative, { row }) || row
+      // )
 
       .filter((matched) => matched.rows.length)
       .sort((a, b) => (a.file.level > b.file.level ? 1 : -1))

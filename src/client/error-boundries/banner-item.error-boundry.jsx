@@ -19,15 +19,16 @@ class BannerItemErrorBoundary extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.hasError) this.setState({ hasError: false, error: null })
+    if (prevState.hasError !== this.state.hasError) {
+      this.setState({ hasError: false, error: null })
+    }
   }
 
   render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
-      return (
-        <ErrorItem error={this.state.error} item={this.props.item} />
-      )
+      return <>ERROR</>
+      // return <ErrorItem error={this.state.error} item={this.props.item} />
     }
 
     return this.props.children

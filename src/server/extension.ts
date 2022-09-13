@@ -9,16 +9,16 @@ import initFileWatcher from './watchers/files'
 import initEditorWatcher from './watchers/editors'
 import initThemeWatcher from './watchers/theme'
 import { posix } from 'path'
-import { SidebarProvider } from './providers/SidebarProvider'
+// import { SidebarProvider } from './providers/SidebarProvider'
 
 export function activate(context: vscode.ExtensionContext) {
-  const sidebarProvider = new SidebarProvider(context.extensionUri)
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      'code-banner-sidebar',
-      sidebarProvider
-    )
-  )
+  // const sidebarProvider = new SidebarProvider(context.extensionUri)
+  // context.subscriptions.push(
+  //   vscode.window.registerWebviewViewProvider(
+  //     'code-banner-sidebar',
+  //     sidebarProvider
+  //   )
+  // )
 
   const explorerPanelProvider = new ExplorerPanelViewProvider(context)
   const debugPanelProvider = new DebugPanelViewProvider(context)
@@ -53,9 +53,10 @@ export function activate(context: vscode.ExtensionContext) {
     // console.log('🌈 Checks...', {
     //   readyCheck,
     // })
+    const allReady = !Object.values(readyCheck).filter((ready) => !ready).length
     if (
       !booted &&
-      !Object.values(readyCheck).filter((ready) => !ready).length
+      allReady
     ) {
       const allFiles = responses.reduce((acc, fa) => [...acc, ...fa], [])
       console.log('🌈 PENDING COMPLETE - CHECKS Clear', {

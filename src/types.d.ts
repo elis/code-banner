@@ -4,7 +4,27 @@ export type CodeBannerConfig = {
   statusbar?: StatusBarConfig
   explorer?: ExplorerPanelConfig
   data?: Record<string, any>
+  context?: Record<string, any>
+  templates?: Record<string, any>
+  options?: Options
+  responsive?: Record<string, any>
 }
+
+export type Options = {
+  refresh?: string
+}
+
+export type ResponsiveConfig = {
+  [key: string]: {
+    [option: string]: number
+  }
+}
+
+export type ResponsiveOption =
+  | 'min-width'
+  | 'min-height'
+  | 'max-width'
+  | 'max-height' 
 
 export type StatusBarConfig = {
   items: StatusBarItem[]

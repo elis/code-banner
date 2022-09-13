@@ -46,7 +46,7 @@
         }
       ]
     },
-    "views": {
+    "inactiveViews": {
       "code-banner-sidebar-view": [
         {
           "type": "webview",
@@ -55,7 +55,9 @@
           "icon": "media/bookmark.svg",
           "contextualTitle": "code-banner"
         }
-      ],
+      ]
+    },
+    "views": {
       "explorer": [
         {
           "type": "webview",
@@ -127,10 +129,13 @@
     "watch": "npm run compile:client && tsc -w -p ./",
     "watch:both": "concurrently -n Server,Client npm:watch:server npm:watch:client",
     "watch:server": "tsc -w -p ./",
-    "watch:client": "node build.js --watch"
+    "watch:client": "node build.js --watch",
+    "changelog": "eplog exec scripts/changelog.js > testlog.md",
+    "changelog:watch": "nodemon --watch scripts/changelog.js --exec \"yarn changelog\""
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.26",
+    "axios": "^0.27.2",
     "class-names": "^1.0.0",
     "concurrently": "^6.3.0",
     "deep-object-diff": "^1.1.0",

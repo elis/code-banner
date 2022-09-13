@@ -8,7 +8,8 @@ const ConfigService = ({ children }) => {
   const comms = useComms()
 
   const [state, setState] = React.useState(
-    vscode.getState()?.config || {
+    // vscode.getState()?.config || {
+    {
       files: [],
     }
   )
