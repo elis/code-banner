@@ -11,7 +11,7 @@ export type CodeBannerConfig = {
 }
 
 export type Options = {
-  refresh?: string
+  refresh?: string | number
 }
 
 export type ResponsiveConfig = {

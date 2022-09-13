@@ -5,9 +5,9 @@ Create visually pleasing and helpful "banners" with your projects custom logo an
 Add custom actions, read and display local JSON/YAML data, and easily customize using styles.
 
 
-[![Badge for version for Visual Studio Code extension EliSklar.code-banner](https://vsmarketplacebadge.apphb.com/version/EliSklar.code-banner.svg?color=blue&style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=EliSklar.code-banner)
-[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/EliSklar.code-banner.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock&WT.mc_id=javascript-0000-jopapa)
-[![Downloads](https://vsmarketplacebadge.apphb.com/downloads-short/EliSklar.code-banner.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock&WT.mc_id=javascript-0000-jopapa)
+[![Badge for version for Visual Studio Code extension EliSklar.code-banner](https://badgen.net/vs-marketplace/v/EliSklar.code-banner)](https://marketplace.visualstudio.com/items?itemName=EliSklar.code-banner)
+[![Installs](https://badgen.net/vs-marketplace/i/EliSklar.code-banner)](https://marketplace.visualstudio.com/items?itemName=EliSklar.code-banner)
+[![Downloads](https://badgen.net/vs-marketplace/d/EliSklar.code-banner)](https://marketplace.visualstudio.com/items?itemName=EliSklar.code-banner)
 [![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/codebanner?color=green&label=r%2Fcodebanner&logo=reddit&logoColor=white&style=flat-square)](https://reddit.com/r/codebanner)
 
 [![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?color=blue&style=flat-square)](http://opensource.org/licenses/MIT)
@@ -932,18 +932,15 @@ Arguments:
   
     Default value to use if the environment variable is not found
 
-
-
-Context can be used to load data from JSON or YAML files, partially or in full.
-
 Example:
 
 ```yaml
 context:
-  data: json:data.json
-  data-with-specific-path: json:package.json|name
-  data-with-specific-path-and-default: json:package.json|name|not-found
+  user: env:USER
+  home: env:HOME
+  defaultUser: env:DEFAULT_USER|defaultUser
 ```
+
 
 
 #### Environment Files
@@ -1234,7 +1231,7 @@ explorer:
 
 ### Responsive Layout
 
-Rows and items can be conditionally shown based on the viewporrt size.
+Rows and items can be conditionally shown based on the viewport size.
 
 You can declare a custom `reposponive` object anywhere in your config and use it in the `if-responsive` property of any `row` or `item`.
 
@@ -1301,7 +1298,18 @@ explorer:
 
 Multiple values can be provide to the `if-context` property to match multiple values. The values can be comma separated or an array.
 
+### Refreshing Data
 
+You can refresh the data in the configuration by providing an `option.refresh` property at the top-level of your configuration file.
+
+The `refresh` property accepts a number in milliseconds or a string in the format of `1m 30s` (1 minute and 30 seconds).
+
+Example
+
+```yaml
+options:
+  refresh: 1m 30s
+```
 
 # Development Roadmap
 

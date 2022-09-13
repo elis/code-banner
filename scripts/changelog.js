@@ -1,5 +1,9 @@
 const { valuefy } = require('eplog') // use this if copying the script
+const { fstat } = require('fs')
+const fs = require('fs')
 // const { valuefy } = require('../../') // don't use this if copying the script
+
+const USE_CACHE = false
 
 require('dotenv').config({
   path: require('path').join(__dirname, '/.env.local'),
@@ -13,9 +17,17 @@ exports.profile = {
   databaseName: process.env.databaseName,
 }
 
-exports.init = async (ctx, client) => {
-	if (!ctx.database?.id)
-		throw new Error('Database not found! :(')
+const getChangeset = async (ctx, client) => {
+  const cacheName = require('path').resolve(__dirname, 'changelog.json')
+
+  if (USE_CACHE) {
+    try {
+      const cache = await fs.promises.readFile(cacheName, 'utf8')
+      return JSON.parse(cache)
+    } catch (e) {
+      console.log('Cache not found')
+    }
+  }
   const response = await client.databases.query({
     database_id: ctx.database.id,
     filter: {
@@ -26,8 +38,6 @@ exports.init = async (ctx, client) => {
     },
     sort: [{ property: 'Release Index', direction: 'ascending' }],
   })
-
-  const output = [CHANGELOG_OPENING]
 
   const versions = await Promise.all(
     valuefy(response.results, true).map(async (version) => {
@@ -77,10 +87,21 @@ exports.init = async (ctx, client) => {
     )
   )
 
+  await fs.promises.writeFile(cacheName, JSON.stringify(changeset, null, 2))
+
+  return changeset
+}
+
+exports.init = async (ctx, client) => {
+  if (!ctx.database?.id) throw new Error('Database not found! :(')
+
+  const changeset = await getChangeset(ctx, client)
+  const output = [CHANGELOG_OPENING]
+
   changeset.forEach((version) => {
     const rows = []
 
-    const versionTitle = `## ${version.values.Version} - ${
+    const versionTitle = `# ${version.values.Version} - ${
       version.values['Release Date'].split('T')[0]
     }`
     rows.push(versionTitle, '')
@@ -89,7 +110,7 @@ exports.init = async (ctx, client) => {
       const children = blocksToMarkdown(version.children)
       rows.push(children)
     }
-		
+
     const changeGroups =
       version.changes?.reduce(
         (acc, change) => ({
@@ -104,16 +125,16 @@ exports.init = async (ctx, client) => {
         group,
         items.map(
           ({ properties: { Name }, children }) =>
-            `-   ${propertyToMarkdown(Name)}${
+            `### ${propertyToMarkdown(Name)}${
               children?.length
-                ? '\n\n' + blocksToMarkdown(children, 4) + '\n'
+                ? '\n\n' + blocksToMarkdown(children, 0) + '\n'
                 : ''
             }`
         ),
       ])
       .map(
         ([group, content]) =>
-          `${group ? `### ${group}\n\n` : ''}${
+          `${group ? `## ${group}\n\n` : ''}${
             content.length ? content.join('\n') + '\n' : ''
           }`
       )
@@ -128,12 +149,35 @@ exports.init = async (ctx, client) => {
 const blocksToMarkdown = (blocks, pad) => {
   const output = []
   const parsed = blocks.map((block) => {
-    if (block.type === 'paragraph') {
-      const parts = block.paragraph.text.map((part) => {
+    if (
+      ['paragraph', 'heading_2', 'heading_3', 'bulleted_list_item'].indexOf(
+        block.type
+      ) > -1
+    ) {
+      const parts = block[block.type].text.map((part) => {
+        if (part.type === 'text') {
+          return annotationToMarkdown(part)
+        }
+        return `Unsupported part type: "${part.type}"`
+      })
+      const getPrefix = (block) => {
+        if (block.type === 'heading_2') return `#### `
+        if (block.type === 'heading_2') return `##### `
+        if (block.type === 'heading_3') return `###### `
+        if (block.type === 'bulleted_list_item') return '- '
+        return ''
+      }
+      const prefix = getPrefix(block)
+      return `${prefix}${parts.join('')}`
+    } else if (block.type === 'code') {
+      // console.log('DA BLOCK CODE', JSON.stringify(block, 1, 2))
+      const parts = block.code.text.map((part) => {
         if (part.type === 'text') return annotationToMarkdown(part)
         return `Unsupported part type: "${part.type}"`
       })
-      return parts.join(' ')
+      return `\`\`\`${
+        (block.code.language !== 'plain text' && block.code.language) || ''
+      }\n${parts.join('')}\n\`\`\``
     }
 
     return `Unsupported block type: "${block.type}"`

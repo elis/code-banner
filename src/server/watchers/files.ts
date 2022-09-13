@@ -92,12 +92,15 @@ const initFileWatcher = async (
 
     // convert string like "2m 30s" to number like 150000
     const regexp = /((\d+)([smhd]))/g
-    const convert = (str: string) => {
-      const matches = str.matchAll(regexp)
+    const convert = (value: string | number) => {
+      if (typeof value === 'number') { return value }
+
+      const matches = value.matchAll(regexp)
       if (!matches) return 0
       return [...matches].reduce((acc, match) => {
         const [, , num, unit] = match
         const multiplier = {
+          ms: 1,
           s: 1000,
           m: 1000 * 60,
           h: 1000 * 60 * 60,

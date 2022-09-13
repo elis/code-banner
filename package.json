@@ -130,8 +130,8 @@
     "watch:both": "concurrently -n Server,Client npm:watch:server npm:watch:client",
     "watch:server": "tsc -w -p ./",
     "watch:client": "node build.js --watch",
-    "changelog": "eplog exec scripts/changelog.js > testlog.md",
-    "changelog:watch": "nodemon --watch scripts/changelog.js --exec \"yarn changelog\""
+    "changelog": "eplog exec scripts/changelog.js > CHANGELOG.md",
+    "changelog:watch": "nodemon --watch scripts/changelog.js --exec \"npm run changelog\""
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.26",
