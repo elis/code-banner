@@ -93,7 +93,9 @@ const initFileWatcher = async (
     // convert string like "2m 30s" to number like 150000
     const regexp = /((\d+)([smhd]))/g
     const convert = (value: string | number) => {
-      if (typeof value === 'number') { return value }
+      if (typeof value === 'number') {
+        return value
+      }
 
       const matches = value.matchAll(regexp)
       if (!matches) return 0
@@ -147,13 +149,11 @@ const initFileWatcher = async (
           invoke()
 
           return () => {
-              channel.appendLine(
-                `Refresh discontinued ${file.relative}`
-              )
-              release = true
-              removeTimeout()
-            }
+            channel.appendLine(`Refresh discontinued ${file.relative}`)
+            release = true
+            removeTimeout()
           }
+        }
       })
     channel.appendLine(
       `Subscriptions: ${JSON.stringify(subscriptions, null, 2)}`
@@ -229,7 +229,7 @@ export const ingest =
       ),
       templates: loaded.templates || {},
       options: loaded.options || {},
-      responsive: loaded.responsive || {}
+      responsive: loaded.responsive || {},
     }
     const sections = 'explorer, scm, debug, test, statusbar'.split(', ')
     for (const section of sections) {
@@ -274,7 +274,7 @@ export const ingest =
               uri,
               loaded[key].context || {},
               loaded[key].templates || {},
-              conf.context
+              { ...conf.context, __dirname: path.dirname(uri.fsPath) }
             )
             const templates = {
               ...conf.templates,
@@ -565,7 +565,10 @@ const withContext = async (
     const args = commandSpreader(str, 'path', 'key?')
     const filePath = composeFilePath(uri, args.path)
     const reqd = await includeFile(filePath)
-    const result = await contextify(uri, reqd, templates, context)
+    const result = await contextify(uri, reqd, templates, {
+      ...context,
+      __dirname: filePath.fsPath.split('/').slice(0, -1).join('/'),
+    })
 
     const coalesce = args.key?.split(',').length > 1
 

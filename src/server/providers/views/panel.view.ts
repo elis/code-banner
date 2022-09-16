@@ -368,6 +368,8 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     if (!workspace)
       return { error: 'No active workspace found ' + workspaceName }
 
+    const relPath = fullpath.replace(workspace.uri.fsPath, '')
+
     const callerDirname = this._cache.files.find(
       (file) => file.relative === caller
     )?.dirname
@@ -375,7 +377,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
     const newpath = vscode.Uri.joinPath(
       workspace.uri,
       callerDirname || '',
-      fullpath
+      relPath
     )
 
     const newFolderPath = hash({
@@ -383,7 +385,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
       workspaceName,
       workspacePath: workspace.uri.fsPath,
     })
-    const newFileName = hash({ fullpath, workspaceName })
+    const newFileName = hash({ relPath, workspaceName })
     const ext = path.extname(fullpath)
     const newFullpath = vscode.Uri.joinPath(
       this._extensionUri,
