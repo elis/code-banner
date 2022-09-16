@@ -680,17 +680,29 @@ export const contextify = async (
         if (Array.isArray(value)) {
           return {
             ...acc,
-            [key]: value.map((item) => {
-              if (typeof item === 'string') {
-                return item.replace(/\$\{(\w+)\}/g, (_, name) => {
-                  return ({ ...selfContext, ...acc } as Record<string, any>)[
-                    name
-                  ]
-                })
-              } else {
-                return item
-              }
-            }),
+            [key]: await value.reduce(
+              (p, item) =>
+                p.then(async (ac: any[]) => [
+                  ...ac,
+                  ...(typeof item === 'string' &&
+                  item.split('|').pop() === 'expand'
+                    ? ((await enrichWithContext(
+                        uri,
+                        item,
+                        selfContext,
+                        templates
+                      )) as any[])
+                    : [
+                        await enrichWithContext(
+                          uri,
+                          item,
+                          selfContext,
+                          templates
+                        ),
+                      ]),
+                ]),
+              Promise.resolve([])
+            ),
           }
         }
         if (typeof value === 'string') {
