@@ -1132,6 +1132,20 @@ explorer:
         items: each:packages:packagesItem
 ```
 
+#### Default Context
+
+##### `__dirname`
+
+You can refer to `context:__dirname` or `${__dirname}` anywhere in your config to receive the relative file path of the config file.
+
+Example:
+  
+```yaml
+context:
+  data: json:${__dirname}/data.json
+```
+
+
 ### Templates
 
 Templates are used to define the structure of a repeating item. They can be used anywhere in the data except for the `context` section.

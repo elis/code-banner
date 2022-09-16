@@ -32,6 +32,17 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
+# v0.4.1 - 2022-09-16
+
+## Added
+
+### Added `__dirname` to context
+
+You can now refer to `context:__dirname` or `${__dirname}` anywhere in your config to receive the relative file path - makes it easier to handle assets in included configs.
+
+
+
+
 # v0.4.0 - 2022-09-14
 
 ## Added
