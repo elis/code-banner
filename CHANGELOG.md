@@ -32,6 +32,11 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
+# v0.4.2 - 2022-09-16
+
+### Fix array values not enriched with context
+
+
 # v0.4.1 - 2022-09-16
 
 ## Added
