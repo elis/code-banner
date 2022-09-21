@@ -259,7 +259,7 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
           return { command, args: [uri] }
         }
 
-        return { command, args }
+        return { command, args: [args?.join(':')] }
       }
 
       const { command, args } = makeCommand(
