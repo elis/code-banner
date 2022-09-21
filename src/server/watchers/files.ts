@@ -281,29 +281,36 @@ export const ingest =
             //    - typeof value === 'array': value.map((value) => enrichWithContecxt(value, context))
             //
 
+            const {
+              context: sectionContext = {},
+              template: sectionTemplates = {},
+              responsive: sectionResponsive = {},
+              ...remaining
+            } = loaded[key]
+
             const context = {
               ...conf.context,
               ...(await contextify(
                 uri,
-                loaded[key].context || {},
-                loaded[key].templates || {},
+                sectionContext,
+                sectionTemplates,
                 { ...conf.context, __dirname: path.dirname(uri.fsPath) }
               )),
             }
             const templates = {
               ...conf.templates,
-              ...(loaded[key].templates || {}),
+              ...sectionTemplates,
             }
 
             const responsive = {
               ...conf.responsive,
-              ...(loaded[key].responsive || {}),
+              ...sectionResponsive,
             }
 
             const result = await enrichWithContext(
               uri,
-              loaded[key],
-              { ...(loaded[key].context || {}), ...context },
+              remaining,
+              context,
               templates
             )
 
@@ -368,7 +375,7 @@ export const enrichWithContext = async (
     const result: Record<string, any> = await Object.entries(data).reduce(
       (p, [key, value]) =>
         p.then(async (acc) => {
-          if (key === 'context' || key === 'templates') {
+          if (key === 'context' || key === 'templates' || key === 'responsive') {
             return acc
           }
           const res = await enrichWithContext(uri, value, context, templates)

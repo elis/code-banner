@@ -3,6 +3,7 @@ import { useConfig } from './config.service'
 import minimatch from 'minimatch'
 import objectPath from 'object-path'
 import { escapeRegex } from '../utils'
+import mhash from 'imurmurhash'
 
 export const BannersContext = createContext()
 const BannersService = ({ children }) => {
@@ -184,8 +185,11 @@ const BannersService = ({ children }) => {
         []
       )
 
-    // console.log('🧃 CONFs', { nextConfs })
-    setState((v) => ({ ...v, confs: nextConfs }))
+    const unconfs = JSON.stringify(nextConfs, (k, v) => k !== 'context' && v)
+    const hashState = mhash(unconfs)
+    const hashed = hashState.result()
+    if (!hashed || hashed !== state.__hash)
+      setState((v) => ({ ...v, confs: nextConfs, __hash: hashed }))
   }, [active, files, visible])
 
   return (
