@@ -49,7 +49,7 @@ const BannersService = ({ children }) => {
                 : {}),
               file,
               reach: (row.depth || 50) + file.level,
-              _matchingEditors: (visible.length
+              _matchingEditors: (visible?.length
                 ? visible
                 : // Patch in a dummy editor if no editors visible
                   [{ level: 1, relative: '.', dirname: '.' }]

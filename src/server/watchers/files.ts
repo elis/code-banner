@@ -376,7 +376,7 @@ export const importJson = async (uri: vscode.Uri) => {
     const json = JSON.parse(file.toString())
     return json
   } catch (error) {
-    console.error('JSON ERROR', { uri }, { error })
+    // console.error('JSON ERROR', { uri }, { error })
     return { error, uri }
   }
 }
@@ -388,7 +388,7 @@ export const importYaml = async (uri: vscode.Uri) => {
     const yaml = YAML.parse(file.toString())
     return yaml
   } catch (error) {
-    console.error('YAML ERROR', { uri }, { error })
+    // console.error('YAML ERROR', { uri }, { error })
     return { error, uri }
   }
 }
@@ -399,7 +399,7 @@ export const importFile = async (uri: vscode.Uri) => {
     const file = await vscode.workspace.fs.readFile(uri)
     return file.toString()
   } catch (error) {
-    console.error('FILE ERROR', { uri }, { error })
+    // console.error('FILE ERROR', { uri }, { error })
     return ''
   }
 }
@@ -410,7 +410,7 @@ export const includeFile = async (uri: vscode.Uri) => {
     const result = await importPlainFile(uri)
     return result
   } catch (error) {
-    console.error('INCLUDE ERROR', { uri }, { error })
+    // console.error('INCLUDE ERROR', { uri }, { error })
     return { error, uri }
   }
 }

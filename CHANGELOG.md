@@ -32,6 +32,67 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
+# v0.4.3 - 2022-09-21
+
+
+
+## Added
+
+### Added debug console.log on banner shift+click
+
+With the new context and templating capabilities it became quite necessary to access the context and the actual resulting object after template manipulation.
+
+To easily access the banners configuration simply `shift+click` on your banner row, and the open the developer tools in vscode to see the latest console log with the banner details such as context and resulting row items.
+
+
+### Added  `sleep`  command
+
+You can now provide a `sleep` command to your click events.
+
+Example:
+
+```yaml
+explorer:
+	rows:
+	- items:
+		- type: text
+			text: Click me to run installation
+			click:
+			- command:workbench.action.terminal.newWithCwd # open a new terminal
+      - sleep:3000 # sleep for 3 seconds
+      - command:workbench.action.terminal.sendSequence:yarn install\u000D # run `yarn install`
+```
+
+
+### Added Click support for multiple actions
+
+When passing `click` directive to an element in your rows and items, you can now pass an array of strings instead of just a string to invoke commands with sequentially.
+
+Example:
+
+```yaml
+explorer:
+	rows:
+	- items:
+		- type: text
+			text: Click me to run installation
+			click:
+			- command:workbench.action.terminal.newWithCwd # open a new terminal
+      - sleep:3000 # sleep for 3 seconds
+      - command:workbench.action.terminal.sendSequence:yarn install\u000D # run `yarn install`
+```
+
+
+
+## Fixed
+
+### Fixed  [vscode.open](http://vscode.open)  command file URI
+
+
+
+
+
+
 # v0.4.2 - 2022-09-16
 
 ### Fix array values not enriched with context

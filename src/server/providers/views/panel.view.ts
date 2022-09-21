@@ -246,6 +246,17 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
               : args?.[0] || ''
           )
           return { command, args: [uri] }
+        } else if (command === 'vscode.open') {
+          const uri = vscode.Uri.file(
+            workspace
+              ? vscode.Uri.joinPath(
+                  workspace.uri,
+                  callerDirname,
+                  args?.[0] || ''
+                ).fsPath
+              : args?.[0] || ''
+          )
+          return { command, args: [uri] }
         }
 
         return { command, args }
@@ -257,7 +268,44 @@ class PanelViewProvider implements vscode.WebviewViewProvider {
         data.payload.caller,
         data.payload.workspace
       )
-      vscode.commands.executeCommand(command, ...(args || []))
+      
+      // const commands = await vscode.commands.getCommands()
+      if (command === 'workbench.action.terminal.newWithCwd') {
+        vscode.commands
+          .executeCommand(command, {
+            cwd: args?.[0] || '',
+          })
+          .then(() => {
+            respond('success')
+          })
+      } else if (command === 'workbench.action.terminal.sendSequence') {
+        const hexToBytes = (hex: string) => {
+          // eslint-disable-next-line no-var
+          for (var bytes = [], c = 0; c < hex.length; c += 2)
+            bytes.push(parseInt(hex.substr(c, 2), 16))
+          return bytes
+        }
+        const repped =
+          typeof args?.[0] === 'string'
+            ? args[0].replace(/(\\u([0-9a-f]{4}))/gi, (...args) => {
+                return String.fromCharCode(...hexToBytes(args[2]))
+              })
+            : args?.[0]
+            
+        vscode.commands
+          .executeCommand(command, {
+            text: repped || 'echo Not Found\u000D',
+          })
+          .then(() => {
+            respond('success')
+          })
+      } else {
+        vscode.commands
+          .executeCommand(command, ...(args || []))
+          .then(() => {
+            respond('success')
+          })
+      }
     }
 
     // ! get-webview-uri

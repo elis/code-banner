@@ -54,10 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
     //   readyCheck,
     // })
     const allReady = !Object.values(readyCheck).filter((ready) => !ready).length
-    if (
-      !booted &&
-      allReady
-    ) {
+    if (!booted && allReady) {
       const allFiles = responses.reduce((acc, fa) => [...acc, ...fa], [])
       console.log('🌈 PENDING COMPLETE - CHECKS Clear', {
         readyCheck,
@@ -160,36 +157,48 @@ export function activate(context: vscode.ExtensionContext) {
         openFileShowMessages(filePath)
       }
     }
-    // Command palette menus
-    context.subscriptions.push(
-      vscode.commands.registerCommand(
-        'code-banner.generateBasicCBFile',
-        async () => {
-          if (!isWorkspaceOpen()) return null
-          preCreation('basic')
-        }
-      )
-    )
 
-    context.subscriptions.push(
-      vscode.commands.registerCommand(
-        'code-banner.generateAdvancedCBFIle',
-        async () => {
-          if (!isWorkspaceOpen()) return null
-          preCreation('advanced')
-        }
-      )
-    )
+    const registerCommands = async () => {
+      const allVsCommands = await vscode.commands.getCommands()
 
-    context.subscriptions.push(
-      vscode.commands.registerCommand('code-banner.showReadMe', async () => {
-        const readmePath = context.asAbsolutePath('README.md')
-        vscode.commands.executeCommand(
-          'markdown.showPreview',
-          vscode.Uri.file(readmePath)
+      // Command palette menus
+      if (allVsCommands.indexOf('code-banner.generateBasicCBFile') === -1)
+        context.subscriptions.push(
+          vscode.commands.registerCommand(
+            'code-banner.generateBasicCBFile',
+            async () => {
+              if (!isWorkspaceOpen()) return null
+              preCreation('basic')
+            }
+          )
         )
-      })
-    )
+
+      if (allVsCommands.indexOf('code-banner.generateAdvancedCBFIle') === -1)
+        context.subscriptions.push(
+          vscode.commands.registerCommand(
+            'code-banner.generateAdvancedCBFIle',
+            async () => {
+              if (!isWorkspaceOpen()) return null
+              preCreation('advanced')
+            }
+          )
+        )
+
+      if (allVsCommands.indexOf('code-banner.showReadMe') === -1)
+        context.subscriptions.push(
+          vscode.commands.registerCommand(
+            'code-banner.showReadMe',
+            async () => {
+              const readmePath = context.asAbsolutePath('README.md')
+              vscode.commands.executeCommand(
+                'markdown.showPreview',
+                vscode.Uri.file(readmePath)
+              )
+            }
+          )
+        )
+    }
+    registerCommands()
   }
   const handlers = {
     onReady: (files: ParsedFile[]) => {

@@ -62,6 +62,24 @@ const Banner = ({ config, relative, workspace }) => {
     }
   }, [responsive, width, height])
 
+  const clickHandler = (e) => {
+    if (e.shiftKey) {
+      console.group('🔰 Banner Debug')
+      console.log('📄 Config', config)
+      console.log('📡 Context', context)
+      console.log('⛓ Items', items)
+      console.log('🎨 Style', style)
+      console.log('🖥 Responsive', responsive)
+      console.table({
+        relative,
+        workspace,
+        ifResponsive,
+        ifContext,
+      })
+      console.groupEnd()
+    }
+  }
+
   const shouldDisplayResponsive = useMemo(() => {
     const result = resps?.length
       ? ifResponsive
@@ -114,6 +132,7 @@ const Banner = ({ config, relative, workspace }) => {
         style={style}
         data-relative={relative}
         data-workspace={workspace}
+        onClick={clickHandler}
       >
         <BannerErrorBoundary items={items}>
           <ItemsDisplay items={items} responsive={resps} />
