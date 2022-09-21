@@ -240,8 +240,19 @@ export const ingest =
         if (loaded[key]) {
           if (executable && typeof loaded[key] === 'function') {
             const data = await loaded[key](uri, context)
+
+            const sectionContext = await contextify(
+              uri,
+              data.context || {},
+              conf.templates,
+              conf.context
+            )
             Object.assign(conf, {
-              [section]: { ...(conf[section] || {}), ...data },
+              [section]: {
+                ...(conf[section] || {}),
+                ...data,
+                context: { ...conf.context, ...sectionContext },
+              },
             })
           } else if (loaded[key]) {
             // context: holds data
@@ -270,12 +281,15 @@ export const ingest =
             //    - typeof value === 'array': value.map((value) => enrichWithContecxt(value, context))
             //
 
-            const context = await contextify(
-              uri,
-              loaded[key].context || {},
-              loaded[key].templates || {},
-              { ...conf.context, __dirname: path.dirname(uri.fsPath) }
-            )
+            const context = {
+              ...conf.context,
+              ...(await contextify(
+                uri,
+                loaded[key].context || {},
+                loaded[key].templates || {},
+                { ...conf.context, __dirname: path.dirname(uri.fsPath) }
+              )),
+            }
             const templates = {
               ...conf.templates,
               ...(loaded[key].templates || {}),
@@ -289,7 +303,7 @@ export const ingest =
             const result = await enrichWithContext(
               uri,
               loaded[key],
-              context,
+              { ...(loaded[key].context || {}), ...context },
               templates
             )
 
@@ -348,6 +362,7 @@ export const enrichWithContext = async (
   }
   if (typeof data === 'object') {
     const context = {
+      ...parentContext,
       ...(await contextify(uri, data.context || {}, templates, parentContext)),
     }
     const result: Record<string, any> = await Object.entries(data).reduce(
@@ -565,10 +580,13 @@ const withContext = async (
     const args = commandSpreader(str, 'path', 'key?')
     const filePath = composeFilePath(uri, args.path)
     const reqd = await includeFile(filePath)
-    const result = await contextify(uri, reqd, templates, {
+    const result = {
       ...context,
-      __dirname: filePath.fsPath.split('/').slice(0, -1).join('/'),
-    })
+      ...(await contextify(uri, reqd, templates, {
+        ...context,
+        __dirname: filePath.fsPath.split('/').slice(0, -1).join('/'),
+      })),
+    }
 
     const coalesce = args.key?.split(',').length > 1
 
@@ -675,7 +693,7 @@ export const contextify = async (
   const result: Record<string, any> = await Object.keys(context).reduce(
     async (p, key) =>
       p.then(async (acc) => {
-        const value = context[key]
+        const value: any = context[key]
 
         if (Array.isArray(value)) {
           return {
@@ -725,7 +743,7 @@ export const contextify = async (
           })
           return {
             ...acc,
-            [key]: res,
+            [key]: { ...selfContext, ...res },
           }
         }
 
@@ -737,7 +755,7 @@ export const contextify = async (
     Promise.resolve({})
   )
 
-  return { ...selfContext, ...result }
+  return { ...result }
 }
 
 export const importPlainFile = async (uri: vscode.Uri) => {

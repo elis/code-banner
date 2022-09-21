@@ -32,6 +32,13 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
+# v0.4.5 - 2022-09-21
+
+## Fixed
+
+### Fix context leak to child-objects
+
+
 # v0.4.4 - 2022-09-21
 
 ## Fixed
