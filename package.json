@@ -135,6 +135,7 @@
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.26",
+    "ahooks": "^3.7.1",
     "axios": "^0.27.2",
     "class-names": "^1.0.0",
     "concurrently": "^6.3.0",

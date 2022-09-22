@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useBanner } from '.'
 import { useComms } from '../services/comms.services'
+import { useDebounce } from 'ahooks'
 
 const useItemHandlers = (item) => {
   const comms = useComms()
@@ -8,6 +9,7 @@ const useItemHandlers = (item) => {
 
   const [classes, setClasses] = useState({})
   const [styles, setStyles] = useState(item.style || {})
+  const debouncedStyles = useDebounce(styles, { wait: 100 })
 
   useEffect(() => {
     if (item.classes) {
@@ -104,6 +106,7 @@ const useItemHandlers = (item) => {
       setStyles((v) => ({ ...v, ...item.hoverStyle }))
     }
   }, [item.hoverStyle])
+
   const onMouseLeave = useCallback(() => {
     if (item.style && item.hoverStyle) {
       setStyles(item.style)
@@ -138,7 +141,7 @@ const useItemHandlers = (item) => {
   }, [item.activeStyle, classes.active])
 
   const handlers = {
-    style: styles,
+    style: debouncedStyles,
     ...(item.click ? { onClick } : {}),
     ...(item.hoverStyle
       ? {

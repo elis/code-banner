@@ -32,6 +32,13 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
+# v0.4.7 - 2022-09-22
+
+## Fixed
+
+### Fix styles causing performance issues
+
+
 # v0.4.6 - 2022-09-22
 
 ## Fixed
