@@ -296,6 +296,7 @@ export const ingest =
                 sectionTemplates,
                 { ...conf.context, __dirname: path.dirname(uri.fsPath) }
               )),
+              __dirname: path.dirname(uri.fsPath)
             }
             const templates = {
               ...conf.templates,
