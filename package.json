@@ -1,7 +1,7 @@
 {
   "name": "code-banner",
   "description": "Upgrade your project in VSCode and make it pop!",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "publisher": "EliSklar",
   "enableProposedApi": false,
   "displayName": "Code Banner",
