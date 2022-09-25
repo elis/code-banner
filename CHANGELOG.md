@@ -32,6 +32,13 @@ Changelog entries are classified using the following labels _(from [keep-a-chang
 
 </details>
 
+# v0.4.9 - 2022-09-25
+
+## Added
+
+### Added support for `contextify` to interpolate external strings with context
+
+
 # v0.4.8 - 2022-09-22
 
 

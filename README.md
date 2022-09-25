@@ -1132,6 +1132,49 @@ explorer:
         items: each:packages:packagesItem
 ```
 
+#### Contextify
+
+Load a value from the context and enrich it with context.
+
+Useful in cases where you have an external string/object (such as from package.json) and you'd want to interpolate it with context values.
+
+##### Directive
+
+  - `contextify:key|context?`
+
+##### Arguments
+
+- `key` : `string`
+
+  Key to access in the context object (dot notation) - see object-path link: https://www.npmjs.com/package/object-path
+
+  If key is provided with commas (`,`) it will be split and the value will be used as a cloascing request to `object-path`.
+
+- `context` : `object` - optional
+  
+    Context to use for interpolation. If not provided, the entire context will be used.
+
+##### Example
+  
+
+```json
+// package.json
+{
+  "name": "my-package",
+  "version": "1.0.0",
+  "PORT": 3000,
+  "open_url": "http://localhost:${PORT}",
+  "description": "My package description"
+}
+```
+
+  ```yaml
+  context:
+    myJson: json:data.json # { name: 'my-package', version: '1.0.0', PORT: 3000, open_url: 'http://localhost:${PORT}', description: 'My package description' }
+    port: context:myJson.PORT # 3000
+    contextified: contextify:myJson.open_url|myJson # results in: "http://localhost:3000"
+  ```
+
 #### Default Context
 
 ##### `__dirname`

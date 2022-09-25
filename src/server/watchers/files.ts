@@ -650,6 +650,25 @@ const withContext = async (
     }
 
     return []
+  } else if (type === 'contextify') {
+    const args = commandSpreader(str, 'name', 'context?')
+
+    const coalesce = args.name.split(',').length > 1
+    const result = objectPath[coalesce ? 'coalesce' : 'get'](
+      context,
+      coalesce ? args.name.split(',') : args.name,
+      args.default
+    )
+
+    const coalesceContext = args.context?.split(',').length > 1
+    const resultContext = args.context ? objectPath[coalesceContext ? 'coalesce' : 'get'](
+      context,
+      coalesce ? args.context.split(',') : args.context
+    ) : context
+
+    const contextified = await enrichWithContext(uri, result, resultContext, templates)
+
+    return contextified
   } else if (type === 'context') {
     const args = commandSpreader(str, 'name', 'default?')
 

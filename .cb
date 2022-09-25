@@ -77,18 +77,19 @@ templates:
                 style:
                   transition: all 60ms ease-in-out
                 text: "by: $(package.author.name, name)"
-          - type: container
-            style:
-              height: 3px
-              border: none
-            items:
-            - type: text
-              text: ""
+          # - type: container
+          #   style:
+          #     height: 3px
+          #     border: none
+          #   items:
+          #   - type: text
+          #     text: " "
           - type: container
             style:
               display: flex
               flexDirection: row
               columnGap: 8px
+              margin-top: 3px
             items:
               - type: text
                 style:
